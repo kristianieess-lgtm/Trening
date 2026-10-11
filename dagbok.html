@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Treningsdagbok</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d2320;--mut:#6b746f;--line:#e2ddd2;--acc:#2f6f4f;--acc2:#b9811a;--bad:#b3402f;--ok:#2f6f4f}
+@media(prefers-color-scheme:dark){:root{--bg:#141816;--card:#1d2320;--ink:#ecefe9;--mut:#9aa59e;--line:#2c3631;--acc:#5fb585;--acc2:#e8b54a;--bad:#e07a68;--ok:#5fb585}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif}
+header{padding:16px 16px 8px;max-width:760px;margin:auto}
+h1{font-size:20px;margin:0}
+.sub{color:var(--mut);font-size:13px}
+nav{position:sticky;top:0;background:var(--bg);display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--line);overflow-x:auto;z-index:5;max-width:760px;margin:auto}
+nav button{flex:1;min-width:max-content;border:0;background:none;color:var(--mut);padding:8px 10px;border-radius:8px;font-size:15px;cursor:pointer}
+nav button.on{background:var(--acc);color:#fff}
+main{max-width:760px;margin:auto;padding:12px 16px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 12px}
+.card h2{font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1;min-width:70px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:2px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:60px}
+button.b{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;cursor:pointer}
+button.g{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+.big{font-size:26px;font-weight:700;line-height:1.2}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;background:var(--line);font-size:12px;color:var(--mut)}
+.pill.a{background:var(--acc);color:#fff}
+.chk{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border:0}
+.chk input{width:22px;height:22px;flex:none}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc)}
+.dayrow{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.dayrow.today{font-weight:700}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--line);margin-right:6px}
+.dot.done{background:var(--ok)}
+.note{border:1px dashed var(--acc2);padding:8px 10px;border-radius:8px;color:var(--mut);font-size:13px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+svg{width:100%;height:auto}
+.hide{display:none}
+.x{color:var(--bad);cursor:pointer;border:0;background:none;font-size:18px}
+.ex{padding:8px 0;border-bottom:1px solid var(--line)}
+.ex:last-child{border:0}
+.ex .nm{font-weight:600}
+.sm{font-size:13px}
+.hl{background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.chip{display:inline-block;margin:2px 4px 2px 0;padding:6px 10px;border:1px solid var(--line);border-radius:99px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Treningsdagbok</h1>
+  <div class="sub" id="topline"></div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+
+<script>
+/* =======================================================================
+   1. PROGRAM – 28 uker + løpsdag. 11.10.2026 → Madrid halvmaraton søndag 25.04.2027
+      Kilder: trening/forskning/01–04. Tall er estimater og kan justeres.
+   ======================================================================= */
+const START='2026-10-11', RACE='2027-04-25', WEEKS=29; // løpet er søndag i uke 29
+
+const PHASES=[
+  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'3 styrkeøkter + 1 gå/løp. Daglig gange. Bygg vane, ikke form.'},
+  {id:2,from:9, to:20,name:'Bygg',          days:5, text:'2 styrke + 3 kondisjon (kvalitet, rolig, langtur). Bonus: lett styrke C.'},
+  {id:3,from:21,to:25,name:'Topp',          days:5, text:'Lengste langturer, mål-tempo på slutten av langtur.'},
+  {id:4,from:26,to:28,name:'Taper',         days:5, text:'Volum ned (–25 / –40 / –60 %), behold litt intensitet.'},
+  {id:5,from:29,to:29,name:'Løpsdag',days:0,text:'Madrid, søndag 25. april.'}
+];
+const phaseOf=w=>PHASES.find(p=>w>=p.from&&w<=p.to)||(w<1?{id:0,name:'Før start',days:0,text:''}:{id:6,name:'Etter løpet',days:0,text:'Fortsett: 3 styrke + 2 kondisjon. Sikt mot 78–80 kg.'});
+
+const EX={ // [øvelse, sett×reps]
+ A:[['Knebøy / goblet / beinpress','3×5–8'],['Benkpress / manualpress','3×6–10'],['Roing (manual/kabel)','3×8–10'],['Enbens-RDL / markløft','2×8'],['Face pull','2×12–15'],['Plank / bærertur','2×30–45 s']],
+ B:[['Rumensk markløft','3×6–8'],['Skulderpress','3×6–10'],['Nedtrekk / pull-ups','3×6–10'],['Bulgarsk split squat','2×8–10'],['Hamstring curl','2×8–12'],['Tåhev (kalv)','2×12–15']],
+ C:[['Utfall / step-up','3×10–12'],['Skrå manualpress','3×10–12'],['Kabelroing','3×10–12'],['Hip thrust','2×10–12'],['Sidehev','2×12–15'],['Biceps / triceps supersett','2×12–15'],['Dead bug / pallof','2×10–12']],
+ R1:[['Goblet-knebøy eller bulgarsk split squat','3×10–15'],['Push-ups (føttene hevet)','3× nær failure'],['Enarms manualroing / TRX-roing','3×10–12'],['Enbens-RDL','2×10'],['Plank','2×45 s']],
+ R2:[['Utfall med manualer','3×12'],['Skulderpress manualer','3×10–12'],['Pull-ups / strikk-nedtrekk','3×8–12'],['Enbens hip thrust','2×12'],['Sidehev','2×15']],
+ MIN:[['Goblet-knebøy / kroppsvekt','2×12'],['Push-ups','2× maks –2'],['Roing med strikk / TRX','2×12']]
+};
+const SESS={
+ A:{t:'Styrke A',  sub:'Ben-fokus, full kropp',      min:50},
+ B:{t:'Styrke B',  sub:'Hengsel og øvre kropp',      min:50},
+ C:{t:'Styrke C',  sub:'Hypertrofi, flere reps',     min:45},
+ R1:{t:'Reiseøkt R1',sub:'Hotellgym / kroppsvekt',    min:30},
+ R2:{t:'Reiseøkt R2',sub:'Hotellgym / kroppsvekt',    min:30},
+ MIN:{t:'Minimumsøkt',sub:'Teller som seier',         min:15}
+};
+const STRENGTH_RULE='RIR 1–3 (stopp 1–3 reps før failure). Dobbel progresjon: når alle sett treffer øvre rep-grense, øk 2,5 kg. Hvile 2–3 min på tunge løft.';
+
+// Gå/løp uke 1–8 (tirsdagsøkt)
+const RUN1={1:'7 × (1 min løp / 2 min gå) ≈ 21 min',2:'8 × (1 min løp / 2 min gå) ≈ 24 min',3:'7 × (2 min løp / 2 min gå) ≈ 28 min',
+ 4:'5 × (2 / 2) ≈ 20 min – nedlast',5:'7 × (3 min løp / 1 min gå) ≈ 28 min',6:'6 × (4 / 1) ≈ 30 min',7:'5 × (6 / 1) ≈ 35 min',
+ 8:'25 min rolig jogg, gåpauser ved behov – nedlast'};
+// Uke 9–28: [rolig min, kvalitetsøkt, langtur min, langtur-merknad]
+const RUN2={
+ 9:[35,'Fartslek: 6 × 1 min litt raskere / 2 min rolig (~35 min)',60,''],
+ 10:[35,'Fartslek: 7 × 1 min / 2 min rolig',65,''],
+ 11:[40,'Fartslek: 8 × 1 min / 2 min rolig',70,''],
+ 12:[30,'Fartslek: 5 × 1 min – nedlast',50,'Nedlast'],
+ 13:[40,'Tempo: 2 × 10 min RPE 6–7, 3 min pause',75,''],
+ 14:[40,'Tempo: 2 × 10 min RPE 6–7',80,''],
+ 15:[40,'Tempo: 3 × 8 min RPE 6–7',90,''],
+ 16:[35,'Tempo: 2 × 8 min – nedlast',65,'Nedlast'],
+ 17:[40,'Tempo: 3 × 10 min RPE 6–7',90,''],
+ 18:[40,'TEST: 5 km på tid, så godt du kan (varm opp 10 min)',95,''],
+ 19:[45,'Tempo: 5 × 5 min, 2 min pause',105,''],
+ 20:[35,'Tempo: 3 × 8 min – nedlast',75,'Nedlast'],
+ 21:[45,'Tempo: 3 × 10 min',110,''],
+ 22:[45,'Tempo: 2 × 15 min',120,'Siste 20 min i mål-tempo (6:40–7:00)'],
+ 23:[45,'Tempo: 3 × 10 min',130,'Siste 20–30 min i mål-tempo – øv geler/drikke'],
+ 24:[35,'Tempo: 2 × 10 min – nedlast',90,'Nedlast'],
+ 25:[40,'Tempo: 3 × 8 min',120,'Siste 30 min i mål-tempo'],
+ 26:[35,'Tempo: 2 × 8 min (taper –25 %)',90,'Taper'],
+ 27:[30,'Tempo: 4 × 4 min (taper –40 %)',70,'Taper']
+};
+const W28={ // uke 28 (18.–24.4.), løpet er søndag 25.4. (index = ukedag, 0=søn)
+ 0:{k:'rolig',t:'Rolig jogg',min:40,d:'40 min rolig. Ingenting nytt.'},
+ 1:{k:'kval',t:'Lett kvalitet',min:30,d:'25 min rolig + 4 × 1 min i løpstempo. Kort og lett.'},
+ 2:{k:'styrke',t:'Lett styrke',min:30,d:'Styrke A, halv volum (2 sett), ingen failure.',s:'A'},
+ 3:{k:'gange',t:'Gange / mobilitet',min:20,d:'20–30 min gange.'},
+ 4:{k:'rolig',t:'Rolig + stigningsløp',min:20,d:'20 min rolig + 3 × 20 s stigningsløp.'},
+ 5:{k:'hvile',t:'Hvile / reise til Madrid',min:0,d:'Reisedag: gå litt, drikk vann, normal mat. Pakk løpsutstyr i håndbagasjen.'},
+ 6:{k:'rolig',t:'Shake-out + startnummer',min:15,d:'15 min veldig rolig + 3 × 20 s stigningsløp. Hent startnummer. Karbo-rik middag, tidlig kveld. Ingenting nytt.'}
+};
+const RACEDAY={k:'lang',t:'HALVMARATON MADRID 🏁',min:150,d:'Start rolig de første 3 km. 30–60 g karbo/time, drikk etter tørst. Nyt det. Mål 2:15–2:30.'};
+const GANGE={k:'gange',t:'Gange / aktiv hvile',min:25,d:'20–30 min rask gange. Valgfritt, men bra for restitusjon og hodet.'};
+const HVILE={k:'hvile',t:'Hvile',min:0,d:'Hvil. Sov godt.'};
+
+function planFor(k){
+  const w=weekNo(k),dw=dow(k),ph=phaseOf(w);
+  if(w<1||w>WEEKS) return {k:'fri',t:'Fri',min:0,d:'',w,ph};
+  let p;
+  if(w===29) p=dw===0?RACEDAY:{k:'hvile',t:'Restitusjon',min:0,d:'Gå, spis, sov. Ta stolt en pause før neste fase.'};
+  else if(w===28) p=W28[dw];
+  else if(ph.id===1){
+    p=({0:{k:'styrke',s:'A'},2:{k:'løp',t:'Gå/løp',min:30,d:RUN1[w]},4:{k:'styrke',s:'B'},6:{k:'styrke',s:'C'}})[dw]||GANGE;
+  } else {
+    const r=RUN2[w];
+    p=({
+      0:{k:'lang',t:'Langtur',min:r[2],d:`${r[2]} min rolig (RPE 3–4, kan snakke). ${r[3]}`.trim()},
+      1:{k:'kval',t:'Kvalitetsløp',min:50,d:r[1]},
+      2:{k:'styrke',s:'A'},
+      4:{k:'rolig',t:'Rolig løp / alternativ',min:r[0],d:`${r[0]} min rolig løp, ELLER sykkel/romaskin hvis kroppen er sliten.`},
+      5:{k:'styrke',s:'B'},
+      6:{k:'bonus',t:'Bonus: Styrke C-lett eller gange',min:25,d:'Valgfri. 25 min C-lett (2 sett per øvelse) eller gange. Hopp over uten dårlig samvittighet.',s:'C',opt:true}
+    })[dw]||HVILE;
+  }
+  p=Object.assign({},p);
+  if(p.s){const s=SESS[p.s];p.t=p.t||s.t;p.min=p.min||s.min;p.d=p.d||s.sub}
+  if(p.k==='styrke'){
+    if(w<=2) p.d+=' · Uke 1–2: bare 2 sett per øvelse, 3–4 reps igjen i tanken. Bygg vane.';
+    else if(w>=26&&w<28) p.d+=' · Taper: ~60 % av volumet, samme tyngde.';
+  }
+  p.w=w;p.ph=ph;return p;
+}
+
+/* Kostholdsfaser: underskudd uke 1–16, vedlikehold deretter */
+const DEFICIT_TO=16;
+function energy(k,plan){
+  const w=weekNo(k),def=w<=DEFICIT_TO;
+  let lo=def?2300:2700, hi=def?2500:3000;
+  if(plan&&plan.k==='lang'){lo+=300;hi+=300}
+  return {lo,hi,def};
+}
+function carbKg(plan){
+  const k=plan&&plan.k;
+  if(k==='lang') return [5,7];
+  if(k==='løp'||k==='rolig'||k==='kval') return [4,5];
+  return [3,4];
+}
+const SUPPS=[
+ ['Kreatin monohydrat 3–5 g','hver dag'],
+ ['Vitamin D 10–20 µg (okt–mars)','hver dag'],
+ ['Omega-3 250–500 mg EPA+DHA','siden du spiser lite fisk']
+];
+const RULES=[
+ 'Protein (30–40 g) til hvert hovedmåltid',
+ 'Grønnsaker/frukt/bær til minst to måltider',
+ 'Vann hele dagen – minst 2 liter',
+ 'Alkohol: ingen eller maks 1–2 enheter',
+ 'Ingen «kaloridrikker» (saft, juice, brus)',
+ 'Sov 7–9 timer (leggetid planlagt)'
+];
+const TRAVEL_RULES=[
+ 'Hotellfrokost: protein først (egg, skyr, ost, kalkun), så havre/grovbrød/frukt. Hopp over wienerbrød og juice.',
+ 'Restaurant: én proteinrett + grønnsaker + en håndfull poteter/ris/pasta. Saus ved siden av. Én ting «på tilbud»: brød, dessert ELLER alkohol.',
+ 'Flyplass: ta med pulver, nøtter, skyr eller proteinbar. Kjøp egg, yoghurt, frukt, kyllingwrap.',
+ '80/20: En dårlig middag betyr ingenting – mønsteret over uker teller.'
+];
+const MEALS={
+ 'Frokost':[
+  ['Havregrøt med skyr, bær og nøtter',35],['Eggerøre (3 egg), 2 skiver grovbrød, ost/skinke, agurk',35],
+  ['Skyr 250 g + müsli/havre + banan + valnøtter',32],['Proteinsmoothie: melk, skyr, myse, banan, bær',40]],
+ 'Lunsj':[
+  ['Kyllingsalat/wrap: kylling, spinat, agurk, paprika, hummus',40],['Linse-/bønnesuppe med kylling og grovbrød',35],
+  ['Cottage cheese, knekkebrød, egg, grønnsaker',35],['Rester fra middag',35]],
+ 'Middag':[
+  ['Kylling i ovn, søtpotet, brokkoli',45],['Kjøttdeig-gryte (5 %): løk, gulrot, paprika, linser, ris/pasta – uten tomat',40],
+  ['Biff/svinefilet, poteter, grønne bønner',45],['Omelett: egg, skinke, sopp, spinat + brød',35],
+  ['Tofu/tempeh-wok: brokkoli, paprika, ris',35],['Kalkun/kylling-pasta: spinat, sopp, parmesan',45]],
+ 'Mellommåltid':[
+  ['Skyr + bær',22],['Cottage cheese + frukt',17],['Proteinshake',22],['2 kokte egg + nøtter',18],['Kalkunpålegg + knekkebrød',15]]
+};
+const FOODS=[['Egg (2 stk)',12],['Skyr naturell (200 g)',22],['Cottage cheese (150 g)',17],['Kyllingfilet (150 g)',35],
+ ['Kjøttdeig 5 % (150 g)',30],['Biff/svin (150 g)',32],['Gresk yoghurt (200 g)',18],['Linser kokt (150 g)',13],
+ ['Kikerter (150 g)',11],['Tofu (150 g)',18],['Myseprotein (1 scoop)',22],['Melk (2 dl)',7],['Brød (2 skiver)',8],
+ ['Havregryn (50 g)',6],['Nøtter (30 g)',6]];
+
+/* =======================================================================
+   2. TILSTAND
+   ======================================================================= */
+const KEY='treningsdagbok.v1';
+let S=load();
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&r.days){r.weeks=r.weeks||{};r.customFoods=r.customFoods||[];r.profile=Object.assign({height:175,startWeight:90,goalLow:80,goalHigh:83,start:START,race:RACE},r.profile);return r}}catch(e){}
+  return {profile:{height:175,startWeight:90,goalLow:80,goalHigh:83,start:START,race:RACE},days:{},weeks:{},customFoods:[]};
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('Kunne ikke lagre i nettleseren – bruk Eksporter under Data.')}}
+const two=n=>String(n).padStart(2,'0');
+const D=(d=new Date())=>d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate());
+const parse=k=>new Date(k+'T00:00:00Z');
+const dow=k=>parse(k).getUTCDay();
+const addDays=(k,n)=>{const d=parse(k);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const day=k=>S.days[k]||(S.days[k]={});
+const $=s=>document.querySelector(s);
+const NO=['søn','man','tir','ons','tor','fre','lør'];
+const fmt=k=>k.slice(8)+'.'+k.slice(5,7);
+let tab='idag',cur=D();
+
+/* =======================================================================
+   3. HJELPERE
+   ======================================================================= */
+function weekNo(k){return Math.floor((parse(k)-parse(S.profile.start))/6048e5)+1}
+function daysTo(k){return Math.round((parse(k)-parse(D()))/864e5)}
+function weights(){return Object.entries(S.days).filter(([k,v])=>v.weight).map(([k,v])=>[k,+v.weight]).sort()}
+function trend(){const w=weights();return w.map(([k])=>{const s=w.filter(([k2])=>k2<=k&&(parse(k)-parse(k2))/864e5<7);return [k,s.reduce((a,b)=>a+b[1],0)/s.length]})}
+function refWeight(){const t=trend();return t.length?t[t.length-1][1]:+S.profile.startWeight}
+function protein(k){return ((S.days[k]||{}).meals||[]).reduce((a,m)=>a+(+m.p||0),0)}
+function proteinTarget(){return Math.round(refWeight()*1.8/5)*5}
+function allFoods(){return FOODS.concat(S.customFoods||[])}
+function weekDays(k){const s=addDays(k,-dow(k));return [...Array(7)].map((_,i)=>addDays(s,i))}
+function restRun(k){let n=0,d=k;for(;n<7;){d=addDays(d,-1);if((S.days[d]||{}).done)break;n++}return n}
+function set(f,v,sub){const d=day(cur);if(sub){d[sub]=d[sub]||{};d[sub][f]=v}else d[f]=v;save()}
+function travelSess(k,p){return (weekDays(k).indexOf(k)%2===0)?'R1':'R2'}
+function effPlan(k){ // tar hensyn til reisedag
+  const p=planFor(k),d=S.days[k]||{};
+  if(d.travel&&(p.k==='styrke'||p.k==='bonus')) return Object.assign({},p,{s:travelSess(k,p),t:SESS[travelSess(k,p)].t,d:'Reisedag: '+SESS[travelSess(k,p)].sub,min:30});
+  if(d.travel&&(p.k==='løp'||p.k==='rolig'||p.k==='kval'||p.k==='lang')) return Object.assign({},p,{t:p.t+' (reise)',d:'Reisedag: 20–30 min jogg/gange på tid, etter følelse. Teller som gjennomført.',min:25});
+  return p;
+}
+
+/* =======================================================================
+   4. VISNINGER
+   ======================================================================= */
+const TABS=[['idag','I dag'],['uke','Uke'],['trening','Trening'],['mat','Kosthold'],['fremgang','Fremgang'],['plan','Plan'],['data','Data']];
+function navR(){$('#nav').innerHTML=TABS.map(([k,l])=>`<button class="${tab==k?'on':''}" onclick="go('${k}')">${l}</button>`).join('')}
+function go(t){tab=t;render();window.scrollTo(0,0)}
+function render(){
+  navR();
+  const w=weekNo(D()),r=daysTo(S.profile.race),ph=phaseOf(w);
+  $('#topline').textContent=`Uke ${Math.min(Math.max(w,0),WEEKS)} av ${WEEKS} · ${ph.name} · ${r>0?r+' dager til halvmaraton':r===0?'LØPSDAG':'løpet er gjennomført'}`;
+  $('#view').innerHTML=({idag:vIdag,uke:vUke,trening:vTrening,mat:vMat,fremgang:vFremgang,plan:vPlan,data:vData})[tab]();
+  if(tab=='fremgang')drawChart();
+}
+function dateBar(){return `<div class="row" style="margin-bottom:10px"><button class="g" style="flex:0" onclick="shift(-1)">‹</button>
+  <input type="date" value="${cur}" onchange="cur=this.value;render()"><button class="g" style="flex:0" onclick="shift(1)">›</button></div>`}
+function shift(n){cur=addDays(cur,n);render()}
+function exList(key){return (EX[key]||[]).map(([n,s])=>`<div class="sm">• ${n} <span class="pill">${s}</span></div>`).join('')}
+
+function vIdag(){
+  const d=day(cur),p=effPlan(cur),ph=p.ph||phaseOf(weekNo(cur));
+  const pt=proteinTarget(),pr=protein(cur),rules=d.rules||{};
+  const ruleN=RULES.filter((_,i)=>rules[i]).length,gap=restRun(cur);
+  const en=energy(cur,p),cb=carbKg(p),kg=refWeight();
+  const bfWeeks=[1,13,26].includes(weekNo(cur));
+  return dateBar()+`
+  <div class="card"><h2>Dagens økt · uke ${p.w} · ${ph.name}</h2>
+    <div class="big">${p.t||'Fri'}</div>
+    <div class="sub">${p.min?p.min+' min · ':''}${NO[dow(cur)]} ${fmt(cur)} ${p.opt?'· <span class="pill">valgfri</span>':''}</div>
+    <div style="margin:8px 0">${p.d||''}</div>
+    ${p.s?`<div>${exList(p.s)}</div><div class="sub" style="margin-top:6px">${STRENGTH_RULE}</div>`:''}
+    <label class="chk"><input type="checkbox" ${d.done?'checked':''} onchange="set('done',this.checked);render()"><span>Gjennomført</span></label>
+    <label class="chk"><input type="checkbox" ${d.minimum?'checked':''} onchange="set('minimum',this.checked);if(this.checked)set('done',true);render()"><span>Tok bare minimumsøkta (15 min) <span class="pill a">teller som seier</span></span></label>
+    <label class="chk"><input type="checkbox" ${d.travel?'checked':''} onchange="set('travel',this.checked);render()"><span>Reisedag (hotell/lite tid)</span></label>
+    ${d.minimum||(gap>=2&&!d.done)?`<div class="card" style="margin-top:8px;margin-bottom:0"><h2>${SESS.MIN.t}</h2>${exList('MIN')}</div>`:''}
+    ${gap>=2&&!d.done?`<div class="sub" style="color:var(--bad);margin-top:6px">Regelen: aldri to dager på rad uten bevegelse. Ta minimumsøkta nå.</div>`:''}
+  </div>
+  <div class="card"><h2>Rask innlogging (under 1 min)</h2>
+    <div class="row">
+      <div><label>Vekt (kg)</label><input type="number" step="0.1" inputmode="decimal" value="${d.weight||''}" onchange="set('weight',this.value)"></div>
+      <div><label>Form (1–5)</label><select onchange="set('readiness',this.value)">${['',1,2,3,4,5].map(x=>`<option ${d.readiness==x?'selected':''}>${x}</option>`).join('')}</select></div>
+      <div><label>Søvn (t)</label><input type="number" step="0.5" inputmode="decimal" value="${d.sleep||''}" onchange="set('sleep',this.value)"></div>
+      <div><label>Økt-RPE (1–10)</label><input type="number" min="1" max="10" value="${d.rpe||''}" onchange="set('rpe',this.value)"></div>
+    </div></div>
+  <div class="card"><h2>Kosthold i dag</h2>
+    <div class="row"><div class="big">${pr} / ${pt} g</div><div class="sub" style="flex:2">protein · ${en.lo}–${en.hi} kcal · karbo ${Math.round(kg*cb[0])}–${Math.round(kg*cb[1])} g</div></div>
+    <div class="bar"><i style="width:${Math.min(100,pr/pt*100)}%"></i></div>
+    <div class="sub" style="margin-top:6px">Regler: ${ruleN}/${RULES.length} ✓ · Tilskudd: ${SUPPS.filter((_,i)=>(d.supp||{})[i]).length}/${SUPPS.length}</div>
+    <button class="g" style="margin-top:8px" onclick="go('mat')">Åpne kosthold</button></div>
+  ${bfWeeks?`<div class="note">Uke ${weekNo(cur)}: tid for kroppsfettmåling (BIA/DEXA). Logg under Fremgang.</div>`:''}
+  ${weekNo(cur)===18?`<div class="note">Uke 18: 5 km-test i løpet av uka. Logg tid under Trening → Løp/kondisjon.</div>`:''}`;
+}
+
+function vUke(){
+  const ds=weekDays(cur),w=weekNo(cur),ph=phaseOf(w);
+  const plan=ds.map(k=>({k,p:effPlan(k)}));
+  const planned=plan.filter(x=>['styrke','løp','rolig','kval','lang'].includes(x.p.k)).length;
+  const done=ds.filter(k=>(S.days[k]||{}).done).length;
+  const wk=S.weeks[w]||{};
+  return dateBar()+`<div class="card"><h2>Uke ${w} · ${ph.name} · ${done} gjennomført (plan ${planned})</h2>`+
+  plan.map(({k,p})=>{const x=S.days[k]||{};
+    return `<div class="dayrow ${k==D()?'today':''}" onclick="cur='${k}';go('idag')">
+      <span><span class="dot ${x.done?'done':''}"></span>${NO[dow(k)]} ${fmt(k)}</span>
+      <span style="text-align:right">${p.t||'Fri'}${x.minimum?' · min':''}${p.opt?' · valgfri':''}</span></div>`}).join('')+`</div>
+  <div class="card"><h2>Ukegjennomgang (5 min)</h2>
+    <div class="sub">Snittvekt denne uka: <b>${avgWeight(ds)}</b> · Midjemål: <b>${lastWaist(ds)}</b></div>
+    <label style="margin-top:8px">Hva gikk bra? Hva justerer jeg neste uke?</label>
+    <textarea onchange="S.weeks[${w}]=Object.assign(S.weeks[${w}]||{},{note:this.value});save()">${wk.note||''}</textarea>
+    <div class="sub" style="margin-top:6px">Sjekk: Snitt flatt >2–3 uker i underskuddsfasen → trekk 100–150 kcal. Faller >0,8 %/uke → legg til mat.</div></div>
+  <div class="card"><h2>Minimumsøkt</h2>${exList('MIN')}<div class="sub" style="margin-top:6px">ELLER 20 min rask gange. Teller som gjennomført.</div></div>`;
+}
+function avgWeight(ds){const v=ds.map(k=>+(S.days[k]||{}).weight).filter(Boolean);return v.length?(v.reduce((a,b)=>a+b)/v.length).toFixed(1)+' kg':'–'}
+function lastWaist(ds){const v=ds.map(k=>(S.days[k]||{}).waist).filter(Boolean);return v.length?v[v.length-1]+' cm':'–'}
+
+function vTrening(){
+  const d=day(cur),p=effPlan(cur),sets=d.sets||[];
+  const last={};
+  Object.entries(S.days).filter(([k,v])=>v.sets&&k<cur).sort().forEach(([k,v])=>v.sets.forEach(s=>{last[s.ex]=`${s.w} kg × ${s.r}`}));
+  const exs=p.s?EX[p.s]:[];
+  return dateBar()+`
+  <div class="card"><h2>${p.t||'Økt'} ${p.min?'· '+p.min+' min':''}</h2>
+    <div class="sub">${p.d||''}</div>
+    <div class="row" style="margin-top:8px">
+      <div><label>Varighet (min)</label><input type="number" value="${d.minutes||''}" onchange="set('minutes',this.value)"></div>
+      <div><label>RPE (1–10)</label><input type="number" min="1" max="10" value="${d.rpe||''}" onchange="set('rpe',this.value)"></div>
+    </div></div>
+  ${exs.length?`<div class="card"><h2>Øvelser · ${STRENGTH_RULE.split('.')[0]}</h2>${exs.map(([n,sc],i)=>`
+    <div class="ex"><div class="nm">${n} <span class="pill">${sc}</span></div>
+      <div class="sub">Sist: ${last[n]||'–'}</div>
+      <div class="row" style="margin-top:4px"><input id="w${i}" type="number" step="0.5" inputmode="decimal" placeholder="kg"><input id="r${i}" type="number" inputmode="numeric" placeholder="reps">
+      <button class="b" style="flex:0" onclick="addSet(${i})">+ sett</button></div></div>`).join('')}</div>`:''}
+  <div class="card"><h2>Loggede sett</h2>
+    <table><tr><th>Øvelse</th><th>Kg</th><th>Reps</th><th></th></tr>
+    ${sets.map((s,i)=>`<tr><td>${s.ex}</td><td>${s.w}</td><td>${s.r}</td><td><button class="x" onclick="delSet(${i})">×</button></td></tr>`).join('')||'<tr><td colspan="4" class="sub">Ingen sett ennå</td></tr>'}</table>
+    <div class="row" style="margin-top:10px"><div style="flex:2"><label>Annen øvelse</label><input id="ex" placeholder="Navn"></div>
+      <div><label>Kg</label><input id="w" type="number" step="0.5" inputmode="decimal"></div><div><label>Reps</label><input id="r" type="number" inputmode="numeric"></div>
+      <button class="b" style="flex:0" onclick="addSet()">+</button></div></div>
+  <div class="card"><h2>Løp / kondisjon</h2>
+    <div class="row">
+      <div><label>Distanse (km)</label><input type="number" step="0.1" value="${(d.run||{}).km||''}" onchange="set('km',this.value,'run')"></div>
+      <div><label>Tid (min)</label><input type="number" value="${(d.run||{}).min||''}" onchange="set('min',this.value,'run')"></div>
+      <div><label>Snittpuls</label><input type="number" value="${(d.run||{}).hr||''}" onchange="set('hr',this.value,'run')"></div>
+    </div></div>
+  <div class="card"><h2>Notat</h2><textarea onchange="set('note',this.value)">${d.note||''}</textarea></div>`;
+}
+function addSet(i){
+  const d=day(cur),exs=effPlan(cur).s?EX[effPlan(cur).s]:[];
+  let ex,w,r;
+  if(i===undefined){ex=$('#ex').value.trim();w=$('#w').value;r=$('#r').value}
+  else{ex=exs[i][0];w=$('#w'+i).value;r=$('#r'+i).value}
+  if(!ex||!r)return;
+  (d.sets=d.sets||[]).push({ex,w:w||0,r});save();render();
+}
+function delSet(i){day(cur).sets.splice(i,1);save();render()}
+
+function vMat(){
+  const d=day(cur),meals=d.meals||[],rules=d.rules||{},supp=d.supp||{},p=effPlan(cur);
+  const pt=proteinTarget(),pr=protein(cur),en=energy(cur,p),cb=carbKg(p),kg=refWeight();
+  return dateBar()+`
+  <div class="card"><h2>Dagens mål · ${en.def?'underskuddsfase (til uke '+DEFICIT_TO+')':'vedlikehold'}</h2>
+    <div class="row">
+      <div><div class="big">${pt} g</div><div class="sub">protein (1,8 g/kg)</div></div>
+      <div><div class="big">${en.lo}–${en.hi}</div><div class="sub">kcal</div></div>
+      <div><div class="big">${Math.round(kg*cb[0])}–${Math.round(kg*cb[1])}</div><div class="sub">g karbohydrat</div></div>
+    </div>
+    <div class="sub" style="margin-top:8px">Estimater basert på ${kg.toFixed(1)} kg. Juster etter 7-dagers snitt, ikke enkeltdager. Ingen kalori-telling nødvendig – protein og reglene under er det som teller.</div></div>
+  <div class="card"><h2>Protein logg: ${pr} / ${pt} g</h2>
+    <div class="bar"><i style="width:${Math.min(100,pr/pt*100)}%"></i></div>
+    <div style="margin-top:10px">${meals.map((m,i)=>`<div class="chk"><span style="flex:1">${m.n}</span><span>${m.p} g</span><button class="x" onclick="delMeal(${i})">×</button></div>`).join('')}</div>
+    <div class="row" style="margin-top:10px">
+      <select id="food" style="flex:3"><option value="">Velg matvare…</option>${allFoods().map((f,i)=>`<option value="${i}">${f[0]} – ${f[1]} g</option>`).join('')}</select>
+      <button class="b" style="flex:0" onclick="addFood()">+</button></div>
+    <div class="row" style="margin-top:8px"><input id="cn" placeholder="Egen matvare" style="flex:3"><input id="cp" type="number" placeholder="g protein">
+      <button class="g" style="flex:0" onclick="addCustom()">+</button></div></div>
+  <div class="card"><h2>Dagens regler</h2>
+    ${RULES.map((t,i)=>`<label class="chk"><input type="checkbox" ${rules[i]?'checked':''} onchange="setIn('rules',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t}</span></label>`).join('')}</div>
+  <div class="card"><h2>Tilskudd</h2>
+    ${SUPPS.map(([t,s],i)=>`<label class="chk"><input type="checkbox" ${supp[i]?'checked':''} onchange="setIn('supp',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t} <span class="sub">${s}</span></span></label>`).join('')}</div>
+  <div class="card"><h2>Måltidsforslag (trykk for å logge protein)</h2>
+    ${Object.entries(MEALS).map(([g,list])=>`<div style="margin:6px 0"><b class="sm">${g}</b><br>${list.map(([n,pp])=>`<span class="chip" onclick="logMeal(${JSON.stringify(n).replace(/"/g,'&quot;')},${pp})">${n} · ~${pp} g</span>`).join('')}</div>`).join('')}
+    <div class="sub" style="margin-top:6px">Ikke fisk, tomat eller squash i listen. Proteinverdier er grove anslag.</div></div>
+  <div class="card"><h2>Når du er på reise</h2>${TRAVEL_RULES.map(t=>`<div class="sm" style="margin:4px 0">• ${t}</div>`).join('')}</div>`;
+}
+function setIn(g,i,v){const d=day(cur);d[g]=d[g]||{};d[g][i]=v;save();render()}
+function addFood(){const i=$('#food').value;if(i==='')return;const f=allFoods()[i];logMeal(f[0],f[1])}
+function logMeal(n,p){const d=day(cur);(d.meals=d.meals||[]).push({n,p});save();render()}
+function addCustom(){const n=$('#cn').value.trim(),p=+$('#cp').value;if(!n||!p)return;
+  if(!S.customFoods.find(f=>f[0]==n))S.customFoods.push([n,p]);logMeal(n,p)}
+function delMeal(i){day(cur).meals.splice(i,1);save();render()}
+
+function vFremgang(){
+  const t=trend(),last=t.length?t[t.length-1][1]:null;
+  const all=Object.entries(S.days),done=all.filter(([k,v])=>v.done).length;
+  const wkDone=weekDays(D()).filter(k=>(S.days[k]||{}).done).length;
+  const km=all.reduce((a,[k,v])=>a+(+(v.run||{}).km||0),0);
+  const waist=all.filter(([k,v])=>v.waist).sort().map(([k,v])=>fmt(k)+': '+v.waist);
+  const bf=all.filter(([k,v])=>v.bf).sort().map(([k,v])=>fmt(k)+': '+v.bf+' %');
+  const d=day(cur);
+  return `<div class="card"><h2>Vekt (7-dagers snitt)</h2>
+    <div class="big">${last?last.toFixed(1)+' kg':'–'}</div>
+    <div class="sub">Start ${S.profile.startWeight} kg · mål ${S.profile.goalLow}–${S.profile.goalHigh} kg – vekt er sekundært, følg midje, styrke og bilder</div>
+    <svg id="chart" viewBox="0 0 400 160"></svg></div>
+  <div class="card"><h2>Konsistens</h2>
+    <div class="row"><div><div class="big">${wkDone}</div><div class="sub">økter denne uka</div></div>
+    <div><div class="big">${done}</div><div class="sub">totalt</div></div>
+    <div><div class="big">${km.toFixed(0)}</div><div class="sub">km løpt</div></div></div></div>
+  <div class="card"><h2>Midjemål og kroppsfett (${fmt(cur)})</h2>
+    <div class="row"><div><label>Midje (cm, ved navle)</label><input type="number" step="0.5" value="${d.waist||''}" onchange="set('waist',this.value)"></div>
+    <div><label>Kroppsfett (%)</label><input type="number" step="0.1" value="${d.bf||''}" onchange="set('bf',this.value)"></div></div>
+    <div class="sub" style="margin-top:6px">Midje: ${waist.join(' · ')||'ingen ennå – mål ukentlig'}<br>Kroppsfett: ${bf.join(' · ')||'mål ved start, uke 13 og uke 26'}<br>Helsemål: midje under halve høyden (≈ 87 cm).</div></div>`;
+}
+function drawChart(){
+  const t=trend(),el=$('#chart');
+  if(t.length<2){el.innerHTML='<text x="10" y="80" fill="currentColor" font-size="12">Logg vekt noen dager for å se kurven.</text>';return}
+  const ys=t.map(x=>x[1]).concat([+S.profile.goalHigh,+S.profile.goalLow]),mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;
+  const t0=parse(t[0][0]),sp=Math.max(864e5,parse(t[t.length-1][0])-t0);
+  const X=k=>20+(parse(k)-t0)/sp*370,Y=v=>150-(v-mn)/(mx-mn)*140;
+  el.innerHTML=`<rect x="20" y="${Y(S.profile.goalHigh)}" width="370" height="${Y(S.profile.goalLow)-Y(S.profile.goalHigh)}" fill="var(--acc)" opacity=".15"/>
+   <polyline fill="none" stroke="var(--acc)" stroke-width="2.5" points="${t.map(([k,v])=>X(k)+','+Y(v)).join(' ')}"/>
+   <text x="22" y="${Y(S.profile.goalHigh)-3}" font-size="9" fill="var(--mut)">målsone</text>`;
+}
+
+function vPlan(){
+  const w0=weekNo(D());
+  return `<div class="card"><h2>Faser</h2>${PHASES.map(p=>`<div style="margin:6px 0"><b>${p.name}</b> <span class="pill">uke ${p.from}–${p.to} · ${p.days} dager</span><div class="sm sub">${p.text}</div></div>`).join('')}
+  <div class="sub" style="margin-top:6px">Kosthold: underskudd uke 1–${DEFICIT_TO} (ca. 0,4–0,5 kg/uke), vedlikehold uke ${DEFICIT_TO+1}–28.</div></div>
+  <div class="card"><h2>28 uker</h2><table><tr><th>Uke</th><th>Start</th><th>Fase</th><th>Langtur / løp</th></tr>
+  ${[...Array(WEEKS)].map((_,i)=>{const w=i+1,s=addDays(S.profile.start,i*7),ph=phaseOf(w);
+    let l=w<=8?RUN1[w]:(w===29?'LØPSDAG søndag 25.4.':w===28?'Taper, shake-out lørdag':RUN2[w][2]+' min'+(RUN2[w][3]?' · '+RUN2[w][3]:''));
+    return `<tr class="${w===w0?'hl':''}"><td>${w}</td><td>${fmt(s)}</td><td>${ph.name}</td><td class="sm">${l}</td></tr>`}).join('')}</table></div>`;
+}
+
+function vData(){
+  const p=S.profile;
+  return `<div class="card"><h2>Innstillinger</h2>
+    <div class="row">
+      <div><label>Startvekt</label><input type="number" value="${p.startWeight}" onchange="S.profile.startWeight=+this.value;save()"></div>
+      <div><label>Mål fra (kg)</label><input type="number" value="${p.goalLow}" onchange="S.profile.goalLow=+this.value;save()"></div>
+      <div><label>Mål til (kg)</label><input type="number" value="${p.goalHigh}" onchange="S.profile.goalHigh=+this.value;save()"></div>
+    </div><div class="sub" style="margin-top:8px">Løpsdato og startdato er låst til planen (Madrid, søndag 25.4.2027). Er løpet en annen dag, si fra så justeres planen.</div></div>
+  <div class="card"><h2>Sikkerhetskopi</h2>
+    <div class="sub">Data ligger kun i denne nettleseren på denne enheten. Eksporter jevnlig (f.eks. hver søndag).</div>
+    <div class="row" style="margin-top:8px"><button class="b" onclick="exp()">Eksporter JSON</button><button class="g" onclick="$('#imp').click()">Importer</button></div>
+    <input id="imp" type="file" accept=".json" class="hide" onchange="imp(this.files[0])"></div>
+  <div class="card"><h2>Nullstill</h2><button class="g" onclick="if(confirm('Slette ALL data?')){localStorage.removeItem(KEY);S=load();render()}">Slett alle data</button></div>
+  <div class="card"><h2>Om</h2><div class="sub">Programmet bygger på forskningsnotatene i mappen «forskning». Dette er ikke medisinsk rådgivning – ved smerte, brystsmerter eller uvanlig tungpust: stopp og kontakt lege.</div></div>`;
+}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='treningsdagbok-'+D()+'.json';a.click()}
+function imp(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.days)throw 0;S=o;save();S=load();render()}catch(e){alert('Ugyldig fil')}};r.readAsText(f)}
+
+render();
+</script>
+</body>
+</html>
