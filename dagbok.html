@@ -789,6 +789,7 @@ const ING={
  cottage:['Cottage cheese',85,12,3,3,'Meieri'],
  egg:['Egg',143,12.5,0.5,10,'Meieri','egg',53],
  ost:['Ost (skåret med høvel)',330,27,0,25,'Meieri','skive',8],
+ kyllingpal:['Kyllingbryst, pålegg',100,20,1,2,'Pålegg','skive',12],
  parmesan:['Parmesan, revet',400,36,0,28,'Meieri'],
  smor:['Smør',740,0.5,0,82,'Meieri','ts',5],
  olje:['Olivenolje',880,0,0,100,'Tørrvarer','ts',4.5],
@@ -935,37 +936,32 @@ R('e_skyrmuesli','post','Skyr, müsli og bær',3,
  [['skyr',250],['muesli',35],['baer',100]],[q('banan',1)],[q('honning',1)],
  ['Skyr i skål, topp med müsli og bær.'],'');
 
-/* ---------- LUNSJ ---------- */
-R('l_wrap','lunsj','Kyllingwrap med hummus',15,
- [q('tortilla',1),['kylling',120],['spinat',30],['agurk',60],['paprika',75],q('hummus',2),q('ost',2)],
- [q('eple',1)],[q('mandel',1)],
- ['Skjær kylling i strimler, krydre med salt, pepper og paprikapulver. Stek i 5–6 min til gjennomstekt.','Varm tortilla. Smør hummus, legg på spinat, agurk, paprika, kylling og ost.','Brett sammen og skjær i to.'],
- 'Stek dobbelt porsjon kylling søndag: da har du lunsj klar tre dager.');
-R('l_linsesuppe','lunsj','Linsesuppe med kylling',25,
- [['linser',60],['kylling',100],q('gulrot',2),q('lok',1),q('olje',1),q('brod',1),KR],
+/* ---------- LUNSJ (alt kan pakkes og spises på jobb, ingen tilberedning) ---------- */
+R('l_wrap','lunsj','Wrap med kylling, hummus og grønt',5,
+ [q('tortilla',1),q('kyllingpal',8),['spinat',30],['agurk',60],['paprika',75],q('hummus',2),q('ost',2),q('eple',1)],
+ [q('mandel',1)],[q('riskake',2)],
+ ['Smør hummus på tortillaen.','Legg på kyllingpålegg, ost, spinat, agurk og paprika.','Brett sammen og pakk inn i bakepapir. Eplet ved siden av.'],
+ 'Alt er ferdig fra butikken: tar 5 minutter kvelden før eller om morgenen.');
+R('l_brodskiver','lunsj','Brødskiver med egg, skinke og ost',5,
+ [q('brod',2),q('egg',2),q('skinke',3),q('ost',2),['agurk',80],['paprika',75],['skyr',150]],
  [q('brod',1)],[q('eple',1)],
- ['Finhakk løk og gulrot, surr i olje 3 min.','Tilsett linser, buljong og 5 dl vann, kok 12–15 min til linsene er møre.','Tilsett kylling i terninger de siste 6 minuttene. Krydre med karri/spisskummen, salt, pepper.','Server med brød.'],
- 'Dobbel porsjon: smaker bedre dagen etter og fryser fint.');
-R('l_potetcottage','lunsj','Bakt potet med cottage cheese og egg',35,
- [q('potet',3),['cottage',200],q('egg',2),['agurk',80],['paprika',75]],
- [q('potet',1)],[q('eple',1)],
- ['Kok eller bak potetene til de er møre (20–30 min i ovn 200 °C, 8–10 min i mikro).','Kok eggene 8 min.','Del potetene, fyll med cottage cheese og skivet egg. Server med agurk og paprika.'],
- 'Mikro potetene i 8–10 minutter når du har dårlig tid.');
-R('l_kyllingsalat','lunsj','Kyllingsalat med ris',20,
- [['kylling',120],['ris',60],['spinat',60],['agurk',80],['paprika',75],['mais',40],q('olje',2),KR],
- [['ris',20]],[q('valnott',1)],
- ['Kok ris etter anvisning (ca. 12 min).','Stek kylling i strimler 5–6 min, krydre.','Bland spinat, agurk, paprika og mais i en skål. Legg på ris og kylling. Dryss olje og sitron over.'],
- 'Gode rester: kok dobbelt ris og bruk dagen etter.');
-R('l_pastasalat','lunsj','Pastasalat med kalkun og mais',15,
+ ['Kok eggene kvelden før (8 min), eller kjøp ferdigkokte.','Smør brødskivene, legg på skinke, ost og skivet egg.','Agurk og paprika i staver. Skyr i en boks som dessert.'],
+ 'Kok 4–6 egg søndag, så er lunsjen lagt for uka.');
+R('l_kalkunbrod','lunsj','Brødskiver med kalkun, hummus og cottage cheese',5,
+ [q('brod',3),q('kalkunpal',5),q('hummus',1),['cottage',100],['agurk',80],['paprika',75]],
+ [q('eple',1)],[q('mandel',1)],
+ ['Smør hummus på brødet og legg på kalkun, agurk og paprika.','Cottage cheese i en boks ved siden av.'],
+ 'Fungerer også fint på kantina eller i bilen.');
+R('l_kyllingsalat','lunsj','Salat med kylling, egg og knekkebrød',8,
+ [['spinat',60],['salat',60],q('kyllingpal',10),q('egg',2),['mais',40],['paprika',75],['agurk',80],q('olje',1),q('knekke',3)],
+ [q('knekke',1),q('eple',1)],[q('valnott',1)],
+ ['Kok eggene kvelden før.','Bland spinat, salat, paprika, agurk og mais i en boks. Legg på kyllingpålegg og egg i kvarter.','Dryss over olje, salt og pepper rett før du spiser. Knekkebrød ved siden av.'],
+ 'Ha dressingen (oljen) i en liten boks så salaten ikke blir slapp.');
+R('l_pastasalat','lunsj','Pastasalat med kalkun og mais',10,
  [['pasta',70],q('kalkunpal',10),['paprika',75],['agurk',80],['mais',40],q('olje',1),['parmesan',15]],
  [['pasta',20]],[q('eple',1)],
- ['Kok pasta 10 min, skyll i kaldt vann.','Bland med kalkun i strimler, paprika, agurk, mais og olje.','Dryss over parmesan, salt og pepper.'],
- 'Holder i kjøleskap 2 dager, god kald.');
-R('l_omelett','lunsj','Omelett med sopp, spinat og ost',12,
- [q('egg',3),['sopp',80],['spinat',40],q('ost',2),q('brod',2),q('eple',1)],
- [q('brod',1)],[q('ost',2)],
- ['Skjær sopp i skiver og stek i litt smør 3 min. Legg på spinat til den faller sammen.','Visp eggene, hell over, stek på middels varme 3–4 min. Fyll med ost og brett.','Server med brød og eple.'],
- '');
+ ['Kok pasta 10 min kvelden før, skyll i kaldt vann.','Bland med kalkun i strimler, paprika, agurk, mais og olje.','Dryss over parmesan, salt og pepper. Lukk i en boks.'],
+ 'Holder i kjøleskap 2 dager og smaker best kald.');
 
 /* ---------- MIDDAG ---------- */
 R('d_kyllingsoet','middag','Ovnsbakt kyllinglår med søtpotet og brokkoli',35,
