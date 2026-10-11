@@ -48,6 +48,22 @@ svg{width:100%;height:auto}
 .ex .nm{font-weight:600}
 .sm{font-size:13px}
 .hl{background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.strip{display:flex;gap:4px;margin-bottom:10px}
+.sd{flex:1;min-width:0;text-align:center;padding:6px 2px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
+.sd.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.sd.today .sub{color:var(--acc);font-weight:700}
+.sd .sl{font-size:10px;line-height:1.15;margin-top:2px;overflow:hidden}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--line);margin:3px auto}
+.sdot.done{background:var(--ok)}
+.tl{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.tl:last-child{border:0}
+.tm{width:46px;flex:none;font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+.tb{flex:1;min-width:0}
+.tl.train{background:color-mix(in srgb,var(--acc) 10%,transparent);margin:0 -14px;padding:9px 14px}
+.swap{margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:0 8px;background:var(--bg)}
+details.wk summary{cursor:pointer;list-style:none}
+details.wk[open] summary{margin-bottom:6px}
+details.hl{border-color:var(--acc)}
 .chip.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
 #modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;align-items:flex-start;justify-content:center;overflow-y:auto;padding:12px}
 .mbox{background:var(--card);border-radius:14px;max-width:560px;width:100%;padding:14px;margin:auto 0}
@@ -179,7 +195,7 @@ const DEFICIT_TO=12;
 function energy(k,plan){
   const w=weekNo(k),def=w<=DEFICIT_TO;
   let lo=def?2300:2700, hi=def?2500:3000;
-  if(plan&&plan.k==='lang'){lo+=300;hi+=300}
+  if(plan&&plan.k==='lang'){lo+=300;hi+=400}
   return {lo,hi,def};
 }
 function carbKg(plan){
@@ -207,20 +223,6 @@ const TRAVEL_RULES=[
  'Flyplass: ta med pulver, nøtter, skyr eller proteinbar. Kjøp egg, yoghurt, frukt, kyllingwrap.',
  '80/20: En dårlig middag betyr ingenting – mønsteret over uker teller.'
 ];
-const MEALS={
- 'Frokost':[
-  ['Havregrøt med skyr, bær og nøtter',35],['Eggerøre (3 egg), 2 skiver grovbrød, ost/skinke, agurk',35],
-  ['Skyr 250 g + müsli/havre + banan + valnøtter',32],['Proteinsmoothie: melk, skyr, myse, banan, bær',40]],
- 'Lunsj':[
-  ['Kyllingsalat/wrap: kylling, spinat, agurk, paprika, hummus',40],['Linse-/bønnesuppe med kylling og grovbrød',35],
-  ['Cottage cheese, knekkebrød, egg, grønnsaker',35],['Rester fra middag',35]],
- 'Middag':[
-  ['Kylling i ovn, søtpotet, brokkoli',45],['Kjøttdeig-gryte (5 %): løk, gulrot, paprika, linser, ris/pasta – uten tomat',40],
-  ['Biff/svinefilet, poteter, grønne bønner',45],['Omelett: egg, skinke, sopp, spinat + brød',35],
-  ['Tofu/tempeh-wok: brokkoli, paprika, ris',35],['Kalkun/kylling-pasta: spinat, sopp, parmesan',45]],
- 'Mellommåltid':[
-  ['Skyr + bær',22],['Cottage cheese + frukt',17],['Proteinshake',22],['2 kokte egg + nøtter',18],['Kalkunpålegg + knekkebrød',15]]
-};
 const FOODS=[['Egg (2 stk)',12],['Skyr naturell (200 g)',22],['Cottage cheese (150 g)',17],['Kyllingfilet (150 g)',35],
  ['Kjøttdeig 5 % (150 g)',30],['Biff/svin (150 g)',32],['Gresk yoghurt (200 g)',18],['Linser kokt (150 g)',13],
  ['Kikerter (150 g)',11],['Tofu (150 g)',18],['Myseprotein (1 scoop)',22],['Melk (2 dl)',7],['Brød (2 skiver)',8],
@@ -775,6 +777,418 @@ const CUES={
 
 
 /* =======================================================================
+   MATBASE OG OPPSKRIFTER
+   Næringsverdier per 100 g (typiske norske verdier, avrundet).
+   [navn, kcal, protein, karbo, fett, kategori, enhet, gram per enhet]
+   ======================================================================= */
+const ING={
+ havre:['Havregryn',370,13,58,7,'Tørrvarer','dl',35],
+ muesli:['Müsli (usukret)',360,10,60,6,'Tørrvarer','dl',40],
+ melk:['Lettmelk',45,3.5,4.6,1.5,'Meieri','dl',100],
+ skyr:['Skyr naturell',63,11,4,0.2,'Meieri'],
+ cottage:['Cottage cheese',85,12,3,3,'Meieri'],
+ egg:['Egg',143,12.5,0.5,10,'Meieri','egg',53],
+ ost:['Ost (skåret med høvel)',330,27,0,25,'Meieri','skive',8],
+ parmesan:['Parmesan, revet',400,36,0,28,'Meieri'],
+ smor:['Smør',740,0.5,0,82,'Meieri','ts',5],
+ olje:['Olivenolje',880,0,0,100,'Tørrvarer','ts',4.5],
+ honning:['Honning',300,0.3,80,0,'Tørrvarer','ts',7],
+ peanottsmor:['Peanøttsmør',600,25,10,50,'Tørrvarer','ss',16],
+ valnott:['Valnøtter, hakket',650,15,3,62,'Tørrvarer','ss',9],
+ mandel:['Mandler',600,21,6,52,'Tørrvarer','liten neve',15],
+ cashew:['Cashewnøtter',580,18,30,44,'Tørrvarer','liten neve',15],
+ brod:['Grovbrød',245,9,41,3,'Brød','skive',35],
+ knekke:['Knekkebrød',340,10,65,2,'Brød','skive',12],
+ tortilla:['Fullkorn tortilla',300,9,50,7,'Brød','stk',60],
+ burgerbrod:['Grovt burgerbrød',250,10,43,4,'Brød','stk',70],
+ riskake:['Riskake',380,8,80,3,'Brød','stk',9],
+ banan:['Banan',90,1,20,0.3,'Frukt og grønt','stk',110],
+ eple:['Eple',55,0.3,12,0.2,'Frukt og grønt','stk',130],
+ baer:['Bær (frosne/ferske)',50,0.7,10,0.3,'Frukt og grønt'],
+ skinke:['Skinke, pålegg',100,17,1,3,'Pålegg','skive',12],
+ kalkunpal:['Kalkunbryst, pålegg',95,18,1,2,'Pålegg','skive',12],
+ kylling:['Kyllingfilet (rå)',110,23,0,2,'Kjøtt'],
+ kyllinglaar:['Kyllinglår uten skinn (rå)',140,20,0,6,'Kjøtt'],
+ kjottdeig:['Kjøttdeig 5 % (rå)',125,21,0,5,'Kjøtt'],
+ biff:['Biff, ytrefilet (rå)',130,22,0,4,'Kjøtt'],
+ svinefilet:['Svinefilet (rå)',110,22,0,2.5,'Kjøtt'],
+ tofu:['Tofu naturell',125,13,2,7,'Kjøl'],
+ potet:['Poteter',75,2,16,0.1,'Frukt og grønt','stk',80],
+ soetpotet:['Søtpotet',85,1.5,20,0.1,'Frukt og grønt'],
+ ris:['Ris (tørr)',355,7,78,1,'Tørrvarer','dl',80],
+ pasta:['Fullkornspasta (tørr)',350,13,65,2.5,'Tørrvarer'],
+ linser:['Røde linser (tørre)',340,25,50,1.5,'Tørrvarer','dl',85],
+ brokkoli:['Brokkoli',33,3.3,3,0.4,'Frukt og grønt'],
+ spinat:['Spinat',20,2.5,1,0.4,'Frukt og grønt'],
+ gulrot:['Gulrot',35,0.7,7.5,0.2,'Frukt og grønt','stk',70],
+ lok:['Løk',35,1,7,0.1,'Frukt og grønt','stk',90],
+ paprika:['Paprika',30,1,6,0.3,'Frukt og grønt','stk',150],
+ agurk:['Agurk',12,0.6,2,0.1,'Frukt og grønt'],
+ sopp:['Sopp (sjampinjong)',22,3,1,0.3,'Frukt og grønt'],
+ gronnebonner:['Grønne bønner',35,2,5,0.2,'Frukt og grønt'],
+ salat:['Salat',15,1.2,2,0.2,'Frukt og grønt'],
+ rodbet:['Rødbeter (kokte)',40,1.5,8,0.1,'Frukt og grønt'],
+ mais:['Mais (hermetikk)',85,3,15,1,'Tørrvarer'],
+ hummus:['Hummus',250,7,12,18,'Kjøl','ss',15],
+ myse:['Myseprotein (pulver)',385,80,6,5,'Tørrvarer','scoop',30],
+ sjokmelk:['Sjokolademelk',70,3.3,10,1.8,'Meieri','dl',100],
+ gel:['Energigel',250,0,62,0,'Tørrvarer','gel',40],
+ soya:['Soyasaus',60,6,6,0,'Tørrvarer','ss',15],
+ krydder:['Krydder, buljong, sitron (etter smak)',0,0,0,0,'Tørrvarer']
+};
+const UNIT={ts:['ts','ts'],ss:['ss','ss'],dl:['dl','dl'],stk:['stk','stk'],skive:['skive','skiver'],egg:['egg','egg'],
+ 'liten neve':['liten neve','små never'],scoop:['scoop','scoop'],gel:['gel','geler']};
+function fracN(n){const w=Math.floor(n+1e-9),h=n-w;if(Math.abs(h)<.13)return String(w);if(Math.abs(h-.5)<.13)return (w?w:'')+'½';
+  if(Math.abs(h-.25)<.13)return (w?w:'')+'¼';if(Math.abs(h-.75)<.13)return (w?w:'')+'¾';return String(Math.round(n))}
+function measure(id,g){
+  const i=ING[id];g=Math.round(g);
+  if(id==='krydder')return 'etter smak';
+  if(!i[6])return g+' g';
+  const n=g/i[7],u=UNIT[i[6]],lab=n>1.2?u[1]:u[0];
+  if(i[6]==='egg'||i[6]==='skive'||i[6]==='stk'||i[6]==='scoop'||i[6]==='gel')return `${fracN(Math.round(n*2)/2)} ${lab} (${g} g)`;
+  if(i[6]==='dl')return `${g} g (ca. ${fracN(Math.round(n*4)/4)} dl)`;
+  return `${g} g (ca. ${fracN(Math.round(n*2)/2)} ${lab})`;
+}
+const q=(id,n)=>[id,n*ING[id][7]];
+function macro(items){const m={k:0,p:0,c:0,f:0};for(const [id,g] of items){const i=ING[id];m.k+=i[1]*g/100;m.p+=i[2]*g/100;m.c+=i[3]*g/100;m.f+=i[4]*g/100}return m}
+
+const RECIPES=[];
+const R=(id,slot,n,min,ing,p1,p2,steg,tips)=>RECIPES.push({id,slot,n,min,ing,p1,p2,steg,tips});
+const KR=['krydder',0];
+
+/* ---------- FROKOST ---------- */
+R('f_gront','frokost','Proteingrøt med skyr og bær',8,
+ [['havre',50],['melk',250],['skyr',150],['baer',80],q('valnott',1),KR],
+ [q('honning',1),q('valnott',1)],[['havre',20]],
+ ['Kok havregryn og melk i en kasserolle i 3–4 minutter under omrøring (eller 2 min i mikro).','Ta av varmen og rør inn halvparten av skyren.','Hell i skål. Topp med resten av skyren, bær, valnøtter og kanel.'],
+ 'Kveldsforberedt versjon: bland havre, melk og skyr i en boks kvelden før og la stå i kjøleskapet.');
+R('f_eggerore','frokost','Eggerøre med skinke, ost og grovbrød',10,
+ [q('egg',3),['melk',15],q('smor',1),q('brod',2),q('skinke',3),q('ost',2),['agurk',80],['paprika',75]],
+ [q('eple',1)],[q('brod',1)],
+ ['Visp egg med melk, salt og pepper.','Smelt smør i panne på middels varme. Hell i eggene og rør forsiktig i 2–3 minutter til de er kremete (ikke tørre).','Rist brødskivene. Legg 1½ skive skinke og 1 skive ost på hver brødskive.','Server eggerøren ved siden av, med agurk og paprika i staver.'],
+ 'Ta eggerøren av varmen mens den fortsatt ser litt våt ut. Den ferdigstekes av restvarmen.');
+R('f_skyrbolle','frokost','Skyrbolle med müsli og banan',3,
+ [['skyr',250],['muesli',40],q('banan',1),q('mandel',1),q('honning',1)],
+ [q('mandel',1)],[q('honning',1),q('valnott',1)],
+ ['Skyr i en bolle.','Topp med müsli, skivet banan, mandler og honning.'],
+ 'Raskeste frokosten: 3 minutter. Perfekt før tidlige møter og på reise (kjøp skyr på butikken).');
+R('f_wrap','frokost','Omelett-wrap',10,
+ [q('egg',3),q('tortilla',1),['spinat',30],['sopp',50],q('ost',2),q('skinke',2),q('smor',1)],
+ [q('banan',1)],[q('eple',1)],
+ ['Skjær sopp i skiver og stek i smør i 2 minutter. Tilsett spinat til den faller sammen.','Visp eggene, hell over og stek til omeletten er stivnet (2–3 min).','Varm tortillaen. Legg omelett, ost og skinke på, brett og del i to.'],
+ 'Pakk inn i bakepapir for å ta med.');
+R('f_smoothie','frokost','Proteinsmoothie (uten pulver)',5,
+ [['melk',250],['skyr',150],q('banan',1),['havre',30],['baer',80],q('peanottsmor',1)],
+ [q('honning',1),['havre',20]],[q('valnott',1)],
+ ['Alt i blender: melk først, så skyr, banan, havregryn, bær og peanøttsmør.','Kjør i 30–45 sekunder til glatt.'],
+ 'Bruk frosne bær. Da blir den tykk og kald uten is.');
+R('f_cottagetoast','frokost','Cottage cheese-toast med kokt egg',10,
+ [q('brod',2),['cottage',150],q('egg',2),['agurk',80],['paprika',75]],
+ [q('eple',1)],[q('brod',1)],
+ ['Kok eggene 8 minutter (hardkokt), avkjøl i kaldt vann.','Rist brødet. Smør cottage cheese på, topp med skivet egg, agurk og paprika.','Pepper og litt salt.'],
+ 'Kok 4–6 egg søndag, så har du egg klare til hele uka.');
+R('f_pannekake','frokost','Havrepannekaker med skyr og bær',15,
+ [['havre',50],q('egg',2),['skyr',100],q('banan',1),['baer',80]],
+ [q('valnott',1),q('honning',1)],[q('mandel',1)],
+ ['Mos banan i en bolle. Visp inn egg, skyr og havregryn (finmalt i blender om du vil ha glatt røre).','La røren hvile 5 min.','Stek små pannekaker i en tørr non-stick panne (eller med litt smør), 1–2 min per side på middels varme.','Server med bær og resten av skyren.'],
+ 'Dobbel porsjon røre og frys ned for travle morgener.');
+
+/* ---------- MELLOMMÅLTID ---------- */
+R('m_skyr','mellom','Skyr med bær og mandler',2,
+ [['skyr',200],['baer',80],q('mandel',0.5)],[q('honning',1)],[q('mandel',0.5)],
+ ['Alt i en boks eller skål. Rør sammen.'],'Tar 2 minutter, og tåler å ligge i veska en times tid.');
+R('m_cottage','mellom','Cottage cheese, eple og knekkebrød',3,
+ [['cottage',150],q('eple',1),q('knekke',1)],[q('knekke',1)],[q('valnott',1)],
+ ['Cottage cheese i en skål. Eple i båter. Knekkebrød ved siden av.'],'');
+R('m_egg','mellom','Kokte egg, brød og gulrot',10,
+ [q('egg',2),q('brod',1),q('gulrot',1)],[q('knekke',1)],[q('mandel',0.5)],
+ ['Kok eggene 8 minutter, avkjøl, skrell.','Server med brødskive og gulrotstaver. Pepper/salt.'],'Kok flere egg i forveien. Holder 4–5 dager i kjøleskapet med skall.');
+R('m_kalkun','mellom','Kalkunpålegg på knekkebrød med grønnsaker',4,
+ [q('kalkunpal',5),q('knekke',3),['agurk',80],['paprika',75]],[q('ost',2)],[q('knekke',1)],
+ ['Legg kalkunskiver på knekkebrødene, topp med agurk og paprika.'],'Lett, rask og fås overalt på reise.');
+R('m_shake','mellom','Myseshake med banan',3,
+ [q('myse',1),['melk',150],q('banan',1)],[['havre',15]],[q('honning',1)],
+ ['Alt i en shaker eller blender. Rist/kjør i 20–30 sekunder.'],'Gjør shaken klar i veska: pulver i shakeren, tilsett melk/vann når du skal drikke.');
+
+/* ---------- FØR TRENING (lite fett, mye karbo) ---------- */
+R('p_bananbrod','pre','Banan og riskaker med peanøttsmør',3,
+ [q('banan',1),q('riskake',2),q('peanottsmor',1)],[q('riskake',1),q('honning',1)],[q('riskake',1)],
+ ['Smør peanøttsmør på riskakene, spis banan ved siden av.'],'Spis 60–90 min før trening.');
+R('p_skyrhonning','pre','Skyr med honning og banan',2,
+ [['skyr',200],q('honning',1),q('banan',1)],[['muesli',15]],[['muesli',15]],
+ ['Bland skyr og honning, skiv banan oppi.'],'');
+R('p_toast','pre','Brødskiver med kalkun og banan',4,
+ [q('brod',2),q('kalkunpal',2),q('banan',1)],[q('riskake',1)],[q('honning',1)],
+ ['Legg kalkun på brødet, spis banan ved siden av.'],'');
+R('p_kakaomelk','pre','Sjokolademelk og banan',1,
+ [['sjokmelk',250],q('banan',1)],[q('riskake',1)],[q('riskake',1)],
+ ['Drikk og spis. Ferdig.'],'Fungerer som både før og etter trening.');
+
+/* ---------- ETTER LANG ØKT ---------- */
+R('e_shake','post','Myseshake, banan og havre',3,
+ [q('myse',1),['melk',200],q('banan',1)],[['havre',30]],[q('honning',1),q('riskake',1)],
+ ['Alt i blender. Drikk innen 30–60 minutter etter økten.'],'');
+R('e_kakaoegg','post','Sjokolademelk, egg og brød',8,
+ [['sjokmelk',250],q('egg',2),q('brod',1)],[q('brod',1)],[q('honning',1)],
+ ['Kok egg (8 min) eller stek spegeegg.','Server med brød og sjokolademelk.'],'Sjokolademelk har god dokumentert effekt som restitusjonsdrikk (karbohydrat + protein).');
+R('e_skyrmuesli','post','Skyr, müsli og bær',3,
+ [['skyr',250],['muesli',35],['baer',100]],[q('banan',1)],[q('honning',1)],
+ ['Skyr i skål, topp med müsli og bær.'],'');
+
+/* ---------- LUNSJ ---------- */
+R('l_wrap','lunsj','Kyllingwrap med hummus',15,
+ [q('tortilla',1),['kylling',120],['spinat',30],['agurk',60],['paprika',75],q('hummus',2),q('ost',2)],
+ [q('eple',1)],[q('mandel',1)],
+ ['Skjær kylling i strimler, krydre med salt, pepper og paprikapulver. Stek i 5–6 min til gjennomstekt.','Varm tortilla. Smør hummus, legg på spinat, agurk, paprika, kylling og ost.','Brett sammen og skjær i to.'],
+ 'Stek dobbelt porsjon kylling søndag: da har du lunsj klar tre dager.');
+R('l_linsesuppe','lunsj','Linsesuppe med kylling',25,
+ [['linser',60],['kylling',100],q('gulrot',2),q('lok',1),q('olje',1),q('brod',1),KR],
+ [q('brod',1)],[q('eple',1)],
+ ['Finhakk løk og gulrot, surr i olje 3 min.','Tilsett linser, buljong og 5 dl vann, kok 12–15 min til linsene er møre.','Tilsett kylling i terninger de siste 6 minuttene. Krydre med karri/spisskummen, salt, pepper.','Server med brød.'],
+ 'Dobbel porsjon: smaker bedre dagen etter og fryser fint.');
+R('l_potetcottage','lunsj','Bakt potet med cottage cheese og egg',35,
+ [q('potet',3),['cottage',200],q('egg',2),['agurk',80],['paprika',75]],
+ [q('potet',1)],[q('eple',1)],
+ ['Kok eller bak potetene til de er møre (20–30 min i ovn 200 °C, 8–10 min i mikro).','Kok eggene 8 min.','Del potetene, fyll med cottage cheese og skivet egg. Server med agurk og paprika.'],
+ 'Mikro potetene i 8–10 minutter når du har dårlig tid.');
+R('l_kyllingsalat','lunsj','Kyllingsalat med ris',20,
+ [['kylling',120],['ris',60],['spinat',60],['agurk',80],['paprika',75],['mais',40],q('olje',2),KR],
+ [['ris',20]],[q('valnott',1)],
+ ['Kok ris etter anvisning (ca. 12 min).','Stek kylling i strimler 5–6 min, krydre.','Bland spinat, agurk, paprika og mais i en skål. Legg på ris og kylling. Dryss olje og sitron over.'],
+ 'Gode rester: kok dobbelt ris og bruk dagen etter.');
+R('l_pastasalat','lunsj','Pastasalat med kalkun og mais',15,
+ [['pasta',70],q('kalkunpal',10),['paprika',75],['agurk',80],['mais',40],q('olje',1),['parmesan',15]],
+ [['pasta',20]],[q('eple',1)],
+ ['Kok pasta 10 min, skyll i kaldt vann.','Bland med kalkun i strimler, paprika, agurk, mais og olje.','Dryss over parmesan, salt og pepper.'],
+ 'Holder i kjøleskap 2 dager, god kald.');
+R('l_omelett','lunsj','Omelett med sopp, spinat og ost',12,
+ [q('egg',3),['sopp',80],['spinat',40],q('ost',2),q('brod',2),q('eple',1)],
+ [q('brod',1)],[q('ost',2)],
+ ['Skjær sopp i skiver og stek i litt smør 3 min. Legg på spinat til den faller sammen.','Visp eggene, hell over, stek på middels varme 3–4 min. Fyll med ost og brett.','Server med brød og eple.'],
+ '');
+
+/* ---------- MIDDAG ---------- */
+R('d_kyllingsoet','middag','Ovnsbakt kyllinglår med søtpotet og brokkoli',35,
+ [['kyllinglaar',200],['soetpotet',250],['brokkoli',200],q('olje',1),KR],
+ [['soetpotet',100]],[['soetpotet',80]],
+ ['Ovn 200 °C. Skjær søtpotet i terninger, legg på plate med olje, salt, paprikapulver. Stek 10 min.','Legg kyllinglår på platen, krydre. Stek 25 min til gjennomstekt (74 °C).','Damp brokkoli i 4–5 min. Server alt sammen.'],
+ 'Alt på én plate = lite oppvask. Lag dobbelt og ha rester til lunsj.');
+R('d_gryte','middag','Kjøttdeiggryte (tomatfri) med ris',30,
+ [['kjottdeig',150],q('lok',1),q('gulrot',1),q('paprika',1),['sopp',100],['linser',40],['ris',45],q('olje',1),KR],
+ [['ris',25]],[['ris',10],['parmesan',8]],
+ ['Surr løk, gulrot og paprika i olje 4 min. Brun kjøttdeigen sammen med sopp.','Tilsett linser, 4 dl vann og buljong. Krydre med paprikapulver, oregano, salt og pepper. Småkok 15 min.','Server over kokt ris. Dryss over litt parmesan.'],
+ 'Tomatfri base: paprika, gulrot og linser gir smak og tykkelse.');
+R('d_biff','middag','Biff med poteter og grønne bønner',30,
+ [['biff',150],q('potet',4),['gronnebonner',150],q('smor',2),q('lok',1)],
+ [q('potet',1),q('smor',1)],[q('potet',1)],
+ ['Kok potetene 15–20 min.','Ta biffen ut av kjøleskapet 20 min før. Salt og pepper. Stek i varm panne 2–3 min per side, la hvile 5 min.','Kok bønnene 4 min og stek dem i litt smør. Server med skivet løk i smør (valgfritt).'],
+ 'Medium-rare til medium: 55–60 °C kjernetemperatur.');
+R('d_wok','middag','Kyllingwok med ris og cashew',20,
+ [['kylling',150],['brokkoli',100],q('gulrot',1),['paprika',75],['sopp',50],['ris',70],q('soya',1),q('olje',1),q('cashew',1)],
+ [['ris',20]],[q('cashew',0.5),['ris',10]],
+ ['Kok ris. Skjær kylling og grønnsaker i strimler.','Stek kylling i olje på høy varme 4–5 min. Tilsett grønnsakene og wok 4 min.','Tilsett soyasaus, ingefær og hvitløk (valgfritt). Server på ris, dryss cashew over.'],
+ 'Frosne wokgrønnsaker er helt ok. Tar 15 minutter totalt.');
+R('d_pasta','middag','Kremet kyllingpasta med spinat',20,
+ [['pasta',80],['kylling',110],['spinat',100],['sopp',100],['parmesan',20],q('olje',2),['melk',100],KR],
+ [['pasta',20]],[['pasta',15]],
+ ['Kok pasta, spar 1 dl kokevann.','Stek kylling i strimler og sopp i olje 6–7 min.','Tilsett spinat, melk og litt kokevann, la småkoke 2 min. Vend inn pasta og parmesan. Pepper og hvitløk etter smak.'],
+ 'Kremet uten fløte: melk + parmesan + kokevann.');
+R('d_tofu','middag','Tofuwok med peanøttsaus (vegetar)',20,
+ [['tofu',200],['brokkoli',100],q('gulrot',1),['paprika',75],['sopp',50],['ris',60],q('soya',1),q('peanottsmor',0.5)],
+ [['ris',20]],[q('cashew',1)],
+ ['Press tofuen i kjøkkenpapir 5 min og skjær i terninger. Stek gylden i panne 6–8 min.','Tilsett grønnsaker og wok 4 min.','Rør sammen peanøttsmør, soyasaus og 2 ss varmt vann til saus. Hell over. Server på ris.'],
+ 'Den proteinrike vegetardagen i uka.');
+R('d_svin','middag','Svinefilet med ovnsgrønnsaker',35,
+ [['svinefilet',190],q('potet',4),q('gulrot',2),['rodbet',100],q('olje',2),KR],
+ [q('potet',1),q('olje',1)],[q('potet',1)],
+ ['Ovn 200 °C. Potet, gulrot og rødbet i terninger med olje og salt. Stek 30 min.','Brun svinefileten i panne 1–2 min per side, legg på plate de siste 12 min.','La kjøttet hvile 5 min før skiving. Server med sennep.'],
+ 'Svinefilet er mager og gjør seg fint kald dagen etter på brød.');
+R('d_burger','middag','Burger med søtpotetbåter (tomatfri)',30,
+ [['kjottdeig',150],q('burgerbrod',1),q('ost',2),['salat',40],['agurk',60],q('lok',1),['soetpotet',150],q('olje',1)],
+ [['soetpotet',100]],[['soetpotet',70]],
+ ['Ovn 220 °C. Søtpotet i båter, olje og salt, 25 min.','Form kjøttdeig til en burger, salt og pepper. Stek 4–5 min per side.','Legg på brød med ost, salat, agurk og løk. Sennep eller litt rømme i stedet for ketchup.'],
+ 'Uten tomat: bruk sennep, agurkdressing eller guacamole.');
+
+/* ---------- KVELDSMAT ---------- */
+R('k_skyr','kveld','Skyr med bær og honning',2,
+ [['skyr',250],['baer',80],q('honning',1)],[q('mandel',0.5)],[['muesli',15]],
+ ['Skyr, bær og honning i en skål.'],'Skyr er rik på kasein (langsomt protein) og mettende på kvelden.');
+R('k_cottage','kveld','Cottage cheese med knekkebrød',3,
+ [['cottage',200],q('knekke',2),['agurk',60]],[q('knekke',1)],[q('mandel',0.5)],
+ ['Cottage cheese i en skål, knekkebrød og agurk ved siden av.'],'');
+R('k_egg','kveld','Egg og brød med kalkun',10,
+ [q('egg',2),q('brod',1),q('kalkunpal',2)],[q('knekke',1)],[q('mandel',0.5)],
+ ['Kok eller stek eggene. Server på brødskive med kalkun.'],'');
+
+/* ---------- DAGSOPPSETT ---------- */
+const SLOTOPT={frokost:['frokost'],mellom:['mellom'],pre:['pre','mellom'],post:['post','mellom'],lunsj:['lunsj'],middag:['middag'],kveld:['kveld']};
+const SLOTNAME={frokost:'Frokost',mellom:'Mellommåltid',pre:'Før trening',post:'Etter trening',lunsj:'Lunsj',middag:'Middag',kveld:'Kveldsmat'};
+const TRAINTIME={morgen:'Morgen (ca. 06:30)',lunsj:'Lunsj (ca. 12:00)',kveld:'Kveld (ca. 17:30)'};
+const TEMPL={
+ kveld:[['07:00','frokost'],['10:00','mellom'],['12:30','lunsj'],['16:00','pre'],['17:30','T'],['19:15','middag'],['21:30','kveld']],
+ morgen:[['06:00','pre'],['06:30','T'],['07:45','frokost'],['10:30','mellom'],['12:45','lunsj'],['16:00','mellom'],['19:00','middag'],['21:30','kveld']],
+ lunsj:[['07:00','frokost'],['10:00','mellom'],['11:30','pre'],['12:15','T'],['13:30','lunsj'],['16:30','mellom'],['19:00','middag'],['21:30','kveld']],
+ hvile:[['07:30','frokost'],['10:30','mellom'],['12:30','lunsj'],['15:30','mellom'],['18:30','middag'],['21:00','kveld']],
+ lang:[['06:30','frokost'],['09:00','T'],['11:15','post'],['13:30','lunsj'],['16:30','mellom'],['19:00','middag'],['21:30','kveld']]
+};
+function trainWindow(p){
+  if(p.k==='lang')return 'lang';
+  if(['styrke','løp','kval','rolig'].includes(p.k)&&!p.opt)return S.profile.trainTime||'kveld';
+  return 'hvile';
+}
+function dayLevel(k,p){const def=weekNo(k)<=DEFICIT_TO;return p.k==='lang'?(def?1:2):(def?0:1)}
+function recMacro(r,lvl){return macro(r.ing.concat(lvl>=1?r.p1:[],lvl>=2?r.p2:[]))}
+function recItems(r,lvl){return {base:r.ing,p1:lvl>=1?r.p1:[],p2:lvl>=2?r.p2:[]}}
+function optsFor(slot){return RECIPES.filter(r=>SLOTOPT[slot].includes(r.slot))}
+function dayNo(k){return Math.floor((parse(k)-parse('2026-01-01'))/864e5)}
+function slotsFor(k){
+  const p=effPlan(k),win=trainWindow(p),tpl=TEMPL[win];
+  const d=S.days[k]||{},pick=d.pick||{},used=new Set();
+  const out=[];
+  tpl.forEach(([time,slot],i)=>{
+    if(slot==='T'){out.push({i,time,slot:'T'});return}
+    const opts=optsFor(slot);
+    let r=RECIPES.find(x=>x.id===pick[i]);
+    if(!r){
+      let n=(dayNo(k)*2+i*3)%opts.length;
+      for(let c=0;c<opts.length;c++){const cand=opts[(n+c)%opts.length];if(!used.has(cand.id)){r=cand;break}}
+    }
+    used.add(r.id);
+    out.push({i,time,slot,r});
+  });
+  return out;
+}
+function dayMacros(k){
+  const p=effPlan(k),lvl=dayLevel(k,p),d=S.days[k]||{},ate=d.ate||{};
+  const tot={k:0,p:0,c:0,f:0},eaten={k:0,p:0,c:0,f:0};
+  for(const s of slotsFor(k)){if(!s.r)continue;const m=recMacro(s.r,lvl);for(const x in tot){tot[x]+=m[x];if(ate[s.i])eaten[x]+=m[x]}}
+  return {tot,eaten,lvl};
+}
+function levelName(l){return ['Basisdag','Mer-dag','Stor dag'][l]}
+function ingList(r,lvl){
+  const t=recItems(r,lvl),L=(a)=>a.filter(x=>x[0]!=='krydder').map(([id,g])=>`<li>${ING[id][0]}: <b>${measure(id,g)}</b></li>`).join('');
+  let h=`<ul>${L(t.base)}</ul>`;
+  const extra=t.p1.concat(t.p2);
+  if(extra.length)h+=`<div class="sub" style="margin-top:6px">Tillegg i dag (${levelName(lvl).toLowerCase()}):</div><ul>${L(extra)}</ul>`;
+  const kr=r.ing.find(x=>x[0]==='krydder');if(kr)h+=`<div class="sub">+ krydder, salt, pepper og buljong etter smak</div>`;
+  return h;
+}
+function recipeSheet(rid,k){
+  const r=RECIPES.find(x=>x.id===rid),p=effPlan(k),lvl=dayLevel(k,p),m=recMacro(r,lvl);
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>${r.n}</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   <div class="pill">${SLOTNAME[r.slot]||r.slot}</div> <span class="sub">ca. ${r.min} min</span>
+   <div class="row" style="margin:10px 0">
+     <div><div class="big">${Math.round(m.k)}</div><div class="sub">kcal</div></div>
+     <div><div class="big">${Math.round(m.p)}</div><div class="sub">g protein</div></div>
+     <div><div class="big">${Math.round(m.c)}</div><div class="sub">g karbo</div></div>
+     <div><div class="big">${Math.round(m.f)}</div><div class="sub">g fett</div></div></div>
+   <h3>Ingredienser (1 porsjon)</h3>${ingList(r,lvl)}
+   <h3>Slik gjør du</h3><ol>${r.steg.map(x=>`<li>${x}</li>`).join('')}</ol>
+   ${r.tips?`<div class="note">${r.tips}</div>`:''}</div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+function pickRecipe(i,rid){const d=day(cur);d.pick=d.pick||{};d.pick[i]=rid;d.openSwap=null;save();render()}
+function toggleSwap(i){const d=day(cur);d.openSwap=(d.openSwap===i)?null:i;save();render()}
+function ateToggle(i,v){const d=day(cur);d.ate=d.ate||{};d.ate[i]=v;save();render()}
+function setTrainTime(v){S.profile.trainTime=v;save();render()}
+
+function mealTimeline(k,edit){
+  const p=effPlan(k),slots=slotsFor(k),lvl=dayLevel(k,p),d=S.days[k]||{},ate=d.ate||{};
+  let h='';
+  for(const s of slots){
+    if(s.slot==='T'){
+      h+=`<div class="tl train"><div class="tm">${s.time}</div><div class="tb"><b>TRENING: ${p.t}</b><div class="sub">${p.min} min · ${p.d||''}</div>
+        ${p.k==='lang'&&p.min>=75?`<div class="sub">Under økten: vann, og 1 gel (ca. 25 g karbo) hver 45. minutt etter første time.</div>`:''}
+        <div style="margin-top:4px"><span class="chip" onclick="go('trening')">Åpne økt</span>${p.s?`<span class="chip" onclick="go('trening')">Se øvelser</span>`:''}</div></div></div>`;
+      continue;
+    }
+    const m=recMacro(s.r,lvl);
+    h+=`<div class="tl"><div class="tm">${s.time}</div><div class="tb">
+      <label class="chk" style="padding:0;border:0"><input type="checkbox" ${ate[s.i]?'checked':''} onchange="ateToggle(${s.i},this.checked)">
+      <span><b>${SLOTNAME[s.slot]}</b>: ${s.r.n}</span></label>
+      <div class="sub">${Math.round(m.k)} kcal · ${Math.round(m.p)} g protein · ${Math.round(m.c)} g karbo</div>
+      ${edit?`<div style="margin-top:4px"><span class="chip" onclick="recipeSheet('${s.r.id}','${k}')">Oppskrift og mengder</span><span class="chip" onclick="toggleSwap(${s.i})">Bytt ⇄</span></div>`:''}
+      ${edit&&d.openSwap===s.i?`<div class="swap">${optsFor(s.slot).map(o=>{const mm=recMacro(o,lvl);return `<div class="dayrow" onclick="pickRecipe(${s.i},'${o.id}')"><span>${o.id===s.r.id?'✓ ':''}${o.n}</span><span class="sub">${Math.round(mm.k)} kcal · ${Math.round(mm.p)} g P</span></div>`}).join('')}</div>`:''}
+      </div></div>`;
+  }
+  return h;
+}
+function shoppingList(k){
+  const ds=weekDays(k),tot={};
+  for(const dk of ds){
+    const p=effPlan(dk),lvl=dayLevel(dk,p);
+    for(const s of slotsFor(dk)){if(!s.r)continue;const t=recItems(s.r,lvl);
+      for(const [id,g] of t.base.concat(t.p1,t.p2)){if(id==='krydder')continue;tot[id]=(tot[id]||0)+g}}
+  }
+  const cats={};
+  for(const [id,g] of Object.entries(tot)){const c=ING[id][5];(cats[c]=cats[c]||[]).push([id,g])}
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>Handleliste uke ${weekNo(k)}</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   <div class="sub">Basert på dagens valgte måltider for ${fmt(ds[0])}–${fmt(ds[6])}. Mengder er netto for hele uka; ta ca. 10 % buffer.</div>
+   ${Object.keys(cats).sort().map(c=>`<h3>${c}</h3><ul>${cats[c].sort((a,b)=>ING[a[0]][0].localeCompare(ING[b[0]][0])).map(([id,g])=>`<li>${ING[id][0]}: <b>${g>=1000?(g/1000).toFixed(1)+' kg':Math.round(g)+' g'}</b>${ING[id][6]?` <span class="sub">(≈ ${fracN(Math.round(g/ING[id][7]*2)/2)} ${UNIT[ING[id][6]][g/ING[id][7]>1.2?1:0]})</span>`:''}</li>`).join('')}</ul>`).join('')}
+   <div class="note">Krydder, salt, pepper, buljong, sitron og soyasaus kommer i tillegg.</div></div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+
+/* =======================================================================
+   EGENTEST (kvalitetssikring) – kjøres fra Data-fanen
+   ======================================================================= */
+function selfTest(){
+  const res=[],ok=(c,t)=>res.push([!!c,t]);
+  const ban=/fisk|laks|tunfisk|tomat|squash|zucchini|ketchup/i;
+  // 1. oppskrifter
+  let bad=[];for(const r of RECIPES){
+    for(const [id] of r.ing.concat(r.p1,r.p2))if(!ING[id])bad.push(r.id+':'+id);
+    if(ban.test((r.n+' '+r.steg.join(' ')+' '+r.tips).replace(/tomatfri|uten tomat|uten ketchup|i stedet for ketchup/gi,'')))bad.push(r.id+':forbudt ord');
+    for(const [id] of r.ing.concat(r.p1,r.p2))if(ban.test(ING[id]?ING[id][0]:''))bad.push(r.id+':forbudt ingrediens');
+  }
+  ok(!bad.length,'Oppskrifter: ingredienser finnes, ingen fisk/tomat/squash '+(bad.length?JSON.stringify(bad):'('+RECIPES.length+' oppskrifter)'));
+  // 2. alle slots har minst 3 alternativer
+  const few=Object.keys(SLOTOPT).filter(s=>optsFor(s).length<3);
+  ok(!few.length,'Hvert måltid har minst 3 alternativer '+few.join(','));
+  // 3. dagsummer per nivå
+  const bounds={0:[2150,2600],1:[2550,3000],2:[2850,3400]};
+  let off=[];
+  for(let w=1;w<=28;w++){for(let dd=0;dd<7;dd++){
+    const k=addDays(S.profile.start,(w-1)*7+dd),p=effPlan(k),m=dayMacros(k);
+    if(!m.tot.p)continue;
+    const b=bounds[m.lvl];
+    if(m.tot.k<b[0]||m.tot.k>b[1])off.push(k+' '+Math.round(m.tot.k)+' kcal (nivå '+m.lvl+')');
+    if(m.tot.p<150)off.push(k+' protein '+Math.round(m.tot.p));
+  }}
+  ok(!off.length,'Alle 28 uker: kcal innen nivåets ramme og protein ≥ 150 g '+(off.length?off.slice(0,4).join('; '):''));
+  // 4. plan vs. uke vs. i dag vs. plan-fane
+  let mis=[];
+  for(let w=1;w<=29;w++)for(let dd=0;dd<7;dd++){
+    const k=addDays(S.profile.start,(w-1)*7+dd),a=effPlan(k).t,b=weekDays(k).map(x=>effPlan(x).t)[dow(k)];
+    if(a!==b)mis.push(k);
+    if(weekNo(k)!==w)mis.push('weekNo '+k);
+  }
+  ok(!mis.length,'Samme økt vises i I dag, Uke og Plan for alle datoer '+(mis.length?mis.slice(0,3).join(','):''));
+  // 5. Styrke og løp per uke
+  const cnt=[];for(let w=9;w<=27;w++){const ds=weekDays(addDays(S.profile.start,(w-1)*7));
+    const s=ds.filter(k=>planFor(k).k==='styrke').length,l=ds.filter(k=>['kval','lang'].includes(planFor(k).k)).length;
+    if(s!==3||l!==2)cnt.push(w)}
+  ok(!cnt.length,'Uke 9–27 har 3 styrkeøkter og 2 løpeøkter '+cnt.join(','));
+  // 6. bibliotek
+  const miss=Object.keys(LIB).filter(x=>!RIG[x]);let sess=[];
+  for(const [sk,list] of Object.entries(EX))for(const e of list)for(const x of e.keys)if(!LIB[x])sess.push(sk+':'+x);
+  ok(!miss.length&&!sess.length,'Alle øvelser i øktene har teknikk og animasjon '+miss.concat(sess).join(','));
+  return res;
+}
+function runTest(){
+  const r=selfTest();
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>Egentest</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   ${r.map(([o,t])=>`<div class="chk"><span>${o?'✅':'❌'}</span><span>${t}</span></div>`).join('')}</div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+
+/* =======================================================================
    2. TILSTAND
    ======================================================================= */
 const KEY='treningsdagbok.v1';
@@ -803,11 +1217,11 @@ function daysTo(k){return Math.round((parse(k)-parse(D()))/864e5)}
 function weights(){return Object.entries(S.days).filter(([k,v])=>v.weight).map(([k,v])=>[k,+v.weight]).sort()}
 function trend(){const w=weights();return w.map(([k])=>{const s=w.filter(([k2])=>k2<=k&&(parse(k)-parse(k2))/864e5<7);return [k,s.reduce((a,b)=>a+b[1],0)/s.length]})}
 function refWeight(){const t=trend();return t.length?t[t.length-1][1]:+S.profile.startWeight}
-function protein(k){return ((S.days[k]||{}).meals||[]).reduce((a,m)=>a+(+m.p||0),0)}
+function protein(k){const c=((S.days[k]||{}).meals||[]).reduce((a,m)=>a+(+m.p||0),0);return Math.round(c+dayMacros(k).eaten.p)}
 function proteinTarget(){return Math.round(refWeight()*1.8/5)*5}
 function allFoods(){return FOODS.concat(S.customFoods||[])}
 function weekDays(k){const s=addDays(k,-dow(k));return [...Array(7)].map((_,i)=>addDays(s,i))}
-function restRun(k){let n=0,d=k;for(;n<7;){d=addDays(d,-1);if((S.days[d]||{}).done)break;n++}return n}
+function restRun(k){let n=0,d=k;for(;n<7;){d=addDays(d,-1);if(d<S.profile.start)return 0;if((S.days[d]||{}).done)break;n++}return n}
 function set(f,v,sub){const d=day(cur);if(sub){d[sub]=d[sub]||{};d[sub][f]=v}else d[f]=v;save()}
 function travelSess(k,p){return (weekDays(k).indexOf(k)%2===0)?'R1':'R2'}
 function effPlan(k){ // tar hensyn til reisedag
@@ -836,24 +1250,38 @@ function shift(n){cur=addDays(cur,n);render()}
 function chips(keys){return keys.map(k=>`<span class="chip" onclick="openEx('${k}',${JSON.stringify(keys).replace(/"/g,'&quot;')})">▶ ${LIB[k].n}</span>`).join('')}
 function exList(key){return (EX[key]||[]).map(e=>`<div class="ex"><div class="nm">${e.n} <span class="pill">${e.s}</span></div><div>${chips(e.keys)}</div></div>`).join('')}
 
+function shortTitle(p){
+  if(p.s&&(p.s==='R1'||p.s==='R2'))return 'Reise';
+  if(p.s&&p.k==='styrke')return 'Styrke '+p.s;
+  return ({lang:'Langtur',kval:'Kvalitet',løp:'Gå/løp',rolig:'Rolig',gange:'Gange',hvile:'Hvile',bonus:'Bonus'})[p.k]||p.t||'Fri';
+}
+function weekStrip(k){
+  return `<div class="strip">${weekDays(k).map(x=>{const p=effPlan(x),dn=(S.days[x]||{}).done;
+    return `<div class="sd ${x===k?'sel':''} ${x===D()?'today':''}" onclick="cur='${x}';render()"><div class="sub">${NO[dow(x)]} ${x.slice(8)}</div><div class="sdot ${dn?'done':''}"></div><div class="sl">${shortTitle(p)}${p.opt?'*':''}</div></div>`}).join('')}</div>`;
+}
 function vIdag(){
   const d=day(cur),p=effPlan(cur),ph=p.ph||phaseOf(weekNo(cur));
   const pt=proteinTarget(),pr=protein(cur),rules=d.rules||{};
   const ruleN=RULES.filter((_,i)=>rules[i]).length,gap=restRun(cur);
-  const en=energy(cur,p),cb=carbKg(p),kg=refWeight();
+  const en=energy(cur,p),dm=dayMacros(cur);
   const bfWeeks=[1,13,26].includes(weekNo(cur));
-  return dateBar()+`
-  <div class="card"><h2>Dagens økt · uke ${p.w} · ${ph.name}</h2>
+  return dateBar()+weekStrip(cur)+`
+  <div class="card"><h2>${NO[dow(cur)]} ${fmt(cur)} · uke ${p.w} · ${ph.name}</h2>
     <div class="big">${p.t||'Fri'}</div>
-    <div class="sub">${p.min?p.min+' min · ':''}${NO[dow(cur)]} ${fmt(cur)} ${p.opt?'· <span class="pill">valgfri</span>':''}</div>
+    <div class="sub">${p.min?p.min+' min · ':''}${p.opt?'valgfri · ':''}${levelName(dm.lvl)} (${Math.round(dm.tot.k)} kcal, ${Math.round(dm.tot.p)} g protein)</div>
     <div style="margin:8px 0">${p.d||''}</div>
-    ${p.s?`<div>${exList(p.s)}</div><div class="sub" style="margin-top:6px">${STRENGTH_RULE}</div>`:''}
-    <label class="chk"><input type="checkbox" ${d.done?'checked':''} onchange="set('done',this.checked);render()"><span>Gjennomført</span></label>
+    <label class="chk"><input type="checkbox" ${d.done?'checked':''} onchange="set('done',this.checked);render()"><span>Økten er gjennomført</span></label>
     <label class="chk"><input type="checkbox" ${d.minimum?'checked':''} onchange="set('minimum',this.checked);if(this.checked)set('done',true);render()"><span>Tok bare minimumsøkta (15 min) <span class="pill a">teller som seier</span></span></label>
     <label class="chk"><input type="checkbox" ${d.travel?'checked':''} onchange="set('travel',this.checked);render()"><span>Reisedag (hotell/lite tid)</span></label>
-    ${d.minimum||(gap>=2&&!d.done)?`<div class="card" style="margin-top:8px;margin-bottom:0"><h2>${SESS.MIN.t}</h2>${exList('MIN')}</div>`:''}
     ${gap>=2&&!d.done?`<div class="sub" style="color:var(--bad);margin-top:6px">Regelen: aldri to dager på rad uten bevegelse. Ta minimumsøkta nå.</div>`:''}
   </div>
+  <div class="card"><h2>Dagens opplegg: hva, når og hvor mye</h2>
+    <div class="row" style="margin-bottom:6px"><div class="sub">Trener: ${TRAINTIME[S.profile.trainTime||'kveld']}</div>
+      <select style="flex:0 0 auto;width:auto;min-width:200px" onchange="setTrainTime(this.value)">${Object.entries(TRAINTIME).map(([k,l])=>`<option value="${k}" ${(S.profile.trainTime||'kveld')===k?'selected':''}>${l}</option>`).join('')}</select></div>
+    ${mealTimeline(cur,false)}
+    <div class="row" style="margin-top:8px"><button class="b" onclick="go('mat')">Oppskrifter, mengder og bytt måltid</button></div></div>
+  ${p.s?`<div class="card"><h2>Øvelser i dag</h2>${exList(p.s)}<div class="sub" style="margin-top:6px">${STRENGTH_RULE}</div></div>`:''}
+  ${(d.minimum||(gap>=2&&!d.done))?`<div class="card"><h2>${SESS.MIN.t}</h2>${exList('MIN')}</div>`:''}
   <div class="card"><h2>Rask innlogging (under 1 min)</h2>
     <div class="row">
       <div><label>Vekt (kg)</label><input type="number" step="0.1" inputmode="decimal" value="${d.weight||''}" onchange="set('weight',this.value)"></div>
@@ -861,11 +1289,10 @@ function vIdag(){
       <div><label>Søvn (t)</label><input type="number" step="0.5" inputmode="decimal" value="${d.sleep||''}" onchange="set('sleep',this.value)"></div>
       <div><label>Økt-RPE (1–10)</label><input type="number" min="1" max="10" value="${d.rpe||''}" onchange="set('rpe',this.value)"></div>
     </div></div>
-  <div class="card"><h2>Kosthold i dag</h2>
-    <div class="row"><div class="big">${pr} / ${pt} g</div><div class="sub" style="flex:2">protein · ${en.lo}–${en.hi} kcal · karbo ${Math.round(kg*cb[0])}–${Math.round(kg*cb[1])} g</div></div>
+  <div class="card"><h2>Status i dag</h2>
+    <div class="row"><div class="big">${pr} / ${pt} g</div><div class="sub" style="flex:2">protein spist · mål ${en.lo}–${en.hi} kcal</div></div>
     <div class="bar"><i style="width:${Math.min(100,pr/pt*100)}%"></i></div>
-    <div class="sub" style="margin-top:6px">Regler: ${ruleN}/${RULES.length} ✓ · Tilskudd: ${SUPPS.filter((_,i)=>(d.supp||{})[i]).length}/${SUPPS.length}</div>
-    <button class="g" style="margin-top:8px" onclick="go('mat')">Åpne kosthold</button></div>
+    <div class="sub" style="margin-top:6px">Regler: ${ruleN}/${RULES.length} ✓ · Tilskudd: ${SUPPS.filter((_,i)=>(d.supp||{})[i]).length}/${SUPPS.length}</div></div>
   ${bfWeeks?`<div class="note">Uke ${weekNo(cur)}: tid for kroppsfettmåling (BIA/DEXA). Logg under Fremgang.</div>`:''}
   ${weekNo(cur)===18?`<div class="note">Uke 18: 5 km-test i løpet av uka. Logg tid under Trening → Løp/kondisjon.</div>`:''}`;
 }
@@ -935,30 +1362,34 @@ function delSet(i){day(cur).sets.splice(i,1);save();render()}
 
 function vMat(){
   const d=day(cur),meals=d.meals||[],rules=d.rules||{},supp=d.supp||{},p=effPlan(cur);
-  const pt=proteinTarget(),pr=protein(cur),en=energy(cur,p),cb=carbKg(p),kg=refWeight();
-  return dateBar()+`
-  <div class="card"><h2>Dagens mål · ${en.def?'underskuddsfase (til uke '+DEFICIT_TO+')':'vedlikehold'}</h2>
+  const pt=proteinTarget(),pr=protein(cur),en=energy(cur,p),dm=dayMacros(cur);
+  const inRange=dm.tot.k>=en.lo-150&&dm.tot.k<=en.hi+150;
+  return dateBar()+weekStrip(cur)+`
+  <div class="card"><h2>${NO[dow(cur)]} ${fmt(cur)} · ${p.t} · ${levelName(dm.lvl)}</h2>
     <div class="row">
-      <div><div class="big">${pt} g</div><div class="sub">protein (1,8 g/kg)</div></div>
-      <div><div class="big">${en.lo}–${en.hi}</div><div class="sub">kcal</div></div>
-      <div><div class="big">${Math.round(kg*cb[0])}–${Math.round(kg*cb[1])}</div><div class="sub">g karbohydrat</div></div>
+      <div><div class="big">${Math.round(dm.tot.k)}</div><div class="sub">kcal planlagt (mål ${en.lo}–${en.hi}) ${inRange?'✓':''}</div></div>
+      <div><div class="big">${Math.round(dm.tot.p)}</div><div class="sub">g protein (mål ≥ ${pt})</div></div>
+      <div><div class="big">${Math.round(dm.tot.c)}</div><div class="sub">g karbo</div></div>
+      <div><div class="big">${Math.round(dm.tot.f)}</div><div class="sub">g fett</div></div>
     </div>
-    <div class="sub" style="margin-top:8px">Estimater basert på ${kg.toFixed(1)} kg. Juster etter 7-dagers snitt, ikke enkeltdager. Ingen kalori-telling nødvendig – protein og reglene under er det som teller.</div></div>
-  <div class="card"><h2>Protein logg: ${pr} / ${pt} g</h2>
-    <div class="bar"><i style="width:${Math.min(100,pr/pt*100)}%"></i></div>
-    <div style="margin-top:10px">${meals.map((m,i)=>`<div class="chk"><span style="flex:1">${m.n}</span><span>${m.p} g</span><button class="x" onclick="delMeal(${i})">×</button></div>`).join('')}</div>
+    <div class="sub" style="margin-top:6px">Spist så langt: ${Math.round(dm.eaten.k)} kcal · ${Math.round(dm.eaten.p)} g protein. ${en.def?'Underskuddsfase (til uke '+DEFICIT_TO+')':'Vedlikehold'}. Mengdene er på porsjonsnivå for dagen: de endrer seg selv etter treningsdagen.</div></div>
+  <div class="card"><h2>Hva spiser jeg når? (trykk «Bytt» for alternativer)</h2>
+    <div class="row" style="margin-bottom:6px"><div class="sub">Trener</div>
+      <select style="flex:0 0 auto;width:auto;min-width:200px" onchange="setTrainTime(this.value)">${Object.entries(TRAINTIME).map(([k,l])=>`<option value="${k}" ${(S.profile.trainTime||'kveld')===k?'selected':''}>${l}</option>`).join('')}</select></div>
+    ${mealTimeline(cur,true)}</div>
+  <div class="card"><h2>Egne tillegg (utenom planen): ${meals.reduce((a,m)=>a+(+m.p||0),0)} g protein</h2>
+    ${meals.map((m,i)=>`<div class="chk"><span style="flex:1">${m.n}</span><span>${m.p} g</span><button class="x" onclick="delMeal(${i})">×</button></div>`).join('')}
     <div class="row" style="margin-top:10px">
       <select id="food" style="flex:3"><option value="">Velg matvare…</option>${allFoods().map((f,i)=>`<option value="${i}">${f[0]} – ${f[1]} g</option>`).join('')}</select>
       <button class="b" style="flex:0" onclick="addFood()">+</button></div>
     <div class="row" style="margin-top:8px"><input id="cn" placeholder="Egen matvare" style="flex:3"><input id="cp" type="number" placeholder="g protein">
       <button class="g" style="flex:0" onclick="addCustom()">+</button></div></div>
+  <div class="card"><h2>Handleliste og oppskrifter</h2>
+    <button class="b" onclick="shoppingList(cur)">Handleliste for uke ${weekNo(cur)}</button></div>
   <div class="card"><h2>Dagens regler</h2>
     ${RULES.map((t,i)=>`<label class="chk"><input type="checkbox" ${rules[i]?'checked':''} onchange="setIn('rules',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t}</span></label>`).join('')}</div>
   <div class="card"><h2>Tilskudd</h2>
     ${SUPPS.map(([t,s],i)=>`<label class="chk"><input type="checkbox" ${supp[i]?'checked':''} onchange="setIn('supp',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t} <span class="sub">${s}</span></span></label>`).join('')}</div>
-  <div class="card"><h2>Måltidsforslag (trykk for å logge protein)</h2>
-    ${Object.entries(MEALS).map(([g,list])=>`<div style="margin:6px 0"><b class="sm">${g}</b><br>${list.map(([n,pp])=>`<span class="chip" onclick="logMeal(${JSON.stringify(n).replace(/"/g,'&quot;')},${pp})">${n} · ~${pp} g</span>`).join('')}</div>`).join('')}
-    <div class="sub" style="margin-top:6px">Ikke fisk, tomat eller squash i listen. Proteinverdier er grove anslag.</div></div>
   <div class="card"><h2>Når du er på reise</h2>${TRAVEL_RULES.map(t=>`<div class="sm" style="margin:4px 0">• ${t}</div>`).join('')}</div>`;
 }
 function setIn(g,i,v){const d=day(cur);d[g]=d[g]||{};d[g][i]=v;save();render()}
@@ -1014,13 +1445,13 @@ function drawChart(){
 function vPlan(){
   const w0=weekNo(D());
   return `<div class="card"><h2>Faser</h2>${PHASES.map(p=>`<div style="margin:6px 0"><b>${p.name}</b> <span class="pill">uke ${p.from}–${p.to} · ${p.days} dager</span><div class="sm sub">${p.text}</div></div>`).join('')}
-  <div class="sub" style="margin-top:6px">Kosthold: underskudd uke 1–${DEFICIT_TO} (ca. 0,4–0,5 kg/uke), vedlikehold uke ${DEFICIT_TO+1}–28.</div></div>
-  <div class="card"><h2>28 uker</h2><table><tr><th>Uke</th><th>Start</th><th>Fase</th><th>Langtur / løp</th></tr>
+  <div class="sub" style="margin-top:6px">Kosthold: underskudd uke 1–${DEFICIT_TO} (ca. 0,4–0,5 kg/uke), vedlikehold uke ${DEFICIT_TO+1}–28. Trykk på en uke for å se hver dag.</div></div>
   ${[...Array(WEEKS)].map((_,i)=>{const w=i+1,s=addDays(S.profile.start,i*7),ph=phaseOf(w);
-    let l=w<=8?RUN1[w]:(w===29?'LØPSDAG søndag 25.4.':w===28?'Taper, shake-out lørdag':RUN2[w][2]+' min'+(RUN2[w][3]?' · '+RUN2[w][3]:''));
-    return `<tr class="${w===w0?'hl':''}"><td>${w}</td><td>${fmt(s)}</td><td>${ph.name}</td><td class="sm">${l}</td></tr>`}).join('')}</table></div>`;
+    const ds=[...Array(7)].map((_,j)=>addDays(s,j));
+    return `<details class="card wk ${w===w0?'hl':''}" ${w===w0?'open':''}><summary><b>Uke ${w}</b> · ${fmt(ds[0])}–${fmt(ds[6])} · ${ph.name}${w===w0?' · <span class="pill a">nå</span>':''}</summary>
+      ${ds.map(k=>{const p=planFor(k);return `<div class="dayrow ${k===D()?'today':''}" onclick="cur='${k}';go('idag')"><span>${NO[dow(k)]} ${fmt(k)}</span><span style="text-align:right"><b>${p.t||'Fri'}</b>${p.opt?' <span class="sub">(valgfri)</span>':''}<br><span class="sub">${(p.d||'').split(' · ')[0].slice(0,90)}</span></span></div>`}).join('')}
+    </details>`}).join('')}`;
 }
-
 function vData(){
   const p=S.profile;
   return `<div class="card"><h2>Innstillinger</h2>
@@ -1033,6 +1464,7 @@ function vData(){
     <div class="sub">Data ligger kun i denne nettleseren på denne enheten. Eksporter jevnlig (f.eks. hver søndag).</div>
     <div class="row" style="margin-top:8px"><button class="b" onclick="exp()">Eksporter JSON</button><button class="g" onclick="$('#imp').click()">Importer</button></div>
     <input id="imp" type="file" accept=".json" class="hide" onchange="imp(this.files[0])"></div>
+  <div class="card"><h2>Kvalitetssjekk</h2><div class="sub">Kontrollerer plan, måltider, kcal/protein per dag og at alle øvelser har teknikk.</div><button class="g" style="margin-top:8px" onclick="runTest()">Kjør egentest</button></div>
   <div class="card"><h2>Nullstill</h2><button class="g" onclick="if(confirm('Slette ALL data?')){localStorage.removeItem(KEY);S=load();render()}">Slett alle data</button></div>
   <div class="card"><h2>Om</h2><div class="sub">Programmet bygger på forskningsnotatene i mappen «forskning». Dette er ikke medisinsk rådgivning – ved smerte, brystsmerter eller uvanlig tungpust: stopp og kontakt lege.</div></div>`;
 }

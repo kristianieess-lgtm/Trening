@@ -3,6 +3,7 @@
 Privat prosjekt: 28 ukers program (styrke + halvmaraton) og kostholdsveileder.
 
 - `dagbok.html` – offline treningsdagbok og kostholdsveileder med øvelsesbibliotek (32 øvelser med animasjon, teknikk og vanlige feil). Åpne filen i nettleseren (Mac eller mobil). Data lagres i nettleseren; bruk *Data → Eksporter* jevnlig.
+- Kosthold: dagsmeny med klokkeslett per treningsdag, 36 oppskrifter med nøyaktige mengder (g, skiver, dl), bytt-alternativer, handleliste per uke. Ingen fisk, tomat eller squash.
 - `forskning/` – forskningsnotater med verifiserte kilder (styrke, halvmaraton, ernæring, motivasjon).
 
 ## Rammer
