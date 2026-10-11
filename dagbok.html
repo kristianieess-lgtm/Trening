@@ -782,78 +782,78 @@ const CUES={
    Næringsverdier per 100 g (typiske norske verdier, avrundet).
    [navn, kcal, protein, karbo, fett, kategori, enhet, gram per enhet]
    ======================================================================= */
-const ING={
- havre:['Havregryn',370,13,58,7,'Tørrvarer','dl',35],
- muesli:['Müsli (usukret)',360,10,60,6,'Tørrvarer','dl',40],
- melk:['Lettmelk',45,3.5,4.6,1.5,'Meieri','dl',100],
+const ING={ /* Kilde: Matvaretabellen.no (Mattilsynet), hentet 11.10.2026. Unntak er merket i Data-fanen. */
+ havre:['Havregryn',369,14.1,57.2,6.7,'Tørrvarer','dl',40],
+ muesli:['Müsli (fruktmüsli)',376,8.5,69.8,5.7,'Tørrvarer'],
+ melk:['Lettmelk (1 %)',41,3.5,4.5,1.0,'Meieri','dl',100],
  skyr:['Skyr naturell',63,11,4,0.2,'Meieri'],
- cottage:['Cottage cheese',85,12,3,3,'Meieri'],
- egg:['Egg',143,12.5,0.5,10,'Meieri','egg',53],
- ost:['Ost (skåret med høvel)',330,27,0,25,'Meieri','skive',8],
- kyllingpal:['Kyllingbryst, pålegg',100,20,1,2,'Pålegg','skive',12],
- smor:['Smør',740,0.5,0,82,'Meieri','ts',5],
- olje:['Olivenolje',880,0,0,100,'Tørrvarer','ts',4.5],
- honning:['Honning',300,0.3,80,0,'Tørrvarer','ts',7],
- peanottsmor:['Peanøttsmør',600,25,10,50,'Tørrvarer','ss',16],
- valnott:['Valnøtter, hakket',650,15,3,62,'Tørrvarer','ss',9],
- mandel:['Mandler',600,21,6,52,'Tørrvarer','liten neve',15],
- brod:['Grovbrød',245,9,41,3,'Brød','skive',35],
- knekke:['Knekkebrød',340,10,65,2,'Brød','skive',12],
- tortilla:['Fullkorn tortilla',300,9,50,7,'Brød','stk',60],
- riskake:['Riskake',380,8,80,3,'Brød','stk',9],
- banan:['Banan',90,1,20,0.3,'Frukt og grønt','stk',110],
- eple:['Eple',55,0.3,12,0.2,'Frukt og grønt','stk',130],
- baer:['Bær (frosne/ferske)',50,0.7,10,0.3,'Frukt og grønt'],
- skinke:['Skinke, pålegg',100,17,1,3,'Pålegg','skive',12],
- kalkunpal:['Kalkunbryst, pålegg',95,18,1,2,'Pålegg','skive',12],
- kylling:['Kyllingfilet (rå)',110,23,0,2,'Kjøtt'],
- kyllinglaar:['Kyllinglår uten skinn (rå)',140,20,0,6,'Kjøtt'],
- kjottdeig:['Kjøttdeig 5 % (rå)',125,21,0,5,'Kjøtt'],
- biff:['Biff, ytrefilet (rå)',130,22,0,4,'Kjøtt'],
- svinefilet:['Svinefilet (rå)',110,22,0,2.5,'Kjøtt'],
- potet:['Poteter',75,2,16,0.1,'Frukt og grønt','stk',80],
- soetpotet:['Søtpotet',85,1.5,20,0.1,'Frukt og grønt'],
- ris:['Ris (tørr)',355,7,78,1,'Tørrvarer','dl',80],
- pasta:['Fullkornspasta (tørr)',350,13,65,2.5,'Tørrvarer'],
- brokkoli:['Brokkoli',33,3.3,3,0.4,'Frukt og grønt'],
- spinat:['Spinat',20,2.5,1,0.4,'Frukt og grønt'],
- gulrot:['Gulrot',35,0.7,7.5,0.2,'Frukt og grønt','stk',70],
- lok:['Løk',35,1,7,0.1,'Frukt og grønt','stk',90],
- paprika:['Paprika',30,1,6,0.3,'Frukt og grønt','stk',150],
- agurk:['Agurk',12,0.6,2,0.1,'Frukt og grønt'],
- salat:['Salat',15,1.2,2,0.2,'Frukt og grønt'],
- mais:['Mais (hermetikk)',85,3,15,1,'Tørrvarer'],
- sjokmelk:['Sjokolademelk',70,3.3,10,1.8,'Meieri','dl',100],
+ cottage:['Cottage cheese',97,13.0,1.5,4.3,'Meieri','dl',100],
+ egg:['Egg',148,12.9,0.3,10.5,'Meieri','egg',56],
+ ost:['Ost (Norvegia)',351,27,0,27,'Meieri','skive',10],
+ smor:['Smør',744,1.0,0.5,82,'Meieri','ts',5],
+ olje:['Olivenolje',892,0.2,0,99,'Tørrvarer','ts',4.5],
+ honning:['Honning',317,0.3,78.9,0,'Tørrvarer','ts',11],
+ peanottsmor:['Peanøttsmør',621,22.8,13.1,51.8,'Tørrvarer','ss',17],
+ valnott:['Valnøtter, hakket',680,14.1,2.8,66.5,'Tørrvarer','ss',9],
+ mandel:['Mandler',601,21.2,6.6,52.1,'Tørrvarer','neve',20],
+ brod:['Grovbrød',239,9.3,40.6,3.1,'Brød','skive',40],
+ knekke:['Knekkebrød (grovt)',308,9.0,55.4,1.5,'Brød','skive',12],
+ tortilla:['Fullkorn tortilla',260,8.5,44.8,4.8,'Brød','stk',60],
+ riskake:['Riskake',340,8.0,67.9,3.0,'Brød','stk',6],
+ banan:['Banan',88,1.1,19.7,0.2,'Frukt og grønt','stk',120],
+ eple:['Eple',50,0.0,11.0,0.1,'Frukt og grønt','stk',130],
+ baer:['Bær (blåbær)',51,1.0,7.5,0.9,'Frukt og grønt'],
+ skinke:['Skinke (kokt, pålegg)',95,16.7,0.7,2.8,'Pålegg','skive',12],
+ kalkunpal:['Kalkunfilet, pålegg',88,20.9,0,0.5,'Pålegg','skive',11],
+ kyllingpal:['Kyllingbryst, pålegg (omtrent som kalkunfilet)',88,20.9,0,0.5,'Pålegg','skive',11],
+ kylling:['Kyllingfilet (rå)',111,23.0,0,2.1,'Kjøtt'],
+ kyllinglaar:['Kyllinglår uten skinn (rå)',131,18.0,0,6.6,'Kjøtt'],
+ kjottdeig:['Karbonadedeig 4,5 % (rå)',123,20.7,0,4.5,'Kjøtt'],
+ biff:['Biff, ytrefilet (rå)',118,22.5,0,3.1,'Kjøtt'],
+ svinefilet:['Svinefilet / mørbrad (rå)',112,23.1,0.3,2.0,'Kjøtt'],
+ potet:['Poteter (kokte)',84,2.1,17.8,0.1,'Frukt og grønt','stk',80],
+ soetpotet:['Søtpotet',80,1.6,16.8,0.1,'Frukt og grønt'],
+ ris:['Ris, jasmin (tørr)',355,7.5,79.6,0.7,'Tørrvarer','dl',80],
+ pasta:['Fullkornspasta (tørr)',362,12.6,68.3,2.5,'Tørrvarer'],
+ brokkoli:['Brokkoli',24,2.9,2.0,0,'Frukt og grønt'],
+ spinat:['Spinat',17,2.8,0.1,0,'Frukt og grønt'],
+ gulrot:['Gulrot',25,0,5.3,0,'Frukt og grønt','stk',80],
+ lok:['Løk',30,1.0,4.4,0,'Frukt og grønt','stk',160],
+ paprika:['Paprika (rød)',26,0.8,4.2,0.2,'Frukt og grønt','stk',145],
+ agurk:['Agurk',9,0.8,1.3,0,'Frukt og grønt'],
+ salat:['Isbergsalat',12,1.0,1.8,0,'Frukt og grønt'],
+ mais:['Mais (hermetikk)',88,2.6,15.4,1.1,'Tørrvarer'],
+ sjokmelk:['Sjokolademelk',62,4.0,8.5,1.2,'Meieri','dl',100],
  krydder:['Krydder, buljong, sitron (etter smak)',0,0,0,0,'Tørrvarer'],
- myse:['Myseprotein (pulver)',385,80,6,5,'Annet','scoop',30],
- proteinbar:['Proteinbar',370,30,35,12,'Annet','stk',55],
- rundstykke:['Rundstykke, grovt',260,9,45,4,'Annet','stk',60],
- loff:['Loff / hvitt brød',260,8,50,2.5,'Annet','skive',30],
- polse:['Pølse (grill/kokt)',250,12,3,21,'Annet','stk',100],
- leverpostei:['Leverpostei',270,11,3,24,'Annet','skive',20],
- brunost:['Brunost',460,10,48,27,'Annet','skive',8],
- syltetoy:['Syltetøy',250,0.3,60,0,'Annet','ts',10],
- majones:['Majones',700,1,2,76,'Annet','ss',15],
- bacon:['Bacon, stekt',420,30,0,33,'Annet','skive',10],
- kjottkake:['Kjøttkake',200,13,6,14,'Annet','stk',70],
- pannekake:['Pannekake',200,7,26,8,'Annet','stk',60],
- pizza:['Pizza (frossen)',240,10,28,9,'Annet'],
- chips:['Potetchips',540,6,50,35,'Annet'],
- sjokolade:['Melkesjokolade',540,7,58,31,'Annet','rute',5],
- kanelbolle:['Kanelbolle / skolebrød',330,7,50,11,'Annet','stk',100],
- is:['Iskrem (vanilje)',200,3,24,10,'Annet','dl',55],
- brus:['Brus (sukker)',42,0,10.6,0,'Annet','dl',100],
- juice:['Juice',45,0.5,10.5,0.1,'Annet','dl',100],
- ol:['Øl',43,0.3,3.5,0,'Annet','dl',100],
- vin:['Vin',80,0.1,2.5,0,'Annet','dl',100],
- peanotter:['Peanøtter',600,26,10,50,'Annet','liten neve',15],
- cornflakes:['Cornflakes',370,7,83,1,'Annet','dl',20],
- yoghurt:['Yoghurt med frukt',90,3.5,14,2,'Annet','dl',100],
- pastakokt:['Pasta, kokt',150,5.5,28,1,'Annet','dl',60],
- risskokt:['Ris, kokt',130,2.7,28,0.3,'Annet','dl',70],
- kaffemelk:['Kaffe med melk',12,0.8,1,0.5,'Annet','dl',100]
+ myse:['Myseprotein (pulver, produsent)',385,80,6,5,'Annet','scoop',30],
+ proteinbar:['Proteinbar (ca., sjekk pakken)',370,30,35,12,'Annet','stk',55],
+ rundstykke:['Rundstykke, grovt',257,8.2,42.1,5.1,'Annet','stk',100],
+ loff:['Loff / hvitt brød',255,8.5,45.7,3.4,'Annet','skive',30],
+ polse:['Grillpølse',217,10.4,1.9,18.5,'Annet','stk',60],
+ leverpostei:['Leverpostei',237,9.9,4.3,20.0,'Annet','skive',20],
+ brunost:['Brunost',410,11.3,30.3,27.0,'Annet','skive',8],
+ syltetoy:['Syltetøy (blåbær)',181,0.4,43.0,0.4,'Annet','ts',10],
+ majones:['Majones',705,1,2,77,'Annet','ss',15],
+ bacon:['Bacon, stekt',520,30,0.2,44.3,'Annet','skive',10],
+ kjottkake:['Kjøttkake',177,11.9,6.8,11.3,'Annet','stk',70],
+ pannekake:['Pannekake',151,7.6,19.5,4.3,'Annet','stk',60],
+ pizza:['Pizza (kjøpt)',222,10.9,24.3,8.5,'Annet'],
+ chips:['Potetchips',502,6.1,50.5,29.3,'Annet'],
+ sjokolade:['Melkesjokolade',541,8.1,53.1,32.3,'Annet','rute',5],
+ kanelbolle:['Kanelbolle / skillingsbolle',339,8.1,52.8,10.0,'Annet','stk',100],
+ is:['Iskrem (vanilje)',178,3.8,20.0,9.2,'Annet','dl',55],
+ brus:['Brus (cola, sukker)',42,0,10.6,0,'Annet','dl',100],
+ juice:['Appelsinjuice',43,0.6,9.6,0.2,'Annet','dl',100],
+ ol:['Pils (4,7 %)',41,0.4,3.2,0,'Annet','dl',100],
+ vin:['Rødvin (12 %)',74,0.1,0.7,0,'Annet','dl',100],
+ peanotter:['Peanøtter',594,25.8,7.6,49.2,'Annet','neve',20],
+ cornflakes:['Frokostblanding (Spesial K)',352,8.0,74.4,1.4,'Annet','dl',20],
+ yoghurt:['Yoghurt med frukt (jordbær)',86,4.0,10.5,3.1,'Annet','dl',100],
+ pastakokt:['Pasta, kokt',133,4.2,23.6,2.1,'Annet','dl',60],
+ risskokt:['Ris, kokt (jasmin)',115,2.4,25.7,0.2,'Annet','dl',70],
+ kaffemelk:['Kaffemelk (3,5 %)',61,3.0,4.4,3.5,'Annet','ss',15]
 };
-const UNIT={ts:['ts','ts'],ss:['ss','ss'],dl:['dl','dl'],stk:['stk','stk'],skive:['skive','skiver'],egg:['egg','egg'],
+const UNIT={neve:['neve','never'],ts:['ts','ts'],ss:['ss','ss'],dl:['dl','dl'],stk:['stk','stk'],skive:['skive','skiver'],egg:['egg','egg'],
  'liten neve':['liten neve','små never'],rute:['rute','ruter'],scoop:['scoop','scoop'],gel:['gel','geler']};
 function fracN(n){const w=Math.floor(n+1e-9),h=n-w;if(Math.abs(h)<.13)return String(w);if(Math.abs(h-.5)<.13)return (w?w:'')+'½';
   if(Math.abs(h-.25)<.13)return (w?w:'')+'¼';if(Math.abs(h-.75)<.13)return (w?w:'')+'¾';return String(Math.round(n))}
@@ -1156,7 +1156,11 @@ function selfTest(){
   const tk='2026-10-10';S.days[tk]={log:[{k:100,p:10,c:5,f:2}],ate:{}};
   const iv=intake(tk);delete S.days[tk];
   const e=macro([['egg',159]]),b=macro([['brod',70]]);
-  ok(Math.abs(iv.p-10)<.01&&Math.abs(iv.k-100)<.01&&Math.round(e.p)===20&&Math.round(b.k)===172,'Matloggeren regner riktig (3 egg = 20 g protein, 2 skiver brød = 172 kcal)');
+  const e2=macro([['egg',168]]),b2=macro([['brod',80]]);
+  ok(Math.abs(iv.p-10)<.01&&Math.abs(iv.k-100)<.01&&Math.abs(e2.p-21.7)<.1&&Math.round(b2.k)===191,'Matloggeren regner riktig (3 egg = 21,7 g protein, 2 skiver brød = 191 kcal)');
+  // 5c. matbasen: energi må stemme med makroene (4/4/9 kcal per g, alkohol unntatt)
+  const odd=Object.entries(ING).filter(([id,v])=>!['krydder','ol','vin','kaffemelk','brus','juice'].includes(id)&&v[1]>20).filter(([id,v])=>{const est=4*v[2]+4*v[3]+9*v[4];return Math.abs(v[1]-est)>Math.max(30,.22*v[1])}).map(([id,v])=>v[0]+' ('+v[1]+' vs '+Math.round(4*v[2]+4*v[3]+9*v[4])+')');
+  ok(!odd.length,'Matbasen: kcal stemmer med protein/karbo/fett for alle matvarer '+odd.join('; '));
   // 6. bibliotek
   const miss=Object.keys(LIB).filter(x=>!RIG[x]);let sess=[];
   for(const [sk,list] of Object.entries(EX))for(const e of list)for(const x of e.keys)if(!LIB[x])sess.push(sk+':'+x);
@@ -1556,6 +1560,7 @@ function vData(){
     <div class="sub">Data ligger kun i denne nettleseren på denne enheten. Eksporter jevnlig (f.eks. hver søndag).</div>
     <div class="row" style="margin-top:8px"><button class="b" onclick="exp()">Eksporter JSON</button><button class="g" onclick="$('#imp').click()">Importer</button></div>
     <input id="imp" type="file" accept=".json" class="hide" onchange="imp(this.files[0])"></div>
+  <div class="card"><h2>Kilder til næringsverdier</h2><div class="sub">Næringsverdier og porsjonsvekter er hentet fra <b>Matvaretabellen.no</b> (Mattilsynet, 2 121 matvarer) og kontrollert 11.10.2026. Unntak: skyr naturell (Tine-pakning, finnes ikke som naturell i tabellen), myseprotein og proteinbar (produsent, sjekk pakken), kyllingpålegg (satt lik kalkunfilet), og vekt per stk for poteter og løk er veiledende. Egne matvarer legger du inn selv.</div></div>
   <div class="card"><h2>Kvalitetssjekk</h2><div class="sub">Kontrollerer plan, måltider, kcal/protein per dag og at alle øvelser har teknikk.</div><button class="g" style="margin-top:8px" onclick="runTest()">Kjør egentest</button></div>
   <div class="card"><h2>Nullstill</h2><button class="g" onclick="if(confirm('Slette ALL data?')){localStorage.removeItem(KEY);S=load();render()}">Slett alle data</button></div>
   <div class="card"><h2>Om</h2><div class="sub">Programmet bygger på forskningsnotatene i mappen «forskning». Dette er ikke medisinsk rådgivning – ved smerte, brystsmerter eller uvanlig tungpust: stopp og kontakt lege.</div></div>`;
