@@ -6,6 +6,8 @@ Privat prosjekt: 28 ukers program (styrke + halvmaraton) og kostholdsveileder.
 - Kosthold: dagsmeny med klokkeslett per treningsdag, 27 enkle oppskrifter med nøyaktige mengder (g, skiver, dl), bytt-alternativer, handleliste per uke. Ingen fisk, tomat, squash eller sopp, og ingen uvanlige varer.
 - Matlogger: søk opp mat eller oppskrift, oppgi mengde (g, skiver, stk, dl) og få protein/karbo/fett/kcal av det du faktisk har spist. Egne matvarer kan legges inn.
 - Næringsverdier og porsjonsvekter er hentet fra Matvaretabellen.no (Mattilsynet) og kontrollert 11.10.2026; unntak er listet i Data-fanen.
+- Ukentlig armdag (Styrke C): biceps curl, hammer curl, triceps over hodet, pushdown, sidehev, face pull.
+- Øvelsene er kvalitetssikret mot åpne kilder (rapportene forskning/05–09); animasjonene er rettet etter funnene.
 - `forskning/` – forskningsnotater med verifiserte kilder (styrke, halvmaraton, ernæring, motivasjon).
 
 ## Rammer

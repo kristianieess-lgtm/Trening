@@ -90,7 +90,7 @@ details.hl{border-color:var(--acc)}
 const START='2026-10-11', RACE='2027-04-25', WEEKS=29; // løpet er søndag i uke 29
 
 const PHASES=[
-  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'Søn gå/løp, man styrke A, ons styrke B, fre styrke C. Daglig gange. Bygg vane, ikke form.'},
+  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'Søn gå/løp, man styrke A, ons styrke B, fre styrke C (armdag). Daglig gange. Bygg vane, ikke form.'},
   {id:2,from:9, to:20,name:'Bygg',          days:5, text:'3 styrke (A, B, C) + 2 løp (kvalitet og langtur). Valgfri rolig økt.'},
   {id:3,from:21,to:25,name:'Topp',          days:5, text:'Lengste langturer, mål-tempo på slutten av langtur.'},
   {id:4,from:26,to:28,name:'Taper',         days:5, text:'Volum ned (–25 / –40 / –60 %), behold litt intensitet.'},
@@ -104,9 +104,9 @@ const EX={ // økter: navn, varianter (nøkler i LIB), sett×reps
     E('Enbens rumensk markløft',['enbensrdl','rdl'],'2×8'),E('Face pull',['facepull'],'2×12–15'),E('Plank / bærertur',['plank','baertur'],'2×30–45 s')],
  B:[E('Rumensk markløft',['rdl'],'3×6–8'),E('Skulderpress',['skulderpress'],'3×6–10'),E('Nedtrekk / pull-ups',['nedtrekk','pullups','strikknedtrekk'],'3×6–10'),
     E('Bulgarsk split squat',['bulgarsk'],'2×8–10'),E('Hamstring curl',['hamcurl'],'2×8–12'),E('Tåhev',['tahev'],'2×12–15')],
- C:[E('Skrå manualpress',['skraa'],'3×10–12'),E('Kabelroing',['kabelroing','manualroing'],'3×10–12'),E('Sidehev',['sidehev'],'3×12–15'),
-    E('Biceps curl',['biceps'],'2×12–15'),E('Triceps pushdown',['triceps'],'2×12–15'),E('Hip thrust',['hipthrust','enbenship'],'2×10–12'),
-    E('Face pull',['facepull'],'2×15'),E('Dead bug / Pallof',['deadbug','pallof'],'2×10–12')],
+ C:[E('Biceps curl',['biceps'],'3×10–12'),E('Hammer curl',['hammer'],'3×10–12'),E('Triceps over hodet',['overhead'],'3×10–12'),
+    E('Triceps pushdown',['triceps'],'3×10–12'),E('Sidehev',['sidehev'],'3×12–15'),E('Face pull',['facepull'],'2×15'),
+    E('Dead bug / Pallof',['deadbug','pallof'],'2×6–10')],
  R1:[E('Goblet-knebøy / bulgarsk',['goblet','bulgarsk'],'3×10–15'),E('Push-ups (føttene hevet)',['pushupshevet','pushups'],'3× nær failure'),
      E('Enarms roing / TRX-roing',['manualroing','trx'],'3×10–12'),E('Enbens rumensk markløft',['enbensrdl'],'2×10'),E('Plank',['plank'],'2×45 s')],
  R2:[E('Utfall / step-up',['utfall','stepup'],'3×12'),E('Skulderpress',['skulderpress'],'3×10–12'),E('Pull-ups / strikk-nedtrekk',['pullups','strikknedtrekk'],'3×8–12'),
@@ -116,7 +116,7 @@ const EX={ // økter: navn, varianter (nøkler i LIB), sett×reps
 const SESS={
  A:{t:'Styrke A',  sub:'Ben-fokus, full kropp',      min:50},
  B:{t:'Styrke B',  sub:'Hengsel og øvre kropp',      min:50},
- C:{t:'Styrke C',  sub:'Overkropp/skuldre, flere reps', min:45},
+ C:{t:'Styrke C · Armdag',  sub:'Armdag: biceps, triceps og skuldre. 2–3 sek ned, nær failure kun på siste sett', min:45},
  R1:{t:'Reiseøkt R1',sub:'Hotellgym / kroppsvekt',    min:30},
  R2:{t:'Reiseøkt R2',sub:'Hotellgym / kroppsvekt',    min:30},
  MIN:{t:'Minimumsøkt',sub:'Teller som seier',         min:15}
@@ -597,6 +597,7 @@ function rigSvg(key,t){
   const K='var(--ink)',M=CL.steel;
   let s=`<rect x="0" y="138" width="200" height="12" fill="var(--line)" opacity=".5"/>`+`<line x1="0" y1="138" x2="200" y2="138" stroke="var(--line)" stroke-width="2"/>`;
   if(ex.view==='front')return s+frontSvg(P,K);
+  if(ex.view==='face')return s+faceSvg(P);
   if(ex.view==='top')return s+topSvg(P);
   const J=solve(ex,P),J0=solve(ex,ex.p[0]),J1=solve(ex,ex.p[ex.p.length-1]);
   // skygge
@@ -607,6 +608,7 @@ function rigSvg(key,t){
     if(o.t==='rect')s+=`<rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx="3" fill="${CL.pad}" stroke="${M}" stroke-width="1"/>`;
     else if(o.t==='line')s+=`<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" stroke="${M}" stroke-width="3.5" stroke-linecap="round"/>`;
     else if(o.t==='bar')s+=`<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>`;
+    else if(o.t==='plateFix'){const a=J[o.j],c=[a[0]+o.dx,a[1]+o.dy],d=vec(o.ang,24);s+=`<line x1="${f1(c[0]-d[0]*.3)}" y1="${f1(c[1]-d[1]*.3)}" x2="${f1(c[0]+d[0])}" y2="${f1(c[1]+d[1])}" stroke="${M}" stroke-width="5" stroke-linecap="round"/>`}
     else if(o.t==='perp'){const a=J.an,k=J[o.to],d=[k[0]-a[0],k[1]-a[1]],n=Math.hypot(d[0],d[1])||1,u=[-d[1]/n,d[0]/n],c=[a[0]-d[0]/n*7,a[1]-d[1]/n*7];s+=`<line x1="${f1(c[0]+u[0]*o.len)}" y1="${f1(c[1]+u[1]*o.len)}" x2="${f1(c[0]-u[0]*o.len)}" y2="${f1(c[1]-u[1]*o.len)}" stroke="${M}" stroke-width="5" stroke-linecap="round"/>`}
   }
   // spøkelsesposer + bevegelsessti
@@ -652,11 +654,43 @@ function frontSvg(P,K){
   o+=limb([100,92],[100,50],17,19,CL.shorts,0)+limb([100,92],[100,50],14,18,CL.shirt);
   o+=limb([100,50],[100,42],5,5,sc)+`<circle cx="100" cy="34" r="8" fill="${sc}"/>`;
   for(const g of [-1,1]){
-    const sh=[100+g*9,52],h=[100+g*(9+Math.sin(a)*42),52+Math.cos(a)*42],el=lerp(sh,h,.52);
+    const sh=[100+g*9,52],dirx=g*Math.sin(a),diry=Math.cos(a);
+    const el=[sh[0]+dirx*22,sh[1]+diry*22];
+    // lett albuebøy (ca. 15-20°) innover mot kroppen
+    const b=17*Math.PI/180,ang=Math.atan2(dirx,diry)-g*b;
+    const h=[el[0]+Math.sin(ang)*20,el[1]+Math.cos(ang)*20];
     o+=limb(sh,el,7,5.5,CL.shirt)+limb(el,h,5.5,4,sc)+`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="5.5" fill="${CL.plate}"/>`;
   }
-  o+=`<circle cx="${f1(100+(9+Math.sin(a)*42))}" cy="${f1(52+Math.cos(a)*42)}" r="9" fill="${CL.glow}" opacity=".25"/>`;
-  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett forfra · løft til skulderhøyde</text>`;
+  const gx=100+(9+Math.sin(a)*42);
+  o+=`<circle cx="${f1(gx)}" cy="${f1(52+Math.cos(a)*42)}" r="9" fill="${CL.glow}" opacity=".25"/>`;
+  // innfelling ovenfra: armene løftes 20-40° foran siden (V, ikke T)
+  const t=Math.min(1,Math.max(0,(P.arm-12)/73)),ix=165,iy=100;
+  o+=`<rect x="138" y="76" width="56" height="48" rx="6" fill="var(--card)" stroke="var(--line)"/>`
+    +`<text x="166" y="86" text-anchor="middle" font-size="6" fill="var(--mut)">Sett ovenfra</text>`
+    +`<circle cx="${ix}" cy="${iy+8}" r="4" fill="${sc}"/>`
+    +limb([ix-5,iy+10],[ix+5,iy+10],3,3,CL.shirt);
+  for(const g of [-1,1]){
+    const L=t*18,ang=30*Math.PI/180;
+    o+=`<line x1="${ix+g*5}" y1="${iy+10}" x2="${f1(ix+g*(5+Math.cos(ang)*L))}" y2="${f1(iy+10-Math.sin(ang)*L)}" stroke="${CL.glow}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }
+  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett forfra · opp til skulderhøyde (ikke høyere)</text>`;
+  return o;
+}
+function faceSvg(P){
+  const t=P.t,sc=CL.skin,C=CL.shirt;
+  let o=limb([92,134],[94,112],6,7,sc)+limb([108,134],[106,112],6,7,sc)+limb([94,112],[97,92],7,10,CL.shorts)+limb([106,112],[103,92],7,10,CL.shorts);
+  o+=limb([100,92],[100,50],14,18,C)+limb([100,50],[100,42],5,5,sc)+`<circle cx="100" cy="34" r="8" fill="${sc}"/>`;
+  for(const g of [-1,1]){
+    const sh=[100+g*9,52];
+    // start: armene frem mot kabelen (sett rett forfra: korte); slutt: albuer i skulderhøyde, ut til siden, underarm opp (ytterrotasjon)
+    const el=[100+g*(11+t*21),56-t*4];
+    const h=[100+g*(5+t*27),60-t*34];
+    o+=limb(sh,el,7,5.5,C)+limb(el,h,5.5,4,sc)+`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="4.5" fill="${CL.plate}"/>`;
+  }
+  o+=`<rect x="0" y="0" width="0" height="0"/>`;
+  o+=`<line x1="${f1(100-5-t*27)}" y1="${f1(60-t*34)}" x2="${f1(100+5+t*27)}" y2="${f1(60-t*34)}" stroke="${CL.steel}" stroke-width="1.4" stroke-dasharray="2 2" opacity="${(t*0.8).toFixed(2)}"/>`;
+  o+=`<circle cx="${f1(100+(11+t*21))}" cy="${f1(56-t*4)}" r="9" fill="${CL.glow}" opacity=".3"/><circle cx="${f1(100-(11+t*21))}" cy="${f1(56-t*4)}" r="9" fill="${CL.glow}" opacity=".3"/>`;
+  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett forfra · albuer i skulderhøyde, hendene over albuene</text>`;
   return o;
 }
 function topSvg(P){
@@ -669,7 +703,7 @@ function topSvg(P){
 }
 
 /* Animasjon i dialogen, med realistisk tempo */
-const CF=['manualroing','kabelroing','facepull','nedtrekk','strikknedtrekk','pullups','hamcurl','biceps','triceps','trx','hipthrust','enbenship','tahev','sidehev','skulderpress','stepup','pallof'];
+const CF=['facepull','manualroing','kabelroing','facepull','nedtrekk','strikknedtrekk','pullups','hamcurl','biceps','triceps','trx','hipthrust','enbenship','tahev','sidehev','skulderpress','stepup','pallof'];
 function sched(key){return CF.includes(key)?[1.3,.6,2.4,.5]:[2.4,.6,1.3,.5]}
 function ease(x){return x*x*(3-2*x)}
 function posAt(key,time){
@@ -776,6 +810,238 @@ const CUES={
  trx:[['hip','Kropp som planke'],['el','Albuer bak']]
 };
 
+
+
+/* =======================================================================
+   KVALITETSSIKRING 11.10.2026: teknikk og animasjon kontrollert mot åpne kilder
+   (rapporter i forskning/05–09: ACE Exercise Library, PMC/PubMed åpne artikler m.fl.).
+   Der kildene er uenige er det valgt den forsiktige varianten for en 50-åring.
+   ======================================================================= */
+CF.push('hammer');
+Object.assign(LIB.benk,{
+ opp:['Legg deg med øynene under stangen. Skulderbladene trekkes litt ned og bakover mot benken, uten å tvinge dem maksimalt sammen.','Føttene flatt i gulvet, under eller litt bak knærne. Svak bue i korsryggen er OK, setet blir på benken.','Grip stangen litt bredere enn skuldrene (ikke mer enn ca. 1,5 × avstanden mellom skulderleddene, omtrent 55–60 cm mellom hendene). Smalere hvis skuldrene er ømme. Håndleddene rett over underarmene.','Løft ut stangen til over skuldrene.'],
+ ut:['Pust inn og senk stangen kontrollert til nedre del av brystbenet (brystvortenivå). Underarmene er loddrette i bunnen.','Albuene ca. 45–70° fra kroppen: som en pil, ikke en T. Ikke rett ut til siden.','Press stangen opp og litt tilbake mot over skuldrene. Pust ut.'],
+ feil:['Albuene rett ut til siden (T, ca. 90°): den mest skulderbelastende posisjonen.','Rumpa løfter seg fra benken.','Stangen spretter fra brystet.','Håndleddene bøyes bakover.','Stangen senkes mot hals eller øvre bryst i stedet for nedre brystben.'],
+ tips:['Bruk alltid sikkerhetsstolper eller spotter.','1–3 repetisjoner igjen i tanken.','Senk i 2–3 sekunder.'],
+ sikker:'Bruk full grep med tommelen rundt stangen. Senk kontrollert og ikke sprett: rupturer av brystmuskelens sene skjer oftest under senking med tung vekt, og menn rundt 50 er i risikogruppen. Plutselig smell, hevelse eller blåmerke i armhule eller overarm: stopp og kontakt lege. Skarp smerte oppå skulderen i bunn: smalere grep og stopp 4–6 cm over brystet. Aldri tung stang uten sikkerhetsstolper.'});
+Object.assign(LIB.manualflat,{
+ ut:['Pust inn og senk manualene kontrollert til brysthøyde, albuene ca. 45–70° fra kroppen (pil, ikke T).','Underarmene er loddrette i bunnen. Stopp når overarmene er omtrent parallelle med gulvet.','Press opp og lett mot hverandre, pust ut.'],
+ feil:['Albuene rett ut til siden (T).','Manualene drar ut til siden og ned under benknivå i bunn.','Manualene sklir inn i hverandre.','Skulderbladene mister spenning.'],
+ sikker:'Sett manualene ned på lårene før du setter deg opp, ikke slipp dem. Tunge sett: spark opp med knærne, og la manualene synke til brystet og deretter til lårene ved utmattelse.'});
+Object.assign(LIB.skraa,{
+ ut:['Pust inn og senk manualene kontrollert til siden av øvre bryst.','Underarmene loddrette, albuene ca. 45–70° fra kroppen. Overarmene peker mot føttene og litt ned, ikke rett ned i benken.','Press opp, pust ut.'],
+ feil:['Benk for bratt (blir skulderpress).','Albuene rett ut til siden.','Rumpa løfter seg.']});
+Object.assign(LIB.skulderpress,{
+ opp:['Stå eller sitt, manualene i skulderhøyde, underarmene loddrette og håndleddene rett over albuene.','Albuene litt foran kroppen, ikke bak den.','Stram mage og sete (hvis stående), ribbena ned.'],
+ ut:['Press manualene opp i skapulaplanet: albuene ut og litt frem (ca. 30–40° foran siden), ikke rett til siden og ikke rett frem. Manualene går litt inn mot hverandre i toppen.','Hold hodet nøytralt, ikke stikk haken frem.','Senk kontrollert til skulderhøyde. Pust ut ved press.'],
+ feil:['Korsryggen svaier og ribbena åpner seg: stram mage, ribbena ned.','Albuene rett ut i 90° med ytterrotasjon («high five»-posisjon).','Manualene driver for langt frem eller bak.','Albuene låses hardt.'],
+ sikker:'Stopp ved stikkende skuldersmerte, særlig en smertefull bue omtrent midt i løftet (ca. 60–120°). Aldri press bak nakken. Svai mer enn 0–5° bakover betyr for tung vekt eller stive skuldre: bruk sittende ryggstøtte.'});
+Object.assign(LIB.sidehev,{
+ opp:['Stå høyt, lett bøyde knær, lette manualer langs siden.','Albuene lett bøyd (ca. 15–20°) og de holder seg slik hele veien.'],
+ ut:['Løft armene i en bue ca. 20–40° foran siden (som en V, ikke en T), til håndleddene er i skulderhøyde (ca. 80–90°, ikke høyere).','Tommelen peker frem eller litt opp, manualen er horisontal.','Senk sakte (2–3 sek).'],
+ tips:['Tenk å løfte med albuene, ikke hendene.','12–15 reps, lett vekt: du skal kunne senke på 2–3 sek uten å svinge overkroppen.'],
+ sikker:'Stopp tidligere hvis du kjenner en smertefull bue omtrent midt i løftet (60–120°). Ikke høyere enn skulderhøyde.'});
+Object.assign(LIB.pushups,{
+ opp:['Hender omtrent skulderbredde (eller litt bredere), under eller marginalt foran skuldrene.','Kroppen i en rett linje fra hode til hæl, mage og rumpe spent. Se ned og litt frem, nakken i forlengelse av ryggen.'],
+ ut:['Senk kroppen som ett stykke til overarmene er omtrent parallelle med gulvet. Dypere bare hvis skuldrene tåler det.','Albuene ca. 45–60° fra kroppen (pil, ikke T).','Press opp til strake armer. Pust ut.'],
+ sikker:'Stopp ved smerte i håndledd (bruk knyttnever eller håndtak). Stikk eller klikk foran i skulderen: bruk hevede hender (benk) eller gå mindre dypt.'});
+Object.assign(LIB.pushupshevet,{
+ opp:['Føttene på en benk eller stol (start lavt, 15–20 cm), hendene på gulvet omtrent skulderbredde.','Kroppen rett fra hode til hæl, se ned og litt frem.'],
+ ut:['Senk kontrollert til overarmene er omtrent parallelle med gulvet.','Albuene ca. 45–60° fra kroppen.','Press opp til strake armer. Hold mage og rumpe spent.'],
+ tips:['Jo høyere føttene er, desto mer last på skuldrene: velg høyere bare hvis skuldrene tåler det.'],
+ sikker:'Stopp ved stikk i skulder eller håndledd. Stolen eller kassen må stå stødig.'});
+Object.assign(LIB.triceps,{
+ ut:['Press håndtaket ned til nesten strake armer, albuene fast ved siden.','Klem triceps 1 sek. Ikke lås albuene hardt: stopp ca. 5° før.','Slipp kontrollert opp til underarmene er omtrent horisontale (ca. 90° i albuen).'],
+ tips:['Hold albuene stille som hengsler.','Overkroppen kan lene 5–10° frem, men skal ikke bevege seg under pressingen.'],
+ sikker:'Plutselig smell, skarp smerte eller svakhet bak albuen: stopp og få sjekket (tricepssenen). Ikke dropp raskt i bunnen med tung vekt.'});
+Object.assign(LIB.manualroing,{
+ ut:['Trekk albuen opp og bakover mot hoften, nær kroppen (ca. 30–45° fra siden).','Før manualen mot nedre ribbein/hofte uten å rotere overkroppen. Stopp når albuen er ved overkroppslinjen, ikke langt bak ryggen.','Senk sakte (2–3 sek) til strak arm.'],
+ feil:['Overkroppen roterer og tvister opp: hold skuldrene parallelle med gulvet.','Du drar med biceps: tenk albue mot hoften.','Albuen går langt bak ryggen og skulderen ruller frem.','Hodet løftes: nakken i flukt med ryggen.'],
+ sikker:'Stopp trekket når overkroppen vil rotere. Stopp ved stikkende smerte i skulder eller korsrygg.'});
+Object.assign(LIB.kabelroing,{
+ ut:['Trekk først med albuene, ikke ved å klemme skulderbladene. Albuene glir bakover nær ribbena (ca. 30–45° fra kroppen), ikke ut til siden.','Håndtaket stopper foran magen. Albuen ender ved overkroppslinjen eller maks litt bak den.','Pause 1 sek, slipp kontrollert frem til strakte armer.'],
+ opp:['Sett deg med føttene på platen, knærne litt bøyd.','Sitt høyt med bryst opp og nøytral rygg. Overkroppen er oppreist og stille hele settet.','Armene strakt, skuldrene kan gli litt frem uten at ryggen runder seg.'],
+ tips:['Tenk «albuer langs ribbena».','Mer mellomrygg og bakre skulder: bredere håndtak og albuer ut til skulderhøyde, lettere vekt, men ikke bak ryggen.'],
+ sikker:'Hold overkroppen oppreist og stille: ikke slå deg bakover for å få vekten opp. Stopp ved stikkende smerte i fremre skulder eller korsrygg.'});
+Object.assign(LIB.nedtrekk,{
+ ut:['Sett skuldrene ned (ikke opp mot ørene), og trekk så albuene ned mot sidene.','Trekk stangen ned foran hodet til øvre bryst. Stopp når albuene er ved ribbena: ikke la dem gå bak kroppen.','Pause 1 sek, slipp kontrollert opp til strake armer.'],
+ feil:['Du lener deg langt bakover og drar med kroppsvekt.','Albuene går bak kroppen og brystet skyves frem.','Stangen trekkes bak nakken.','Skuldrene trekkes opp mot ørene.'],
+ tips:['Tenk albuer ned mot hoftene (ikke bakover).','Ikke øk lenet under trekket: maks ca. 10–15°.'],
+ sikker:'Aldri bak nakken: ingen fordel og krever mer skulderbevegelighet. Stopp ved stikkende skulder- eller albuesmerte.'});
+Object.assign(LIB.strikknedtrekk,{
+ opp:['Fest strikken høyt, over hodehøyde, i en dørramme eller stolpe, slik at trekket går nedover.','Sitt og grip strikken med skulderbredde.'],
+ ut:['Sett skuldrene ned, og trekk albuene ned mot sidene til hendene er ved øvre bryst.','Stopp når albuene er ved ribbena, ikke bak kroppen.','Slipp kontrollert opp. La strikken aldri smelle tilbake.'],
+ sikker:'Sjekk at strikken er hel, og festet sikkert før du drar.'});
+Object.assign(LIB.pullups,{
+ opp:['Grip stangen omtrent skulderbredde (marginalt bredere er OK, unngå vid grep), håndflatene fra deg.','Heng med strake armer og skuldrene lett ned (ikke i ørene).','Kryss anklene, lett bøyde knær.'],
+ ut:['Start med å senke skuldrene, deretter albuene ned mot siden. La skulderbladene bevege seg fritt.','Hodet i flukt med overkroppen, før haken over stangen uten å stikke den frem.','Senk kontrollert til full hang. Pust ut når du drar.'],
+ feil:['Du svinger (kipping).','Albuene går bak kroppen i toppen.','Halv bevegelse: bruk hjelp heller enn å jukse.','Skuldrene i ørene.'],
+ sikker:'Stopp ved stikkende smerte i skulder eller albue. Slipp ikke ned ukontrollert i bunn: albuene tåler det dårlig. Ved skulderplager: unngå passivt hengende «dead hang».'});
+Object.assign(LIB.trx,{
+ opp:['Grip TRX-håndtakene, lean bakover med strake armer og kroppen som en rett planke fra ankel til skulder.','Jo flatere kropp, desto tyngre. Føttene i gulvet. Sag i korsryggen = stopp.'],
+ ut:['Trekk brystet mot håndtakene med albuene nær kroppen (ca. 30–45°); hendene ender ved brystet/nedre ribbein.','Albuene stopper ved overkroppslinjen, ikke langt bak ryggen. Klem skulderbladene lett sammen, pause 1 sek.','Slipp kontrollert til strake armer.'],
+ feil:['Hoftene synker.','Albuene går langt bak ryggen og skulderen ruller frem.','Skuldrene trekkes opp.','Du trekker med nakken.']});
+Object.assign(LIB.facepull,{
+ opp:['Still taukroken i øye- til skulderhøyde.','Grip tauet med tommelen mot deg, ta ett skritt bakover så kabelen er stram.','Stå stødig, lett bøyde knær, mage spent.'],
+ ut:['Trekk tauet mot ansiktet med albuene i skulderhøyde og ut til siden: ikke over skulderen.','Roter underarmene opp og ut slik at hendene ender over albuenivå, tommelen mot ørene.','Pause 1 sek og slipp kontrollert frem.'],
+ feil:['Albuene løftes over skulderen og skuldrene trekkes mot ørene.','Du lener deg bakover og bruker kroppsvekt.','Tung vekt gir innadrotasjon i skulderen: vekten skal være lett.'],
+ tips:['Lettvekts-øvelse for skuldrene, 12–15 reps.','Ikke over hodehøyde.'],
+ sikker:'Bruk lett vekt. Stopp ved stikkende skuldersmerte.'});
+Object.assign(LIB.biceps,{
+ opp:['Stå høyt, albuene inn mot kroppen, manualer langs siden. Skuldre ned, håndledd rette.'],
+ ut:['Bøy albuene og løft manualene mot skuldrene (ca. 140° i albuen). Albuene stille ved siden av kroppen.','Senk sakte (2–3 sek) til nesten strak arm, uten å smekke albuen i.'],
+ feil:['Du svinger med overkroppen.','Albuene driver frem, eller bak kroppen i bunn.','For rask senking.'],
+ sikker:'Stopp ved smerte i albuen eller innsiden av albuen. Ikke heng ned i helt strak arm med tung last, og ikke rykk opp fra bunn (distal bicepssene).'});
+LIB.hammer={n:'Hammer curl',g:'Armer',m:'Biceps, underarm (brachioradialis)',u:'2 manualer',
+ opp:['Stå høyt, manualer langs lårene med håndflatene mot kroppen og tommelen frem. Lukket grep.','Skuldre ned, albuene inn mot kroppen, håndledd rette.'],
+ ut:['Bøy albuene og løft manualene foran skuldrene uten å rotere håndleddet. Nøytralt grep hele veien.','Albuen er stille ved siden av kroppen.','Senk sakte (2–3 sek) til nesten strak arm.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du svinger med overkroppen.','Albuene driver frem og belaster fremre skulder.','Håndleddet bøyes.','For rask senking.'],
+ tips:['Nøytralt grep er ofte skånsommere for håndledd og albue.','Alternerende eller samtidig: begge fungerer.'],
+ lett:'Lettere manualer, eller kabel/strikk.',vanskelig:'Tempo 3 sek ned, eller pause 1 sek øverst.',hotell:'Manualer eller strikk.',
+ sikker:'Stopp ved skarp smerte i albuen. Mye grepbelastning kan trigge tennisalbue: bruk moderate manualer og 10–15 reps.'};
+LIB.overhead={n:'Triceps-ekstensjon over hodet (manual)',g:'Armer',m:'Triceps (spesielt langt hode)',u:'1 manual',
+ opp:['Sitt på en benk med ryggstøtte (eller stå), hold én manual med begge hender under øvre vektskive.','Løft manualen til over hodet med strake armer, ribbena ned, haken lett inn.'],
+ ut:['Senk manualen bak hodet ved å bøye kun albuene. Overarmene står stille tett ved hodet, albuene peker opp og frem.','Stopp ved ca. 90° i albuen (underarmene omtrent horisontale bak hodet), ikke dypere.','Press opp til nesten strake armer, ikke hard lås.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Albuene flarer ut til sidene.','Overarmene vandrer frem og bak.','Korsryggen svaier: ribbena opp, for tung vekt.','For dypt og rykkete i bunn.'],
+ tips:['2–3 sek ned, 1 sek opp.','Ikke til failure: bruk en vekt der du kan stoppe kontrollert.','Får du ikke armene rett opp uten å svaie: la overarmene lene 10–20° frem, eller bruk kabel.'],
+ lett:'Lettere manual, eller kabel/strikk.',vanskelig:'Tempo 3 sek ned, eller pause 1 sek i bunn.',hotell:'Én manual og en stol eller benk.',
+ sikker:'Vær forsiktig med tung vekt bak hodet. Stopp ved smerte oppå eller foran skulderen, nummenhet i armen eller nakkesmerte. Plutselig smell eller svakhet bak albuen: stopp og få sjekket.'};
+Object.assign(LIB.rdl,{
+ opp:['Ta stangen fra stativ i lår- til midjehøyde. Føttene hoftebredde, stang/manualer foran lårene i strakte armer.','Knærne litt bøyd (ca. 10–15°) og de holder seg slik hele tiden.','Skuldrene bak, bryst opp, nøytral rygg, blikket mot gulvet.'],
+ ut:['Pust inn og send hoftene bakover som om du lukker en bildør med rumpa.','Senk stang/manualer tett langs lårene til omtrent knehøyde, eller til du kjenner tydelig strekk bak lårene og ryggen fortsatt er uendret. Midt på leggen bare hvis du er bevegelig nok uten at ryggen endrer seg.','Press hoftene frem for å reise deg, klem setet øverst. Pust ut.'],
+ feil:['Ryggen runder seg: stopp tidligere og trekk skuldrene bak.','Du bøyer knærne og gjør den til en knebøy: knærne er nesten stive.','Stangen driver bort fra kroppen.','Du ser opp i speilet: nakken strammes og ryggen følger blikket.','Du lener deg bakover i toppen.'],
+ sikker:'Stopp hvis ryggen begynner å runde seg. Øk vekten sakte over uker: rask lastøkning er en større skadefaktor enn små tekniske avvik. Rette ben (stiff-leg) er for øvede.'});
+Object.assign(LIB.enbensrdl,{
+ opp:['Stå på ett ben med lett bøyd kne, manualen i motsatt hånd av stående ben (valgfritt).','Hoftene i flukt, blikket 1–2 meter foran deg på gulvet. Ha gjerne en hånd i lett kontakt med en vegg eller stol.'],
+ ut:['Send hoftene bakover og la det frie benet strekke seg rett bakover i flukt med overkroppen.','Hold begge hofter vendt mot gulvet.','Senk så dypt du kan holde ryggen og hoftene stille: ikke så dypt som mulig.','Press hoftene frem og reis deg. Pust ut.'],
+ feil:['Hoften roterer åpent opp: hold begge hofter mot gulvet.','Ryggen runder seg.','Fritt ben kastes høyere enn overkroppen: korsryggen svaier.','Det stående benet låses helt eller bøyes for mye.']});
+Object.assign(LIB.hipthrust,{
+ ut:['Press hælene i gulvet og løft hoftene til overkropp og lår er i en rett linje (ikke høyere). Leggene er omtrent vertikale.','Ribbena ned mot bekkenet, rull bekkenet litt bakover og klem setet. Ikke svai korsryggen.','Pause 1 sek, senk kontrollert.'],
+ feil:['Hoftene løftes for høyt: da er det korsryggen som svaier, ikke setet som jobber.','Knærne faller innover.','Hamstring krampar: flytt føttene nærmere setet.'],
+ sikker:'Bruk pute under stangen. Hold benken stabil. Stopp ved smerte i korsrygg eller hoftebøyer.'});
+Object.assign(LIB.enbenship,{
+ opp:['Samme oppsett som hip thrust, men ett ben løftet (kne bøyd mot brystet eller strukket i linje med låret).'],
+ ut:['Press gjennom hælen og løft hoftene til en rett linje. Hoften skal ikke synke på det løftede benets side.','Ribbena ned, ikke svai korsryggen.','Pause 1 sek, senk kontrollert.'],
+ feil:['Hoften roterer og faller til siden.','Korsryggen svaier.','Hamstring krampar: flytt foten nærmere setet.'],
+ sikker:'Stopp ved krampe eller smerte i korsrygg.'});
+Object.assign(LIB.plank,{
+ ut:['Løft kroppen til en rett linje fra hodet til hælene.','Stram mage, klem rumpa og trykk underarmene lett mot gulvet.','Pust rolig mens du holder 10–30 sekunder. Gjenta 2–4 ganger.'],
+ feil:['Hoftene synker og korsryggen svikter.','Rumpa peker mot taket.','Skuldrene trekkes mot ørene.','Hodet henger ned eller løftes for høyt.'],
+ tips:['Flere korte, gode hold slår ett langt og slapt: 4 × 15 sek.','Stopp når formen går.'],
+ sikker:'Stopp ved smerte i korsrygg eller skuldre. Korsryggsplager: gjør planken på knær eller med hendene mot en benk.'});
+Object.assign(LIB.baertur,{
+ ut:['Gå jevne, kontrollerte skritt 20–30 meter.','Hold overkroppen høy, magen spent, ingen lening.','Snu rolig og gå tilbake.'],
+ sikker:'Velg en vekt du kan bære hele distansen uten å lene deg eller heve skuldrene. Start med to like vekter (ensidig bæring belaster korsryggen mer). Rydd veien, ikke slipp manualene på føttene.'});
+Object.assign(LIB.deadbug,{
+ opp:['Ligg på ryggen, knær bøyd 90° over hoftene, armene rett opp mot taket.','Hold korsryggen stille og lett mot gulvet: ikke klem hardt og ikke la den svaie.'],
+ ut:['Senk motsatt arm og ben mot gulvet, sakte, og strekk bare så langt du kan holde ryggen stille.','Gå tilbake og bytt side.','Pust ut når du strekker ut, inn når du kommer tilbake.'],
+ feil:['Korsryggen buer seg: stopp før det skjer.','Ribbena åpner seg og buer ut.','Du holder pusten.','For rask bevegelse.'],
+ tips:['6–10 rolige repetisjoner per side, 2–3 sett.','Siste repetisjon skal se like god ut som den første.']});
+Object.assign(LIB.pallof,{
+ opp:['Sett kabelen i brysthøyde og stå på tvers, slik at kabelen drar rett i siden av deg.','Hold håndtaket med begge hender foran brystet, ta et skritt bort så kabelen er stram.','Føttene skulderbredde, lett bøyde knær.'],
+ ut:['Press hendene rett frem fra brystet til strake armer, uten å la kroppen rotere mot kabelen. Hofte og skuldre vinkelrett frem.','Hold 2 sek.','Før hendene sakte tilbake til brystet. 5–10 repetisjoner per side, gjør begge sider.'],
+ lett:'Stå nærmere ankeret, eller kneel på ett kne.'});
+
+/* ---- animasjon: rettede poser ---- */
+RIG.benk.p=[{sn:35,th:270,to:-90,ua:0,fa:0},{sn:35,th:270,to:-90,ua:135,fa:0}];
+RIG.manualflat.p=[{sn:35,th:270,to:-90,ua:0,fa:0},{sn:35,th:270,to:-90,ua:130,fa:0}];
+RIG.skraa.p=[{sn:35,th:260,to:-60,ua:5,fa:5},{sn:35,th:260,to:-60,ua:155,fa:5}];
+RIG.skulderpress.p=[{sn:0,th:0,to:0,ua:160,fa:0},{sn:0,th:0,to:0,ua:3,fa:2}];
+RIG.pushups.p=[{sn:70,th:70,to:70,ua:180,fa:180,f1:180},{sn:87,th:87,to:87,ua:270,fa:125,f1:180}];
+RIG.pushupshevet.p=[{sn:81,th:81,to:81,ua:180,fa:180,f1:180},{sn:97,th:97,to:97,ua:250,fa:108,f1:180}];
+RIG.triceps.p=[{sn:0,th:0,to:8,ua:178,fa:88},{sn:0,th:0,to:8,ua:178,fa:178}];
+RIG.manualroing.p=[{sn:15,th:-30,to:70,ua:180,fa:180},{sn:15,th:-30,to:70,ua:255,fa:180}];
+RIG.kabelroing.p=[{sn:280,th:265,to:5,ua:95,fa:90},{sn:280,th:265,to:5,ua:195,fa:80}];
+RIG.nedtrekk.p=[{sn:-5,th:265,to:-10,ua:10,fa:10},{sn:-5,th:265,to:-10,ua:175,fa:40}];
+RIG.strikknedtrekk.p=RIG.nedtrekk.p;
+RIG.pullups.p=[{sn:75,th:0,to:0,ua:0,fa:0},{sn:75,th:0,to:-5,nk:5,ua:178,fa:12}];
+RIG.trx.p=[{sn:-50,th:-50,to:-50,nk:-50,ua:55,fa:55},{sn:-35,th:-35,to:-35,nk:-35,ua:160,fa:15}];
+RIG.facepull={view:'face',p:[{t:0},{t:1}],lab:['Armene frem','Albuer ut, hendene opp']};
+RIG.biceps.p=[{sn:0,th:0,to:0,ua:178,fa:180},{sn:0,th:0,to:0,ua:172,fa:38}];
+RIG.hammer={a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:178,fa:180},{sn:0,th:0,to:0,ua:172,fa:38}],lab:['Ned','Opp']};
+RIG.overhead={a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:3,fa:2},{sn:0,th:0,to:0,ua:3,fa:-95}],lab:['Topp','Bak hodet (90°)']};
+RIG.rdl.p=[{sn:0,th:-8,to:0,ua:180,fa:180},{sn:0,th:-15,to:72,ua:215,fa:215}];
+RIG.enbensrdl.p=[{sn:0,th:-6,to:0,ua:185,fa:185,la:185,lb:185,f2:90},{sn:5,th:-8,to:75,ua:207,fa:207,la:262,lb:262,f2:180}];
+RIG.hipthrust.p=[{sn:-31,th:240,to:-55,ua:125,fa:125},{sn:-8,th:270,to:-84,ua:96,fa:96}];
+RIG.hipthrust.props=[{t:'rect',x:22,y:106,w:40,h:32}];
+RIG.enbenship.p=[{sn:-31,th:240,to:-55,ua:125,fa:125,la:55,lb:70,f2:90},{sn:-8,th:270,to:-84,ua:96,fa:96,la:70,lb:70,f2:90}];
+RIG.enbenship.props=[{t:'rect',x:22,y:106,w:40,h:32}];
+RIG.plank.at=[45,125];RIG.plank.p=[{sn:83,th:83,to:83,ua:180,fa:90,f1:180}];
+RIG.baertur.p=[{sn:0,th:0,to:0,ua:180,fa:180,la:150,lb:175,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:195,lb:190,f2:90}];
+RIG.deadbug.p=[{sn:270,th:180,to:-90,ua:0,fa:0,la:0,lb:90,f2:90},{sn:270,th:180,to:-90,ua:-90,fa:-90,la:88,lb:90,f2:90}];
+RIG.pallof.p=[{h:0},{h:0.6}];
+
+/* ---- forklaringer og markerte muskler ---- */
+Object.assign(CUES,{
+ benk:[['wr','Stang over skuldrene'],['el','Albue ca. 60° (pil, ikke T)'],['hip','Rumpe på benken']],
+ manualflat:[['wr','Manualer over skuldrene'],['el','Albue ca. 60°']],
+ skraa:[['wr','Manualer over øvre bryst'],['el','Albue mot føttene, ca. 60°']],
+ skulderpress:[['wr','Rett over skulder (skapulaplanet)'],['to','Ribbena ned, ikke svai']],
+ kabelroing:[['el','Albuer nær ribbena'],['to','Overkropp stille'],['kn','Lett bøyde knær']],
+ manualroing:[['el','Albue mot hoften, nær kroppen'],['to','Flat rygg'],['wr','Strak arm nede']],
+ nedtrekk:[['el','Albuer ned, ikke bak kroppen'],['to','Lett bakoverlent, ikke mer'],['wr','Stang foran hodet']],
+ strikknedtrekk:[['el','Albuer ned, ikke bak kroppen'],['sh','Skuldre ned']],
+ pullups:[['sh','Skuldre ned først'],['hd','Hake over stangen'],['el','Albuer ned mot siden']],
+ trx:[['hip','Kropp som planke'],['el','Albue ved kroppen, ikke langt bak']],
+ hammer:[['el','Albue stille'],['wr','Tommelen opp, håndledd rett']],
+ overhead:[['el','Albuer peker opp og frem'],['to','Ribbena ned, ikke svai'],['wr','Ca. 90° i albuen']],
+ rdl:[['hip','Hoftene bakover'],['kn','Lett bøyd kne, konstant'],['wr','Stang tett på lår']],
+ pushups:[['hip','Rett linje'],['el','Albuer 45–60°']],
+ pushupshevet:[['hip','Rett linje'],['el','Albuer 45–60°']]
+});
+Object.assign(HL,{hammer:['ua'],overhead:['ua']});
+Object.assign(TRK,{overhead:'wr'});
+
+
+/* ---- ben (forskning/07) ---- */
+Object.assign(LIB.goblet,{tips:['2 sekunder ned, 1 sekund opp.','Kneet kan gå litt forbi tåen når hælene er i gulvet: det er normalt. Bekkenet ruller ikke under.','Stopp når du har 1–3 repetisjoner igjen i tanken.']});
+Object.assign(LIB.knebokstang,{
+ ut:['Pust inn, spenn mage og rygg («stiv stamme»).','Send hoftene bakover og ned, knærne følger tærne.','Gå ned til lårene er omtrent parallelle, eller til rett før bekkenet ruller under og korsryggen runder seg. Stangen er hele tiden over midtfoten.','Press gulvet fra deg og reis deg. Pust ut på vei opp.'],
+ sikker:'Bruk alltid sikkerhetsstolper eller spotter på tunge sett. Ikke til failure med stang. Har du høyt blodtrykk: avklar med lege og unngå lange pusteholdt.'});
+Object.assign(LIB.beinpress,{
+ ut:['Pust inn og senk platen kontrollert til knærne er rundt 90° (maks ca. 100°), og ikke dypere enn der bekkenet løfter seg fra setet. Knærne skal ikke gå mot brystet.','Hold hælene i platen og press jevnt gjennom hele foten til beina nesten er strake. Ikke lås knærne.','Pust ut på vei opp, og senk igjen med kontroll.'],
+ feil:['Setet løfter seg og korsryggen runder seg: gå mindre dypt.','Knærne faller innover.','Knærne låses ut hardt i toppen.','Du skyver på knærne med hendene.']});
+Object.assign(LIB.bulgarsk,{
+ opp:['Mål skrittlengden fra bakfotens tåsnøre på benken til fremre hæl: ca. 70–80 cm (ca. 80 % av benlengde). Juster så fremre legg står omtrent loddrett i bunn og hælen er i gulvet.','Manualer langs siden, overkroppen høy.'],
+ feil:['For nær benken og kneet skyter frem forbi tåen.','Overkroppen faller langt frem.','Korsryggen overstrekkes for å holde seg høy.','Hælen i fremre fot løfter seg, eller kneet faller innover.'],
+ tips:['Start uten vekt, finn riktig avstand først.','Samme antall reps på begge sider.','Mer sete: 15–30° fremoverlent overkropp med vertikal legg.']});
+Object.assign(LIB.utfall,{
+ ut:['Ta ett langt skritt bakover (omtrent en benlengde) og senk til bakre kne er nær gulvet uten å treffe det. Bakre hæl opp, tåen i gulvet.','Fremre kne over ankelen, vekten mest på fremre ben, overkroppen høy.','Press gjennom fremre fot og trå tilbake til start. Pust ut opp.'],
+ tips:['Bakover-utfall gir vanligvis mindre belastning på kneskålen enn fremover-utfall, men er ikke risikofritt: ikke dypere enn du kontrollerer.']});
+Object.assign(LIB.stepup,{
+ u:'Kasse/benk (start lavt, ca. 20–25 cm), manualer',
+ opp:['Start med en lav kasse (ca. 20–25 cm) og øk høyden når du har kontroll. Sett hele foten på kassen.','Overkroppen høy, manualer langs siden.'],
+ feil:['Du dytter med bakre fot.','Kneet faller innover.','Bekkenet faller til siden.','For høy kasse.']});
+Object.assign(LIB.tahev,{
+ ut:['Press opp på tå så høyt du kan, knærne strake.','Pause 1 sek øverst.','Senk sakte (3 sek). Standard: ned til hælene er på gulvhøyde. Hæl under trinnet bare når akillessenen og hælen er helt smertefrie.'],
+ tips:['Progresjon over uker: to ben, deretter to ben med manualer, og først til slutt ett ben (høyest belastning på akillessenen).','Ta også et sett med bøyde knær (soleus).'],
+ sikker:'Stopp ved smerte eller ømhet i akillessenen eller hælen, eller stivhet dagen etter. Ikke sprett i bunnen. Aldersgruppen 40–59 år har økt risiko for akillesruptur: bygg opp gradvis.'});
+Object.assign(LIB.hamcurl,{
+ ut:['Bøy knærne og trekk hælene mot rumpa (ca. 100–110° i kneet).','Pause 1 sek øverst.','Senk sakte (3 sek) til nesten strake ben.'],
+ tips:['Senk sakte, det er der resultatet kommer.','Hoftene presses ned i benken. Fotposisjonen betyr lite: ved leggkrampe, slipp tåløftet.'],
+ sikker:'Stopp ved krampe eller stikkende smerte i baksiden av låret eller knehasen (hamstringsskade er vanlig hos løpere).'});
+
+RIG.knebokstang.p=[{sn:0,th:0,to:0,ua:200,fa:8},{sn:32,th:-80,to:35,ua:200,fa:8}];
+RIG.knebokstang.props=[{t:'barAt',j:'sh',dx:-5,dy:-4}];
+RIG.beinpress.p=[{sn:240,th:240,to:-50,ua:150,fa:100,f1:-30},{sn:285,th:200,to:-50,ua:150,fa:100,f1:-30}];
+RIG.beinpress.props=[{t:'line',x1:73,y1:104,x2:30,y2:70},{t:'plateFix',j:'an',dx:5,dy:-3,ang:-30}];
+RIG.bulgarsk.p=[{sn:5,th:-10,to:5,ua:180,fa:180,la:225,lb:250,f2:270},{sn:18,th:-85,to:5,ua:180,fa:180,la:207,lb:328,f2:270}];
+RIG.utfall.p=[{sn:0,th:0,to:0,ua:180,fa:180,la:180,lb:180,f2:90},{sn:10,th:-80,to:5,ua:180,fa:180,la:200,lb:265,f2:140}];
+RIG.stepup.at=[110,117];
+RIG.stepup.props=[{t:'rect',x:85,y:122,w:45,h:16}];
+RIG.stepup.p=[{sn:25,th:-67,to:10,ua:180,fa:180,la:160,lb:213,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:110,lb:180,f2:90}];
+RIG.tahev={a:'an',at:[100,126],hold:'db',props:[{t:'rect',x:96,y:132,w:30,h:6}],p:[{sn:0,th:0,to:0,ua:180,fa:180,f1:78,ay:3},{sn:0,th:0,to:0,ua:180,fa:180,f1:140,ay:-9}],lab:['Hæl under kanten','På tå']};
+RIG.hamcurl.p=[{sn:90,th:90,to:90,ua:95,fa:150,f1:160},{sn:195,th:90,to:90,ua:95,fa:150,f1:240}];
+RIG.hamcurl.props=[{t:'rect',x:50,y:118,w:100,h:6},{t:'line',x1:58,y1:124,x2:58,y2:138},{t:'line',x1:142,y1:124,x2:142,y2:138}];
+Object.assign(CUES,{
+ knebokstang:[['sh','Stang på trapezius'],['kn','Knær følger tærne'],['to','Stiv stamme']],
+ beinpress:[['kn','Ca. 90° i kneet'],['hip','Rygg og sete mot setet']],
+ bulgarsk:[['kn','Kne ved ankelen, ikke forbi tå'],['to','Høy overkropp'],['an2','Bakfot på benk']],
+ tahev:[['an','Så høyt du kan'],['kn','Strake knær']],
+ utfall:[['kn','Kne over ankelen'],['to','Høy overkropp'],['an2','Bakre hæl opp, tå i gulvet']]
+});
 
 /* =======================================================================
    MATBASE OG OPPSKRIFTER
