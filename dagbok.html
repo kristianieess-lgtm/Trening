@@ -89,7 +89,7 @@ details.hl{border-color:var(--acc)}
 const START='2026-10-11', RACE='2027-04-25', WEEKS=29; // løpet er søndag i uke 29
 
 const PHASES=[
-  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'3 styrkeøkter + 1 gå/løp. Daglig gange. Bygg vane, ikke form.'},
+  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'Søn gå/løp, man styrke A, ons styrke B, fre styrke C. Daglig gange. Bygg vane, ikke form.'},
   {id:2,from:9, to:20,name:'Bygg',          days:5, text:'3 styrke (A, B, C) + 2 løp (kvalitet og langtur). Valgfri rolig økt.'},
   {id:3,from:21,to:25,name:'Topp',          days:5, text:'Lengste langturer, mål-tempo på slutten av langtur.'},
   {id:4,from:26,to:28,name:'Taper',         days:5, text:'Volum ned (–25 / –40 / –60 %), behold litt intensitet.'},
@@ -168,7 +168,7 @@ function planFor(k){
   if(w===29) p=dw===0?RACEDAY:{k:'hvile',t:'Restitusjon',min:0,d:'Gå, spis, sov. Ta stolt en pause før neste fase.'};
   else if(w===28) p=W28[dw];
   else if(ph.id===1){
-    p=({0:{k:'styrke',s:'A'},2:{k:'løp',t:'Gå/løp',min:30,d:RUN1[w]},4:{k:'styrke',s:'B'},6:{k:'styrke',s:'C'}})[dw]||GANGE;
+    p=({0:{k:'løp',t:'Gå/løp',min:30,d:'5 min rask gange, deretter '+RUN1[w]+'. Avslutt med 5 min gange. Rolig tempo (RPE 3–4): du skal kunne snakke.'},1:{k:'styrke',s:'A'},3:{k:'styrke',s:'B'},5:{k:'styrke',s:'C'}})[dw]||GANGE;
   } else {
     const r=RUN2[w];
     p=({
