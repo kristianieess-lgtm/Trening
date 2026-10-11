@@ -16,5 +16,8 @@ Privat prosjekt: 28 ukers program (styrke + halvmaraton) og kostholdsveileder.
 - Energiunderskudd uke 1–12, vedlikehold etterpå. Mål 80–83 kg med mer muskel; vekt er sekundært.
 - Kosthold uten fisk (laks/tunfisk), tomat og squash.
 
+## Publisere til mobil
+`python3 bygg.py` lager mappen `site/` (index.html, manifest, service worker, ikoner). Last mappen opp på Netlify-prosjektet `treningsdagbok-madrid-2027` (Deploys → dra og slipp `site`). På mobilen: åpne adressen og velg «Legg til på Hjem-skjerm».
+
 ## Oppdatere
 Rediger `dagbok.html` (programdata ligger øverst i skriptet), commit og push.

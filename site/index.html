@@ -1,0 +1,1848 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2f6f4f">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Trening">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Treningsdagbok</title>
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#1d2320;--mut:#6b746f;--line:#e2ddd2;--acc:#2f6f4f;--acc2:#b9811a;--bad:#b3402f;--ok:#2f6f4f}
+@media(prefers-color-scheme:dark){:root{--bg:#141816;--card:#1d2320;--ink:#ecefe9;--mut:#9aa59e;--line:#2c3631;--acc:#5fb585;--acc2:#e8b54a;--bad:#e07a68;--ok:#5fb585}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,system-ui,"Segoe UI",sans-serif}
+header{padding:16px 16px 8px;max-width:760px;margin:auto}
+h1{font-size:20px;margin:0}
+.sub{color:var(--mut);font-size:13px}
+nav{position:sticky;top:0;background:var(--bg);display:flex;gap:4px;padding:8px 12px;border-bottom:1px solid var(--line);overflow-x:auto;z-index:5;max-width:760px;margin:auto}
+nav button{flex:1;min-width:max-content;border:0;background:none;color:var(--mut);padding:8px 10px;border-radius:8px;font-size:15px;cursor:pointer}
+nav button.on{background:var(--acc);color:#fff}
+main{max-width:760px;margin:auto;padding:12px 16px 80px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 12px}
+.card h2{font-size:13px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row>*{flex:1;min-width:70px}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:2px}
+input,select,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:60px}
+button.b{background:var(--acc);color:#fff;border:0;border-radius:8px;padding:9px 14px;font:inherit;cursor:pointer}
+button.g{background:none;border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer}
+.big{font-size:26px;font-weight:700;line-height:1.2}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;background:var(--line);font-size:12px;color:var(--mut)}
+.pill.a{background:var(--acc);color:#fff}
+.chk{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.chk:last-child{border:0}
+.chk input{width:22px;height:22px;flex:none}
+.bar{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--acc)}
+.dayrow{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.dayrow.today{font-weight:700}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--line);margin-right:6px}
+.dot.done{background:var(--ok)}
+.note{border:1px dashed var(--acc2);padding:8px 10px;border-radius:8px;color:var(--mut);font-size:13px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+svg{width:100%;height:auto}
+.hide{display:none}
+.x{color:var(--bad);cursor:pointer;border:0;background:none;font-size:18px}
+.ex{padding:8px 0;border-bottom:1px solid var(--line)}
+.ex:last-child{border:0}
+.ex .nm{font-weight:600}
+.sm{font-size:13px}
+.hl{background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.strip{display:flex;gap:4px;margin-bottom:10px}
+.sd{flex:1;min-width:0;text-align:center;padding:6px 2px;border:1px solid var(--line);border-radius:10px;cursor:pointer;background:var(--card)}
+.sd.sel{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc)}
+.sd.today .sub{color:var(--acc);font-weight:700}
+.sd .sl{font-size:10px;line-height:1.15;margin-top:2px;overflow:hidden}
+.sdot{width:8px;height:8px;border-radius:50%;background:var(--line);margin:3px auto}
+.sdot.done{background:var(--ok)}
+.tl{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.tl:last-child{border:0}
+.tm{width:46px;flex:none;font-weight:700;color:var(--acc);font-variant-numeric:tabular-nums}
+.tb{flex:1;min-width:0}
+.tl.train{background:color-mix(in srgb,var(--acc) 10%,transparent);margin:0 -14px;padding:9px 14px}
+.swap{margin-top:6px;border:1px solid var(--line);border-radius:10px;padding:0 8px;background:var(--bg)}
+details.wk summary{cursor:pointer;list-style:none}
+details.wk[open] summary{margin-bottom:6px}
+details.hl{border-color:var(--acc)}
+.dayrow .pill{align-self:center;white-space:nowrap;flex:none}
+.chip.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+#modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;align-items:flex-start;justify-content:center;overflow-y:auto;padding:12px}
+.mbox{background:var(--card);border-radius:14px;max-width:560px;width:100%;padding:14px;margin:auto 0}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:18px}
+.mbox h3{font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin:14px 0 4px}
+.mbox ol,.mbox ul{margin:0;padding-left:20px}.mbox li{margin:3px 0}
+.chip{display:inline-block;margin:2px 4px 2px 0;padding:6px 10px;border:1px solid var(--line);border-radius:99px;font-size:13px;cursor:pointer;background:var(--bg);color:var(--ink)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Treningsdagbok</h1>
+  <div class="sub" id="topline"></div>
+</header>
+<nav id="nav"></nav>
+<main id="view"></main>
+
+<script>
+/* =======================================================================
+   1. PROGRAM – 28 uker + løpsdag. 11.10.2026 → Madrid halvmaraton søndag 25.04.2027
+      Kilder: trening/forskning/01–04. Tall er estimater og kan justeres.
+   ======================================================================= */
+const START='2026-10-11', RACE='2027-04-25', WEEKS=29; // løpet er søndag i uke 29
+
+const PHASES=[
+  {id:1,from:1, to:8, name:'Komme i gang',  days:4, text:'Søn gå/løp, man styrke A, ons styrke B, fre styrke C (armdag). Daglig gange. Bygg vane, ikke form.'},
+  {id:2,from:9, to:20,name:'Bygg',          days:5, text:'3 styrke (A, B, C) + 2 løp (kvalitet og langtur). Valgfri rolig økt.'},
+  {id:3,from:21,to:25,name:'Topp',          days:5, text:'Lengste langturer, mål-tempo på slutten av langtur.'},
+  {id:4,from:26,to:28,name:'Taper',         days:5, text:'Volum ned (–25 / –40 / –60 %), behold litt intensitet.'},
+  {id:5,from:29,to:29,name:'Løpsdag',days:0,text:'Madrid, søndag 25. april.'}
+];
+const phaseOf=w=>PHASES.find(p=>w>=p.from&&w<=p.to)||(w<1?{id:0,name:'Før start',days:0,text:''}:{id:6,name:'Etter løpet',days:0,text:'Fortsett: 3 styrke + 2 kondisjon. Sikt mot 80–83 kg med mer muskel.'});
+
+const E=(n,keys,sc)=>({n,keys,s:sc});
+const EX={ // økter: navn, varianter (nøkler i LIB), sett×reps
+ A:[E('Knebøy',['goblet','knebokstang','beinpress'],'3×5–8'),E('Benkpress',['benk','manualflat'],'3×6–10'),E('Roing',['kabelroing','manualroing'],'3×8–10'),
+    E('Enbens rumensk markløft',['enbensrdl','rdl'],'2×8'),E('Face pull',['facepull'],'2×12–15'),E('Plank / bærertur',['plank','baertur'],'2×30–45 s')],
+ B:[E('Rumensk markløft',['rdl'],'3×6–8'),E('Skulderpress',['skulderpress'],'3×6–10'),E('Nedtrekk / pull-ups',['nedtrekk','pullups','strikknedtrekk'],'3×6–10'),
+    E('Bulgarsk split squat',['bulgarsk'],'2×8–10'),E('Hamstring curl',['hamcurl'],'2×8–12'),E('Tåhev',['tahev'],'2×12–15')],
+ C:[E('Biceps curl',['biceps'],'3×10–12'),E('Hammer curl',['hammer'],'3×10–12'),E('Triceps over hodet',['overhead'],'3×10–12'),
+    E('Triceps pushdown',['triceps'],'3×10–12'),E('Sidehev',['sidehev'],'3×12–15'),E('Face pull',['facepull'],'2×15'),
+    E('Dead bug / Pallof',['deadbug','pallof'],'2×6–10')],
+ R1:[E('Goblet-knebøy / bulgarsk',['goblet','bulgarsk'],'3×10–15'),E('Push-ups (føttene hevet)',['pushupshevet','pushups'],'3× nær failure'),
+     E('Enarms roing / TRX-roing',['manualroing','trx'],'3×10–12'),E('Enbens rumensk markløft',['enbensrdl'],'2×10'),E('Plank',['plank'],'2×45 s')],
+ R2:[E('Utfall / step-up',['utfall','stepup'],'3×12'),E('Skulderpress',['skulderpress'],'3×10–12'),E('Pull-ups / strikk-nedtrekk',['pullups','strikknedtrekk'],'3×8–12'),
+     E('Enbens hip thrust',['enbenship'],'2×12'),E('Sidehev',['sidehev'],'2×15')],
+ MIN:[E('Goblet-knebøy / kroppsvekt',['goblet'],'2×12'),E('Push-ups',['pushups'],'2× maks –2'),E('Roing med strikk / TRX',['trx'],'2×12')]
+};
+const SESS={
+ A:{t:'Styrke A',  sub:'Ben-fokus, full kropp',      min:50},
+ B:{t:'Styrke B',  sub:'Hengsel og øvre kropp',      min:50},
+ C:{t:'Styrke C · Armdag',  sub:'Armdag: biceps, triceps og skuldre. 2–3 sek ned, nær failure kun på siste sett', min:45},
+ R1:{t:'Reiseøkt R1',sub:'Hotellgym / kroppsvekt',    min:30},
+ R2:{t:'Reiseøkt R2',sub:'Hotellgym / kroppsvekt',    min:30},
+ MIN:{t:'Minimumsøkt',sub:'Teller som seier',         min:15}
+};
+const STRENGTH_RULE='RIR 1–3 (stopp 1–3 reps før failure). Dobbel progresjon: når alle sett treffer øvre rep-grense, øk 2,5 kg. Hvile 2–3 min på tunge løft.';
+
+// Gå/løp uke 1–8 (tirsdagsøkt)
+const RUN1={1:'7 × (1 min løp / 2 min gå) ≈ 21 min',2:'8 × (1 min løp / 2 min gå) ≈ 24 min',3:'7 × (2 min løp / 2 min gå) ≈ 28 min',
+ 4:'5 × (2 / 2) ≈ 20 min – nedlast',5:'7 × (3 min løp / 1 min gå) ≈ 28 min',6:'6 × (4 / 1) ≈ 30 min',7:'5 × (6 / 1) ≈ 35 min',
+ 8:'25 min rolig jogg, gåpauser ved behov – nedlast'};
+// Uke 9–28: [rolig min, kvalitetsøkt, langtur min, langtur-merknad]
+const RUN2={
+ 9:[35,'Fartslek: 6 × 1 min litt raskere / 2 min rolig (~35 min)',60,''],
+ 10:[35,'Fartslek: 7 × 1 min / 2 min rolig',65,''],
+ 11:[40,'Fartslek: 8 × 1 min / 2 min rolig',70,''],
+ 12:[30,'Fartslek: 5 × 1 min – nedlast',50,'Nedlast'],
+ 13:[40,'Tempo: 2 × 10 min RPE 6–7, 3 min pause',75,''],
+ 14:[40,'Tempo: 2 × 10 min RPE 6–7',80,''],
+ 15:[40,'Tempo: 3 × 8 min RPE 6–7',90,''],
+ 16:[35,'Tempo: 2 × 8 min – nedlast',65,'Nedlast'],
+ 17:[40,'Tempo: 3 × 10 min RPE 6–7',90,''],
+ 18:[40,'TEST: 5 km på tid, så godt du kan (varm opp 10 min)',95,''],
+ 19:[45,'Tempo: 5 × 5 min, 2 min pause',105,''],
+ 20:[35,'Tempo: 3 × 8 min – nedlast',75,'Nedlast'],
+ 21:[45,'Tempo: 3 × 10 min',110,''],
+ 22:[45,'Tempo: 2 × 15 min',120,'Siste 20 min i mål-tempo (6:40–7:00)'],
+ 23:[45,'Tempo: 3 × 10 min',130,'Siste 20–30 min i mål-tempo – øv geler/drikke'],
+ 24:[35,'Tempo: 2 × 10 min – nedlast',90,'Nedlast'],
+ 25:[40,'Tempo: 3 × 8 min',120,'Siste 30 min i mål-tempo'],
+ 26:[35,'Tempo: 2 × 8 min (taper –25 %)',90,'Taper'],
+ 27:[30,'Tempo: 4 × 4 min (taper –40 %)',70,'Taper']
+};
+const W28={ // uke 28 (18.–24.4.), løpet er søndag 25.4. (index = ukedag, 0=søn)
+ 0:{k:'rolig',t:'Rolig jogg',min:40,d:'40 min rolig. Ingenting nytt.'},
+ 1:{k:'kval',t:'Lett kvalitet',min:30,d:'25 min rolig + 4 × 1 min i løpstempo. Kort og lett.'},
+ 2:{k:'styrke',t:'Lett styrke',min:30,d:'Styrke A, halv volum (2 sett), ingen failure.',s:'A'},
+ 3:{k:'gange',t:'Gange / mobilitet',min:20,d:'20–30 min gange.'},
+ 4:{k:'rolig',t:'Rolig + stigningsløp',min:20,d:'20 min rolig + 3 × 20 s stigningsløp.'},
+ 5:{k:'hvile',t:'Hvile / reise til Madrid',min:0,d:'Reisedag: gå litt, drikk vann, normal mat. Pakk løpsutstyr i håndbagasjen.'},
+ 6:{k:'rolig',t:'Shake-out + startnummer',min:15,d:'15 min veldig rolig + 3 × 20 s stigningsløp. Hent startnummer. Karbo-rik middag, tidlig kveld. Ingenting nytt.'}
+};
+const RACEDAY={k:'lang',t:'HALVMARATON MADRID 🏁',min:150,d:'Start rolig de første 3 km. 30–60 g karbo/time, drikk etter tørst. Nyt det. Mål 2:15–2:30.'};
+const GANGE={k:'gange',t:'Gange / aktiv hvile',min:25,d:'20–30 min rask gange. Valgfritt, men bra for restitusjon og hodet.'};
+const HVILE={k:'hvile',t:'Hvile',min:0,d:'Hvil. Sov godt.'};
+
+function planFor(k){
+  const w=weekNo(k),dw=dow(k),ph=phaseOf(w);
+  if(w<1||w>WEEKS) return {k:'fri',t:'Fri',min:0,d:'',w,ph};
+  let p;
+  if(w===29) p=dw===0?RACEDAY:{k:'hvile',t:'Restitusjon',min:0,d:'Gå, spis, sov. Ta stolt en pause før neste fase.'};
+  else if(w===28) p=W28[dw];
+  else if(ph.id===1){
+    p=({0:{k:'løp',t:'Gå/løp',min:30,d:'5 min rask gange, deretter '+RUN1[w]+'. Avslutt med 5 min gange. Rolig tempo (RPE 3–4): du skal kunne snakke.'},1:{k:'styrke',s:'A'},3:{k:'styrke',s:'B'},5:{k:'styrke',s:'C'}})[dw]||GANGE;
+  } else {
+    const r=RUN2[w];
+    p=({
+      0:{k:'lang',t:'Langtur',min:r[2],d:`${r[2]} min rolig (RPE 3–4, du kan snakke i hele setninger). ${r[3]}`.trim()},
+      1:GANGE,
+      2:{k:'kval',t:'Kvalitetsløp',min:50,d:r[1]},
+      3:{k:'styrke',s:'A'},
+      4:{k:'rolig',t:'Valgfri rolig økt',min:r[0],d:`${r[0]} min rolig løp, sykkel eller romaskin. Bare hvis du har overskudd.`,opt:true},
+      5:{k:'styrke',s:'B'},
+      6:{k:'styrke',s:'C'}
+    })[dw]||HVILE;
+  }
+  p=Object.assign({},p);
+  if(p.s){const s=SESS[p.s];p.t=p.t||s.t;p.min=p.min||s.min;p.d=p.d||s.sub}
+  if(p.k==='styrke'){
+    if(w<=2) p.d+=' · Uke 1–2: bare 2 sett per øvelse, 3–4 reps igjen i tanken. Bygg vane.';
+    else if(w>=26&&w<28) p.d+=' · Taper: ~60 % av volumet, samme tyngde.';
+  }
+  p.w=w;p.ph=ph;return p;
+}
+
+/* Kostholdsfaser: underskudd uke 1–12, vedlikehold deretter */
+const DEFICIT_TO=12;
+function energy(k,plan){
+  const w=weekNo(k),def=w<=DEFICIT_TO;
+  let lo=def?2300:2700, hi=def?2500:3000;
+  if(plan&&plan.k==='lang'){lo+=300;hi+=400}
+  return {lo,hi,def};
+}
+function carbKg(plan){
+  const k=plan&&plan.k;
+  if(k==='lang') return [5,7];
+  if(k==='løp'||k==='rolig'||k==='kval') return [4,5];
+  return [3,4];
+}
+const SUPPS=[
+ ['Kreatin monohydrat 3–5 g','hver dag'],
+ ['Vitamin D 10–20 µg (okt–mars)','hver dag'],
+ ['Omega-3 250–500 mg EPA+DHA','siden du spiser lite fisk']
+];
+const RULES=[
+ 'Protein (30–40 g) til hvert hovedmåltid',
+ 'Grønnsaker/frukt/bær til minst to måltider',
+ 'Vann hele dagen – minst 2 liter',
+ 'Alkohol: ingen eller maks 1–2 enheter',
+ 'Ingen «kaloridrikker» (saft, juice, brus)',
+ 'Sov 7–9 timer (leggetid planlagt)'
+];
+const TRAVEL_RULES=[
+ 'Hotellfrokost: protein først (egg, skyr, ost, kalkun), så havre/grovbrød/frukt. Hopp over wienerbrød og juice.',
+ 'Restaurant: én proteinrett + grønnsaker + en håndfull poteter/ris/pasta. Saus ved siden av. Én ting «på tilbud»: brød, dessert ELLER alkohol.',
+ 'Flyplass: ta med pulver, nøtter, skyr eller proteinbar. Kjøp egg, yoghurt, frukt, kyllingwrap.',
+ '80/20: En dårlig middag betyr ingenting – mønsteret over uker teller.'
+];
+const FOODS=[['Egg (2 stk)',12],['Skyr naturell (200 g)',22],['Cottage cheese (150 g)',17],['Kyllingfilet (150 g)',35],
+ ['Kjøttdeig 5 % (150 g)',30],['Biff/svin (150 g)',32],['Gresk yoghurt (200 g)',18],['Linser kokt (150 g)',13],
+ ['Kikerter (150 g)',11],['Tofu (150 g)',18],['Myseprotein (1 scoop)',22],['Melk (2 dl)',7],['Brød (2 skiver)',8],
+ ['Havregryn (50 g)',6],['Nøtter (30 g)',6]];
+
+/* =======================================================================
+   ØVELSESBIBLIOTEK: teknikk + animasjon (stilfigur)
+   Vinkler: grader fra rett opp, med klokka (0=opp, 90=høyre/fremover, 180=ned).
+   ======================================================================= */
+const LIB={
+goblet:{n:'Goblet-knebøy',g:'Ben',m:'Forside lår, sete, kjerne',u:'1 manual eller kettlebell',
+ opp:['Hold manualen loddrett foran brystet med begge hender rundt den ene enden. Albuene peker ned.','Stå med føttene litt bredere enn skuldrene, tærne ut ca. 15–30°.','Bryst opp, blikket rett frem, stram magen.'],
+ ut:['Pust inn og spenn magen.','Send hoftene bakover og ned, og la knærne gli utover i samme retning som tærne.','Gå ned til lårene er omtrent parallelle med gulvet (eller så dypt du kontrollerer uten at korsryggen runder seg). Albuene går mellom knærne.','Press hele foten mot gulvet og reis deg. Pust ut på vei opp.'],
+ pust:'Inn på vei ned, ut når du har passert det vanskeligste punktet på vei opp.',
+ feil:['Knærne faller innover: press dem utover over tærne.','Hælene løfter seg: flytt vekten bakover mot hælene.','Korsryggen runder seg i bunnen: gå mindre dypt eller jobb med ankelmobilitet.','Overkroppen faller fremover: hold manualen tett inn mot brystet.'],
+ tips:['2 sekunder ned, 1 sekund opp.','Stopp når du har 1–3 repetisjoner igjen i tanken.'],
+ lett:'Knebøy ned til en benk eller stol.',vanskelig:'Tyngre manual, 2 sekunders pause i bunnen, eller knebøy med stang.',hotell:'Perfekt hotellgym-øvelse: én manual er nok.',
+ sikker:'Stopp ved smerte i kne eller rygg. Svimmelhet betyr: sett deg ned og pust.'},
+knebokstang:{n:'Knebøy med stang',g:'Ben',m:'Forside lår, sete, korsrygg, kjerne',u:'Stang i rack, sikkerhetsstolper',
+ opp:['Still stangen i rack i høyde midt på brystet, og sett sikkerhetsstolpene like under bunnposisjonen din.','Gå under stangen og legg den på øvre trapezius (på musklene, ikke på nakkevirvlene). Grip litt bredere enn skuldrene, albuene ned.','Løft ut, ta 2–3 rolige skritt bakover, føtter skulderbredde, tærne ut 15–30°.'],
+ ut:['Pust inn, spenn mage og rygg («stiv stamme»).','Send hoftene bakover og ned, knærne følger tærne.','Gå ned til lårene er omtrent parallelle. Stangen skal hele tiden være over midtfoten.','Press gulvet fra deg og reis deg. Pust ut på vei opp.'],
+ pust:'Inn og hold før du går ned, ut når du er over det vanskelige punktet.',
+ feil:['Knærne faller innover.','Hoftene skyter opp først og overkroppen vipper frem («good morning»).','For dypt med rund korsrygg.','Stangen glir fremover: hold albuene under stangen og trykk bryst opp.'],
+ tips:['Bruk sikkerhetsstolper hver gang.','Start med lett stang uke 1–2.'],
+ lett:'Goblet-knebøy eller beinpress.',vanskelig:'Pause-knebøy med 2 sekunders stopp i bunn.',hotell:'Krever rack. Bruk goblet-knebøy eller bulgarsk split squat hvis du ikke har det.',
+ sikker:'Bruk alltid sikkerhetsstolper eller spotter på tunge sett. Ikke tren til failure med stang.'},
+beinpress:{n:'Beinpress',g:'Ben',m:'Forside lår, sete',u:'Beinpressmaskin',
+ opp:['Sett deg godt tilbake i setet, hele ryggen og setet mot underlaget.','Plasser føttene på platen omtrent skulderbredde, midt på platen, tærne litt ut.','Grip håndtakene og slipp av sikkerhetsstoppene.'],
+ ut:['Pust inn og senk platen kontrollert til knærne er rundt 90° (ikke dypere enn der setet løfter seg).','Press jevnt gjennom hele foten til beina nesten er strake. Ikke lås knærne helt.','Pust ut på vei opp, og senk igjen med kontroll.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Setet løfter seg og korsryggen runder seg: gå mindre dypt.','Knærne faller innover.','Knærne låses ut hardt i toppen.','For stor vekt og for liten bevegelse: kutt vekten.'],
+ tips:['Hold hælene i platen.','Bruk en tung vekt først etter at teknikken sitter.'],
+ lett:'Lavere vekt og kortere bevegelse.',vanskelig:'Pause 2 sek nederst, eller enbens-press.',hotell:'Finnes ofte på hotellgym. Ellers: goblet-knebøy.',
+ sikker:'Ikke press knærne helt ut. Sett sikkerhetsstoppene riktig før du starter.'},
+benk:{n:'Benkpress (stang)',g:'Bryst',m:'Bryst, fremre skulder, triceps',u:'Benk med rack, stang',
+ opp:['Legg deg med øynene under stangen. Skulderbladene trekkes ned og sammen mot benken.','Føttene flatt i gulvet, litt bak knærne. Svak bue i korsryggen er OK, setet blir på benken.','Grip stangen ca. 1,5 × skulderbredde, håndledd rett over underarm.','Løft ut stangen til over skuldrene.'],
+ ut:['Pust inn og senk stangen kontrollert til nedre del av brystbenet. Underarmene er loddrette i bunnen.','Albuene ca. 45–60° fra kroppen, ikke rett ut til siden.','Press stangen opp og litt tilbake mot over skuldrene. Pust ut.'],
+ pust:'Inn ned, ut på vei opp.',
+ feil:['Albuene flares rett ut: trekk dem inn mot kroppen.','Rumpa løfter seg fra benken.','Stangen spretter fra brystet.','Håndleddene bøyes bakover.'],
+ tips:['Bruk alltid spotter eller sikkerhetsstolper.','1–3 repetisjoner igjen i tanken.'],
+ lett:'Manualpress på benk.',vanskelig:'Pause 1–2 sek på brystet.',hotell:'Bruk manualpress eller push-ups med føttene hevet.',
+ sikker:'Aldri tren alene med tung stang uten sikkerhetsstolper. Ikke «lås» tommelen ved siden av fingrene.'},
+manualflat:{n:'Manualpress (flat benk)',g:'Bryst',m:'Bryst, fremre skulder, triceps',u:'Manualer, flat benk',
+ opp:['Sitt med manualene på lårene, legg deg ned og dytt manualene opp med knærne.','Skulderbladene ned og sammen. Føttene flatt i gulvet.','Manualene over skuldrene, håndflatene frem (nøytral eller litt skrådd grep er OK).'],
+ ut:['Pust inn og senk manualene kontrollert til brysthøyde, albuene ca. 45–60° fra kroppen.','Underarmene er loddrette i bunnen.','Press opp og lett mot hverandre, pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Albuene rett ut til siden.','For dypt, med smerte i fremre skulder.','Manualene for brede eller for smale.','Skulderbladene mister spenning.'],
+ tips:['Senk manualene sakte (2–3 sek).'],
+ lett:'Lettere manualer og kortere bevegelse.',vanskelig:'Skrå benk 30° eller 2 sek pause i bunnen.',hotell:'Fungerer fint på hotellgym.',
+ sikker:'Legg manualene ned på lårene før du setter deg opp, ikke slipp dem.'},
+skraa:{n:'Skrå manualpress (30°)',g:'Bryst',m:'Øvre bryst, fremre skulder, triceps',u:'Manualer, skrå benk 30°',
+ opp:['Still benken på 30° (ikke brattere, da blir det mer skulderpress).','Legg deg tilbake, skulderbladene ned og sammen, føttene flatt.','Manualene over øvre bryst.'],
+ ut:['Pust inn og senk manualene kontrollert til siden av øvre bryst.','Underarmene loddrette, albuene 45–60° fra kroppen.','Press opp, pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Benk for bratt (skulderpress).','Albuene rett ut.','Rumpa løfter seg.'],
+ tips:['Sett deg godt tilbake i benken.'],
+ lett:'Lettere manualer.',vanskelig:'Tempo 3 sek ned.',hotell:'Skrå benk finnes ofte, ellers push-ups med føttene hevet.',
+ sikker:'Samme som flat manualpress.'},
+manualroing:{n:'Enarms manualroing',g:'Rygg',m:'Brede ryggmuskler, øvre rygg, biceps',u:'Manual, benk eller stabil støtte',
+ opp:['Støtt den ene hånden og kneet (eller bare hånden) på en benk. Ryggen rett, nesten parallell med gulvet.','Manualen henger rett ned under skulderen i strak arm.','Blikket ned og litt frem, nakken i forlengelse av ryggen.'],
+ ut:['Trekk albuen opp og bakover mot hoften, ikke skuldra mot øret.','Før manualen mot nedre ribbein/hofte, klem skulderbladet lett mot ryggraden.','Senk sakte (2–3 sek) til full strak arm. Pust ut når du drar.'],
+ pust:'Ut ved trekk, inn ved senking.',
+ feil:['Overkroppen roterer og tvister opp: hold skuldrene parallelle med gulvet.','Du drar med biceps: tenk albue mot hoften.','Hodet løftes: nakken i flukt med ryggen.'],
+ tips:['Pause 1 sek øverst.','Samme antall reps på begge sider.'],
+ lett:'Lettere manual, mindre bevegelse.',vanskelig:'Pause 2 sek, eller langsom senking.',hotell:'Manual og en benk eller seng-kant.',
+ sikker:'Hold ryggen nøytral. Stopp ved stikkende smerte i korsrygg.'},
+kabelroing:{n:'Sittende kabelroing',g:'Rygg',m:'Mellomrygg, brede ryggmuskler, biceps',u:'Kabelapparat med roinghåndtak',
+ opp:['Sett deg med føttene på platen, knærne litt bøyd.','Grip håndtaket, sitt høyt i ryggen med bryst opp, nøytral rygg.','Armene strakt, skuldrene dratt litt frem uten å runde ryggen.'],
+ ut:['Trekk håndtaket mot navlen ved å dra albuene bakover langs kroppen.','Klem skulderbladene lett sammen, uten å lene deg bakover.','Pause 1 sek, så slipp kontrollert frem til strakte armer.'],
+ pust:'Ut ved trekk, inn ved retur.',
+ feil:['Du svinger overkroppen frem og tilbake: hold den stabil.','Skuldrene trekkes opp mot ørene.','For lite bevegelse bakover.'],
+ tips:['Tenk «albuer i baklomma».'],
+ lett:'Lettere vekt, stopp halvveis.',vanskelig:'Pause 2 sek i bakre posisjon.',hotell:'Finnes ofte. Alternativ: enarms manualroing eller TRX-roing.',
+ sikker:'Ikke lene deg bakover over loddlinjen.'},
+rdl:{n:'Rumensk markløft',g:'Hofte/sete',m:'Bakside lår, sete, nedre rygg',u:'Stang eller manualer',
+ opp:['Stå med føttene hoftebredde, stang/manualer foran lårene i strakte armer.','Knærne litt bøyd (ca. 10–15°) og de holder seg slik hele tiden.','Skuldrene bak, bryst opp, nøytral rygg.'],
+ ut:['Pust inn og send hoftene bakover som om du skal lukke en bildør med rumpa.','Senk stang/manualer tett langs lår og legger til de passerer knærne, eller til du kjenner full strekk i baksiden av lårene (ofte midt på leggen).','Ryggen er hele tiden rett, ikke rund.','Press hoftene frem for å reise deg, klem setet øverst. Pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Ryggen runder seg: stopp tidligere og trekk skuldrene bak.','Du bøyer knærne og gjør den til en knebøy: knærne er nesten stive.','Stangen driver bort fra kroppen.','Du lener deg bakover i toppen.'],
+ tips:['Stang i kontakt med lårene hele veien.','Tenk hoftene bakover, ikke ned.'],
+ lett:'Lettere vekt, bare til under knærne.',vanskelig:'Tyngre eller tempo 3 sek ned.',hotell:'Manualer fungerer fint.',
+ sikker:'Stopp hvis ryggen begynner å runde seg. Ikke øk vekten før teknikken sitter.'},
+enbensrdl:{n:'Enbens rumensk markløft',g:'Hofte/sete',m:'Bakside lår, sete, balanse, kjerne',u:'1 manual (valgfritt)',
+ opp:['Stå på ett ben med lett bøyd kne, manualen i motsatt hånd av stående ben (valgfritt).','Hoftene i flukt, blikket 1–2 meter foran deg på gulvet.'],
+ ut:['Send hoftene bakover og la det frie benet strekke seg rett bakover i flukt med overkroppen.','Hold hoftene vendt mot gulvet, ikke roter åpent.','Senk til overkroppen er nesten parallell med gulvet eller du mister nøytral rygg.','Press hoftene frem og reis deg. Pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Hoften roterer åpent opp: hold begge hofter mot gulvet.','Ryggen runder seg.','Det stående benet låses helt eller bøyes for mye.'],
+ tips:['Ha en fingertupp på en vegg for balanse hvis nødvendig.'],
+ lett:'Støtt med hånd på stol eller vegg, ingen vekt.',vanskelig:'Tyngre vekt, eller pause 2 sek.',hotell:'Kroppsvekt eller én manual.',
+ sikker:'Stå på et sted der du kan sette fra deg det andre benet.'},
+facepull:{n:'Face pull (kabel)',g:'Skuldre',m:'Bakre skulder, øvre rygg, rotatorcuff',u:'Kabelapparat med tau, høyde ca. øyne',
+ opp:['Still taukroken i øyehøyde.','Grip tauet med tommelen mot deg, ta ett skritt bakover så kabelen er stram.','Stå stødig, lett bøyde knær, mage spent.'],
+ ut:['Trekk tauet mot ansiktet, med albuene høyt og utover.','Før hendene til begge sider av ansiktet, tommelen mot ørene, og drei underarmene lett ut.','Pause 1 sek, og slipp kontrollert frem.'],
+ pust:'Ut ved trekk, inn ved retur.',
+ feil:['Du lener deg bakover og bruker kroppsvekt.','Albuene faller ned: hold dem i skulderhøyde.','For tung vekt: kutt til lett.'],
+ tips:['Dette er en lettvekts-øvelse for skuldrene, 12–15 reps.'],
+ lett:'Strikk festet i dør eller stolpe.',vanskelig:'Pause 2 sek i bakre posisjon.',hotell:'Treningsstrikk festet i dørhåndtak.',
+ sikker:'Bruk lett vekt, stopp ved stikkende skuldersmerte.'},
+plank:{n:'Plank (underarmer)',g:'Kjerne',m:'Mage, korsrygg, sete, skuldre',u:'Matte',
+ opp:['Legg underarmene på gulvet med albuene rett under skuldrene.','Strekk beina bakover, tåballene i gulvet.'],
+ ut:['Løft kroppen til en rett linje fra hodet til hælene.','Stram mage, klem rumpa og trykk underarmene lett mot gulvet.','Pust rolig mens du holder 30–45 sekunder.'],
+ pust:'Rolig og jevn pust, ikke hold pusten.',
+ feil:['Hoftene synker og korsryggen svikter.','Rumpa peker mot taket.','Hodet henger ned eller løftes for høyt.'],
+ tips:['Heller kortere og perfekt enn lenger og slapp.','Stopp når formen går.'],
+ lett:'Plank med knærne i gulvet eller hendene på en benk.',vanskelig:'Løft en arm eller et ben av gangen.',hotell:'Matte eller teppe.',
+ sikker:'Stopp ved smerte i korsrygg eller skuldre.'},
+baertur:{n:'Bærertur (farmer’s walk)',g:'Kjerne',m:'Grep, skuldre, kjerne, ben',u:'2 manualer eller kettlebells',
+ opp:['Ta to tunge manualer, stå høyt med skuldrene bak og ned.','Hold armene strake langs siden.'],
+ ut:['Gå rolige, lange skritt 20–30 meter.','Hold overkroppen høy, magen spent, ingen lening.','Snu rolig og gå tilbake.'],
+ pust:'Rolig og jevn.',
+ feil:['Du lener deg til siden.','Skuldrene trekkes mot ørene.','For korte, hakkete skritt.'],
+ tips:['Tungt men kontrollert.'],
+ lett:'Lettere manualer, kortere distanse.',vanskelig:'Tyngre eller én manual (ensidig bæring).',hotell:'Manualer i hotellgym.',
+ sikker:'Rydd veien, ikke slipp manualene ned på føttene.'},
+skulderpress:{n:'Skulderpress (manualer)',g:'Skuldre',m:'Skuldre, triceps, øvre bryst',u:'2 manualer',
+ opp:['Stå eller sitt, manualene i skulderhøyde, albuene litt foran kroppen.','Underarmene loddrette, håndleddene rett over albuene.','Stram mage og sete (hvis stående).'],
+ ut:['Press manualene rett opp til strake armer over hodet.','Hodet beveger seg litt frem når manualene passerer, så tilbake under armene.','Senk kontrollert til skulderhøyde. Pust ut ved press.'],
+ pust:'Ut ved press, inn ved senking.',
+ feil:['Korsryggen svaies: stram mage og sete.','Manualene driver for langt frem eller bak.','Albuene låses hardt.'],
+ tips:['Hvis du er stiv i skuldrene: lett skråstilt benk (80°).'],
+ lett:'Sittende med ryggstøtte.',vanskelig:'Stående med tyngre manualer.',hotell:'Manualer og en benk eller stol.',
+ sikker:'Stopp ved stikkende skuldersmerte (ikke bare brenning).'},
+nedtrekk:{n:'Nedtrekk (skulderbredde)',g:'Rygg',m:'Brede ryggmuskler, biceps',u:'Nedtrekksapparat',
+ opp:['Sett lårstøtten så beina holdes stabilt, sitt med bryst opp.','Grip stangen litt bredere enn skuldrene, tommelen rundt stangen.','Lett bakoverlent (ca. 10–15°).'],
+ ut:['Start med å trekke skuldrene ned og bak, deretter albuene ned mot sidene.','Trekk stangen til øvre bryst, ikke bak hodet.','Pause 1 sek, slipp kontrollert opp til strake armer.'],
+ pust:'Ut ved trekk, inn ved retur.',
+ feil:['Du lener deg langt bakover og drar med kroppsvekt.','Stangen trekkes bak nakken.','Skuldrene trekkes opp mot ørene i toppen.'],
+ tips:['Tenk «albuer i baklommen».'],
+ lett:'Strikk-nedtrekk, eller pull-up-assist.',vanskelig:'Pause 2 sek, tempo 3 sek ut.',hotell:'Finnes i de fleste gym. Ellers strikk festet høyt.',
+ sikker:'Aldri bak nakken.'},
+strikknedtrekk:{n:'Strikk-nedtrekk',g:'Rygg',m:'Brede ryggmuskler, biceps',u:'Treningsstrikk festet høyt',
+ opp:['Fest strikken høyt, over hodehøyde, i en dørramme eller stolpe.','Sitt eller stå på kne, grip strikken med skulderbredde.'],
+ ut:['Trekk skuldrene ned og bak.','Trekk albuene ned mot sidene til hendene er ved øvre bryst.','Slipp kontrollert opp.'],
+ pust:'Ut ved trekk, inn ved retur.',
+ feil:['Du drar med armene alene.','Overkroppen vipper frem og tilbake.'],
+ tips:['Bruk en tykkere strikk for mer motstand.'],
+ lett:'Tynnere strikk.',vanskelig:'Tykkere strikk eller to strikker.',hotell:'Strikk i bagasjen.',
+ sikker:'Sjekk at strikken er hel, og festet sikkert før du drar.'},
+pullups:{n:'Pull-ups',g:'Rygg',m:'Brede ryggmuskler, biceps, kjerne',u:'Stang, evt. assistert maskin',
+ opp:['Grip stangen litt bredere enn skuldrene, håndflatene fra deg (over-grep).','Heng med strake armer, skuldrene dratt litt ned (ikke hengende i leddene).','Kryss anklene, lett bøyde knær.'],
+ ut:['Start med å dra skuldrene ned, deretter albuene ned mot hoftene.','Før haken over stangen uten å strekke nakken.','Senk kontrollert til full hang. Pust ut når du drar.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du svinger (kipping).','Halv bevegelse: bruk hjelp heller enn å jukse.','Skuldrene i ørene.'],
+ tips:['Bruk assistert maskin eller strikk til du klarer 6–8 rene reps.'],
+ lett:'Assistert maskin, strikk eller negativer (hopp opp, senk 5 sek).',vanskelig:'Ekstra vekt eller 3 sek pause øverst.',hotell:'Finnes ikke alltid, bruk strikk-nedtrekk eller TRX-roing.',
+ sikker:'Stopp ved stikkende skulder- eller albuesmerte.'},
+bulgarsk:{n:'Bulgarsk split squat',g:'Ben',m:'Forside lår, sete, balanse',u:'Benk, manualer (valgfritt)',
+ opp:['Stå 60–80 cm foran en benk og legg baksiden av bakre fot (tåsnøre) på benken.','Front fot så langt frem at kneet er over ankelen i bunn.','Manualer langs siden, overkroppen høy.'],
+ ut:['Pust inn og senk rett ned til bakre kne er nær gulvet.','Fremre kne følger tærne, trykk gjennom hele fremre fot.','Press opp og pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['For nær benken og kneet skyter frem.','Overkroppen faller langt frem.','Hælen i fremre fot løfter seg.'],
+ tips:['Start uten vekt, finn riktig avstand først.','Gjør samme antall reps på begge sider.'],
+ lett:'Bakre fot på gulvet (vanlig utfall).',vanskelig:'Tyngre manualer, tempo 3 sek ned.',hotell:'Benk eller stol. Manualer eller kroppsvekt.',
+ sikker:'Hold deg i nærheten av en vegg ved dårlig balanse.'},
+hamcurl:{n:'Hamstring curl (liggende)',g:'Ben',m:'Bakside lår',u:'Hamstring curl-maskin',
+ opp:['Legg deg på magen, pute rett over hælene (ikke på akillessenen).','Kneleddene i flukt med maskinens aksel, hoftene presset mot benken.'],
+ ut:['Bøy knærne og trekk hælene mot rumpa.','Pause 1 sek øverst.','Senk sakte (3 sek) til nesten strake ben.'],
+ pust:'Ut ved bøy, inn ved retur.',
+ feil:['Hoftene løfter seg fra benken.','For rask senking.','For tung vekt.'],
+ tips:['Senk sakte, det er der resultatet kommer.'],
+ lett:'Lettere vekt, kortere bevegelse.',vanskelig:'Enbens-curl eller 4 sek senking.',hotell:'Alternativ: enbens rumensk markløft eller hip thrust.',
+ sikker:'Stopp ved krampe eller stikkende smerte i baksiden av lår.'},
+tahev:{n:'Tåhev (kalv)',g:'Ben',m:'Legg',u:'Trinn eller skråbrett (valgfritt), manualer',
+ opp:['Stå med forfoten på kanten av et trinn, hælene fritt.','Hold deg lett i en vegg for balanse.'],
+ ut:['Press opp på tå så høyt du kan.','Pause 1 sek øverst.','Senk sakte (3 sek) til hælene er under trinnet for full strekk.'],
+ pust:'Rolig, jevn.',
+ feil:['Du spretter i bunnen.','Knærne bøyes eller låses.','For kort bevegelse.'],
+ tips:['Full bevegelse, sakte senking.'],
+ lett:'På gulvet med to ben.',vanskelig:'Ett ben, eller manualer.',hotell:'Trapp eller kanten på en skammel.',
+ sikker:'Hold fast ved ustødig underlag.'},
+utfall:{n:'Bakover-utfall',g:'Ben',m:'Forside lår, sete',u:'Manualer (valgfritt)',
+ opp:['Stå høyt med føttene hoftebredde, manualer langs siden.'],
+ ut:['Ta ett langt skritt bakover og senk til bakre kne er nær gulvet.','Fremre kne over ankelen, overkroppen høy.','Press gjennom fremre fot og trå tilbake til start. Pust ut opp.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Skrittet er for kort og kneet skyter frem.','Overkroppen vipper fremover.','Kneet faller innover.'],
+ tips:['Bakover-utfall er skånsomt for knærne.'],
+ lett:'Støtt hånden på en vegg, uten vekt.',vanskelig:'Tyngre manualer eller gående utfall.',hotell:'Kroppsvekt eller manualer.',
+ sikker:'Stopp ved knesmerte.'},
+stepup:{n:'Step-up',g:'Ben',m:'Forside lår, sete',u:'Kasse/benk (30–45 cm), manualer',
+ opp:['Stå foran en stabil kasse. Sett hele foten på kassen.','Overkroppen høy, manualer langs siden.'],
+ ut:['Press gjennom hælen på kassen og reis deg til du står oppreist.','Hold det andre benet fritt, ikke dytt fra gulvet.','Senk kontrollert (2–3 sek) tilbake til gulvet.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du dytter med bakre fot.','Kneet faller innover.','For høy kasse.'],
+ tips:['Samme antall reps på begge sider.'],
+ lett:'Lavere kasse.',vanskelig:'Tyngre manualer eller høyere kasse.',hotell:'Benk eller stabil stol.',
+ sikker:'Kontroller at kassen ikke glir.'},
+hipthrust:{n:'Hip thrust',g:'Hofte/sete',m:'Sete, bakside lår',u:'Benk, stang eller manual (valgfritt)',
+ opp:['Sitt på gulvet med øvre rygg (nedre del av skulderbladene) mot kanten av en benk.','Føttene flatt, knærne bøyd, vekten over hoftene.','Haken lett mot brystet.'],
+ ut:['Press hælene i gulvet og løft hoftene til overkroppen og lårene er i en rett linje.','Ribbeina nede, klem setet hardt.','Pause 1 sek, senk kontrollert.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Korsryggen svaies: ribbena opp.','Knærne faller innover.','Hoftene løftes for høyt.'],
+ tips:['Underarmene nede, ikke dytt med hodet.'],
+ lett:'Glute bridge fra gulvet.',vanskelig:'Stang over hoftene eller enbens.',hotell:'Benk og én manual på hoftene.',
+ sikker:'Bruk pute under stangen. Hold benken stabil.'},
+enbenship:{n:'Enbens hip thrust',g:'Hofte/sete',m:'Sete, bakside lår',u:'Benk',
+ opp:['Samme oppsett som hip thrust, men ett ben løftet.'],
+ ut:['Press gjennom hælen og løft hoftene.','Hold hoftene i flukt, ikke roter.','Pause 1 sek, senk kontrollert.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Hoften roterer og faller til siden.','Korsryggen svaies.'],
+ tips:['Gjør jevnt antall reps på begge sider.'],
+ lett:'To bens hip thrust.',vanskelig:'Vekt over hoftene.',hotell:'Kroppsvekt på benk eller sofa.',
+ sikker:'Stopp ved krampe.'},
+sidehev:{n:'Sidehev (skuldre)',g:'Skuldre',m:'Midtre skulder',u:'2 lette manualer',view:'front',
+ opp:['Stå høyt, lett bøyde knær, lette manualer langs siden.','Albuene litt bøyd, lett fremover.'],
+ ut:['Løft armene ut til siden til skulderhøyde, lillefingeren litt opp.','Ikke høyere enn skulderhøyde.','Senk sakte (2–3 sek).'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du svinger med kroppen.','Skuldrene trekkes mot ørene.','For tungt.'],
+ tips:['Tenk å helle ut vann fra en kanne.','12–15 reps.'],
+ lett:'Lettere manualer, eller halv bevegelse.',vanskelig:'Pause 1 sek i toppen.',hotell:'Lette manualer.',
+ sikker:'Bruk lett vekt.'},
+biceps:{n:'Biceps curl',g:'Armer',m:'Biceps',u:'2 manualer',
+ opp:['Stå høyt, albuene inn mot kroppen, manualer langs siden.'],
+ ut:['Bøy albuene og løft manualene mot skuldrene.','Albuene holder seg ved siden av kroppen.','Senk sakte (2–3 sek).'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du svinger med overkroppen.','Albuene driver frem.','For rask senking.'],
+ tips:['Rolig og kontrollert.'],
+ lett:'Lettere manualer.',vanskelig:'Hammer curl eller pause 1 sek.',hotell:'Manualer eller strikk.',
+ sikker:'Stopp ved smerte i albuen.'},
+triceps:{n:'Triceps pushdown (kabel)',g:'Armer',m:'Triceps',u:'Kabelapparat med tau eller stang',
+ opp:['Fest tau/stang høyt, ta et steg bakover, stå med lett bøyde knær.','Albuene inntil kroppen, underarmene omtrent horisontale.'],
+ ut:['Press håndtaket ned til strake armer, albuene fast ved siden.','Klem triceps 1 sek.','Slipp kontrollert opp til underarmene er horisontale.'],
+ pust:'Ut ned, inn opp.',
+ feil:['Albuene løftes og kroppen lener seg over.','For tung vekt og skuldrene hjelper.'],
+ tips:['Hold albuene stille som hengsler.'],
+ lett:'Lettere vekt, tykkere kabel.',vanskelig:'Enarms eller tempo 3 sek opp.',hotell:'Strikk festet høyt i en dørramme.',
+ sikker:'Ikke lås albuene hardt.'},
+deadbug:{n:'Dead bug',g:'Kjerne',m:'Dype mageområder, hoftebøyere',u:'Matte',
+ opp:['Ligg på ryggen, knær bøyd 90° over hoftene, armene rett opp mot taket.','Presse korsryggen lett mot gulvet.'],
+ ut:['Senk motsatt arm og ben mot gulvet, sakte, uten at korsryggen løfter seg.','Gå tilbake og bytt side.','Pust ut når du strekker ut, inn når du kommer tilbake.'],
+ pust:'Ut på vei ut, inn på vei tilbake.',
+ feil:['Korsryggen buer seg: stopp før det skjer.','Du holder pusten.','For rask bevegelse.'],
+ tips:['Kvalitet fremfor antall.'],
+ lett:'Bare ben, eller bare armer.',vanskelig:'Lett vekt i hendene.',hotell:'Teppe på gulvet.',
+ sikker:'Stopp ved smerte i korsrygg.'},
+pallof:{n:'Pallof press',g:'Kjerne',m:'Skrå mage, dype stabilisatorer',u:'Kabel eller strikk',view:'top',
+ opp:['Still kabelen i brysthøyde. Stå på tvers, sideveis til kabelen.','Hold håndtaket med begge hender foran brystet, ta et skritt bort så kabelen er stram.','Føttene skulderbredde, lett bøyde knær.'],
+ ut:['Press hendene rett frem fra brystet til strake armer, uten å la kroppen rotere mot kabelen.','Hold 2 sek.','Før hendene sakte tilbake til brystet.'],
+ pust:'Ut ved press, inn ved retur.',
+ feil:['Kroppen roterer mot kabelen.','Du lener deg bort fra kabelen.','Skuldrene trekkes opp.'],
+ tips:['Kroppen er en stiv søyle. Bruk lett motstand.'],
+ lett:'Lettere motstand, stå nærmere.',vanskelig:'Gå lenger bort, eller hold 5 sek.',hotell:'Strikk festet i dørramme.',
+ sikker:'Samme som kjerneøvelser: stopp ved smerte.'},
+pushups:{n:'Push-ups',g:'Bryst',m:'Bryst, skuldre, triceps, kjerne',u:'Matte',
+ opp:['Hender litt bredere enn skuldrene, rett under skuldrene.','Kroppen i en rett linje fra hode til hæl, mage og rumpe spent.'],
+ ut:['Senk kroppen som ett stykke til brystet er en knyttneve over gulvet.','Albuene 45° fra kroppen (pil, ikke T).','Press opp til strake armer. Pust ut.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Hoftene synker eller rumpa opp.','Albuene rett ut til siden.','Hodet faller frem.'],
+ tips:['Gjør færre, men perfekte.','Stopp 1–2 reps før failure.'],
+ lett:'Hendene på en benk eller på knærne.',vanskelig:'Føttene hevet, pause, tempo, ryggsekk.',hotell:'Perfekt hotellrom-øvelse.',
+ sikker:'Stopp ved smerte i håndledd (bruk knyttnever eller håndtak).'},
+pushupshevet:{n:'Push-ups (føttene hevet)',g:'Bryst',m:'Øvre bryst, skuldre, triceps, kjerne',u:'Benk eller stol',
+ opp:['Føttene på en benk eller stol, hendene på gulvet, litt bredere enn skuldrene.','Kroppen rett fra hode til hæl.'],
+ ut:['Senk kroppen kontrollert til brystet nesten møter gulvet.','Press opp til strake armer.','Hold mage og rumpe spent.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Hoftene synker.','Albuene rett ut.'],
+ tips:['Jo høyere føttene, desto mer tyngde på skuldrene.'],
+ lett:'Vanlige push-ups.',vanskelig:'Høyere benk eller tempo 3 sek ned.',hotell:'Seng eller stol.',
+ sikker:'Samme som push-ups.'},
+trx:{n:'TRX-/strikkroing (liggende)',g:'Rygg',m:'Mellomrygg, brede ryggmuskler, biceps',u:'TRX eller strikk festet høyt',
+ opp:['Grip TRX-håndtakene, lean bakover med strake armer og kroppen som en planke.','Jo flatere kropp, desto tyngre. Føttene i gulvet.'],
+ ut:['Trekk albuene bakover og brystet mot håndtakene.','Klem skulderbladene sammen, pause 1 sek.','Slipp kontrollert til strake armer.'],
+ pust:'Ut ved trekk, inn ved retur.',
+ feil:['Hoftene synker.','Skuldrene trekkes opp.','Du trekker med nakken.'],
+ tips:['Kropp som en planke hele tiden.'],
+ lett:'Stå mer opp (mer vertikal).',vanskelig:'Flatere kropp, føttene hevet.',hotell:'TRX eller strikk i dørhåndtak.',
+ sikker:'Sjekk festet. Ikke bruk ustødig dør.'}
+};
+
+/* Animasjonsdata. p[0] = startposisjon, p[1] = sluttposisjon.
+   a = ankerledd ('an','hip','sh','wr'), at = [x,y]. hold: 'db'|'bar' i hånden. */
+const RIG={
+goblet:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:175,fa:20},{sn:35,th:-85,to:20,ua:175,fa:20}],lab:['Opp','Bunn']},
+knebokstang:{a:'an',at:[100,132],props:[{t:'barAt',j:'sh',dx:-5,dy:0}],p:[{sn:0,th:0,to:0,ua:200,fa:-30},{sn:32,th:-80,to:35,ua:200,fa:-30}],lab:['Opp','Bunn']},
+beinpress:{a:'hip',at:[70,100],props:[{t:'line',x1:73,y1:104,x2:30,y2:70},{t:'perp',j:'an',to:'kn',len:22}],p:[{sn:240,th:240,to:-50,ua:150,fa:100},{sn:250,th:200,to:-50,ua:150,fa:100}],lab:['Ben strake','Knær bøyd']},
+benk:{a:'hip',at:[80,110],hold:'bar',props:[{t:'rect',x:25,y:113,w:105,h:6},{t:'line',x1:35,y1:119,x2:35,y2:138},{t:'line',x1:120,y1:119,x2:120,y2:138}],p:[{sn:-30,th:270,to:-90,ua:0,fa:0},{sn:-30,th:270,to:-90,ua:170,fa:10}],lab:['Topp','Bryst']},
+manualflat:{a:'hip',at:[80,110],hold:'db',props:[{t:'rect',x:25,y:113,w:105,h:6},{t:'line',x1:35,y1:119,x2:35,y2:138},{t:'line',x1:120,y1:119,x2:120,y2:138}],p:[{sn:-30,th:270,to:-90,ua:0,fa:0},{sn:-30,th:270,to:-90,ua:170,fa:10}],lab:['Topp','Bunn']},
+skraa:{a:'hip',at:[88,113],hold:'db',props:[{t:'line',x1:90,y1:117,x2:45,y2:88},{t:'rect',x:78,y:117,w:26,h:5}],p:[{sn:-30,th:260,to:-60,ua:5,fa:5},{sn:-30,th:260,to:-60,ua:200,fa:10}],lab:['Topp','Bunn']},
+manualroing:{a:'an',at:[100,132],hold:'db',props:[{t:'rect',x:118,y:96,w:44,h:6},{t:'line',x1:124,y1:102,x2:124,y2:138},{t:'line',x1:156,y1:102,x2:156,y2:138}],p:[{sn:15,th:-30,to:70,ua:180,fa:180},{sn:15,th:-30,to:70,ua:245,fa:180}],lab:['Strak arm','Albue bak']},
+kabelroing:{a:'hip',at:[70,124],props:[{t:'rect',x:52,y:126,w:36,h:6},{t:'line',x1:136,y1:104,x2:136,y2:138},{t:'cableTo',x:152,y:118}],p:[{sn:280,th:265,to:10,ua:80,fa:85},{sn:280,th:265,to:-5,ua:200,fa:80}],lab:['Frem','Trukket']},
+rdl:{a:'an',at:[100,132],hold:'bar',p:[{sn:0,th:0,to:0,ua:180,fa:180},{sn:8,th:-18,to:65,ua:218,fa:218}],lab:['Opp','Ned']},
+enbensrdl:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:185,fa:185,la:185,lb:185,f2:90},{sn:5,th:-8,to:75,ua:195,fa:195,la:262,lb:262,f2:180}],lab:['Opp','Ned']},
+facepull:{a:'an',at:[100,132],props:[{t:'cableTo',x:168,y:56}],p:[{sn:0,th:0,to:-5,ua:90,fa:90},{sn:0,th:0,to:-5,ua:260,fa:70}],lab:['Strake armer','Trukket']},
+plank:{a:'an',at:[45,130],static:true,props:[{t:'line',x1:150,y1:138,x2:170,y2:138}],p:[{sn:78,th:78,to:78,ua:180,fa:90,f1:180}],lab:['Hold','Hold']},
+baertur:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:180,fa:180,la:150,lb:175,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:210,lb:190,f2:90}],lab:['Skritt','Skritt']},
+skulderpress:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:160,fa:0},{sn:0,th:0,to:0,ua:10,fa:5}],lab:['Skulderhøyde','Over hodet']},
+nedtrekk:{a:'hip',at:[75,108],props:[{t:'cableTo',x:82,y:6},{t:'rect',x:58,y:111,w:34,h:5},{t:'padAt',j:'kn'}],p:[{sn:-5,th:265,to:-10,ua:5,fa:5},{sn:-5,th:265,to:-10,ua:200,fa:30}],lab:['Opp','Trukket']},
+strikknedtrekk:{a:'hip',at:[75,108],props:[{t:'cableTo',x:82,y:6},{t:'rect',x:58,y:111,w:34,h:5}],p:[{sn:-5,th:265,to:-10,ua:5,fa:5},{sn:-5,th:265,to:-10,ua:200,fa:30}],lab:['Opp','Trukket']},
+pullups:{a:'wr',at:[100,22],props:[{t:'bar',x1:70,y1:22,x2:130,y2:22}],p:[{sn:90,th:0,to:0,ua:0,fa:0},{sn:90,th:0,to:-8,ua:195,fa:15}],lab:['Hang','Topp']},
+bulgarsk:{a:'an',at:[110,132],hold:'db',props:[{t:'rect',x:34,y:108,w:30,h:6},{t:'line',x1:38,y1:114,x2:38,y2:138},{t:'line',x1:60,y1:114,x2:60,y2:138}],p:[{sn:5,th:-10,to:5,ua:180,fa:180,la:225,lb:250,f2:270},{sn:25,th:-85,to:5,ua:180,fa:180,la:212,lb:327,f2:270}],lab:['Opp','Bunn']},
+hamcurl:{a:'hip',at:[80,114],props:[{t:'rect',x:40,y:118,w:110,h:6},{t:'line',x1:48,y1:124,x2:48,y2:138},{t:'line',x1:142,y1:124,x2:142,y2:138}],p:[{sn:90,th:90,to:90,ua:150,fa:180},{sn:170,th:90,to:90,ua:150,fa:180}],lab:['Strakt','Bøyd']},
+tahev:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:180,fa:180,f1:90},{sn:0,th:0,to:0,ua:180,fa:180,f1:140,ay:-9}],lab:['Hæl ned','På tå']},
+utfall:{a:'an',at:[115,132],hold:'db',p:[{sn:0,th:0,to:0,ua:180,fa:180,la:180,lb:180,f2:90},{sn:10,th:-80,to:5,ua:180,fa:180,la:200,lb:265,f2:180}],lab:['Stå','Bunn']},
+stepup:{a:'an',at:[110,107],hold:'db',props:[{t:'rect',x:85,y:113,w:45,h:25}],p:[{sn:30,th:-85,to:10,ua:180,fa:180,la:160,lb:213,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:110,lb:180,f2:90}],lab:['Start','Topp']},
+hipthrust:{a:'sh',at:[55,100],hold:'bar',holdAt:'hip',props:[{t:'rect',x:22,y:106,w:36,h:26}],p:[{sn:-31,th:240,to:-55,ua:125,fa:125},{sn:0,th:270,to:-90,ua:90,fa:90}],lab:['Bunn','Topp']},
+enbenship:{a:'sh',at:[55,100],props:[{t:'rect',x:22,y:106,w:36,h:26}],p:[{sn:-31,th:240,to:-55,ua:125,fa:125,la:55,lb:70,f2:90},{sn:0,th:270,to:-90,ua:90,fa:90,la:70,lb:70,f2:90}],lab:['Bunn','Topp']},
+sidehev:{view:'front',p:[{arm:12},{arm:85}],lab:['Ned','Skulderhøyde']},
+biceps:{a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:175,fa:180},{sn:0,th:0,to:0,ua:170,fa:15}],lab:['Ned','Opp']},
+triceps:{a:'an',at:[100,132],props:[{t:'cableTo',x:120,y:12}],p:[{sn:0,th:0,to:8,ua:178,fa:75},{sn:0,th:0,to:8,ua:178,fa:180}],lab:['Opp','Ned']},
+deadbug:{a:'hip',at:[100,126],props:[{t:'line',x1:30,y1:134,x2:170,y2:134}],p:[{sn:270,th:180,to:-90,ua:0,fa:0,la:0,lb:90,f2:90},{sn:270,th:180,to:-90,ua:-90,fa:-90,la:80,lb:85,f2:90}],lab:['Start','Strekk']},
+pallof:{view:'top',p:[{h:0},{h:1}],lab:['Ved brystet','Armer strake']},
+pushups:{a:'an',at:[40,129],p:[{sn:70,th:70,to:70,ua:180,fa:180,f1:180},{sn:88,th:88,to:88,ua:250,fa:110,f1:180}],lab:['Topp','Bunn']},
+pushupshevet:{a:'an',at:[35,110],props:[{t:'rect',x:12,y:116,w:34,h:22}],p:[{sn:81,th:81,to:81,ua:180,fa:180,f1:180},{sn:97,th:97,to:97,ua:250,fa:110,f1:180}],lab:['Topp','Bunn']},
+trx:{a:'an',at:[115,130],props:[{t:'cableTo',x:128,y:8}],p:[{sn:-50,th:-50,to:-50,nk:-50,ua:55,fa:55},{sn:-35,th:-35,to:-35,nk:-35,ua:-110,fa:70}],lab:['Armer strake','Trukket']}
+};
+
+const SEG={sn:28,th:30,to:40,nk:14,ua:22,fa:20};
+const vec=(a,l)=>{const r=a*Math.PI/180;return [Math.sin(r)*l,-Math.cos(r)*l]};
+function mix(p0,p1,t){const o={};for(const k in p0){o[k]=(typeof p0[k]=='number'&&typeof p1[k]=='number')?p0[k]+(p1[k]-p0[k])*t:p0[k]}return o}
+function solve(ex,P){
+  const nk=P.nk!==undefined?P.nk:P.to;
+  const E=[['an','kn',P.sn,SEG.sn],['kn','hip',P.th,SEG.th],['hip','sh',P.to,SEG.to],['sh','hd',nk,SEG.nk],['sh','el',P.ua,SEG.ua],['el','wr',P.fa,SEG.fa]];
+  if(P.la!==undefined)E.push(['hip','kn2',P.la,SEG.th],['kn2','an2',P.lb,SEG.sn]);
+  const J={};J[ex.a]=[ex.at[0],ex.at[1]+(P.ay||0)];
+  for(let i=0;i<12;i++)for(const [p,c,a,l] of E){const v=vec(a,l);
+    if(J[p]&&!J[c])J[c]=[J[p][0]+v[0],J[p][1]+v[1]];
+    else if(J[c]&&!J[p])J[p]=[J[c][0]-v[0],J[c][1]-v[1]];}
+  return J;
+}
+const CL={shirt:'var(--acc)',shorts:'#3b4a63',skin:'#e8b894',shoe:'#1f2428',glow:'#ff8a1f',steel:'#7b8794',pad:'#d6d0c0',plate:'#2b2f33'};
+const f1=n=>n.toFixed(1);
+const pt=a=>f1(a[0])+','+f1(a[1]);
+function limb(a,b,w1,w2,fill,op){
+  const dx=b[0]-a[0],dy=b[1]-a[1],n=Math.hypot(dx,dy)||1,nx=-dy/n,ny=dx/n;
+  const p=[[a[0]+nx*w1/2,a[1]+ny*w1/2],[b[0]+nx*w2/2,b[1]+ny*w2/2],[b[0]-nx*w2/2,b[1]-ny*w2/2],[a[0]-nx*w1/2,a[1]-ny*w1/2]];
+  return `<g fill="${fill}"${op!==undefined?` opacity="${op}"`:''}><polygon points="${p.map(pt).join(' ')}"/><circle cx="${f1(a[0])}" cy="${f1(a[1])}" r="${w1/2}"/><circle cx="${f1(b[0])}" cy="${f1(b[1])}" r="${w2/2}"/></g>`;
+}
+const lerp=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+function foot(an,dir,w,op){const e=[an[0]+vec(dir,11)[0],an[1]+vec(dir,11)[1]];return limb(an,e,6.5,4.5,CL.shoe,op)}
+function ghost(J){
+  const s=(a,b)=>`<line x1="${f1(a[0])}" y1="${f1(a[1])}" x2="${f1(b[0])}" y2="${f1(b[1])}"/>`;
+  return `<g stroke="${CL.steel}" stroke-width="3" stroke-linecap="round" opacity=".22">${s(J.an,J.kn)}${s(J.kn,J.hip)}${s(J.hip,J.sh)}${s(J.sh,J.el)}${s(J.el,J.wr)}</g>`;
+}
+function arrowHead(a,b,col){
+  const d=[b[0]-a[0],b[1]-a[1]],n=Math.hypot(d[0],d[1])||1,u=[d[0]/n,d[1]/n],v=[-u[1],u[0]];
+  const tip=b,l=[b[0]-u[0]*6+v[0]*3,b[1]-u[1]*6+v[1]*3],r=[b[0]-u[0]*6-v[0]*3,b[1]-u[1]*6-v[1]*3];
+  return `<polygon points="${pt(tip)} ${pt(l)} ${pt(r)}" fill="${col}" opacity=".85"/>`;
+}
+function bodySvg(ex,J,P,key,t){
+  let s='';
+  const shift=(a,dx,dy)=>[a[0]+dx,a[1]+dy];
+  // fjern arm (bak)
+  s+=limb(shift(J.sh,-3,-1),shift(J.el,-3,-1),6.5,5,CL.shirt,.5)+limb(shift(J.el,-3,-1),shift(J.wr,-3,-1),5,3.8,CL.skin,.5);
+  // fjern ben
+  if(J.kn2)s+=limb(J.hip,J.kn2,12,8.5,CL.shorts,.55)+limb(J.kn2,J.an2,8.5,5.5,CL.skin,.55)+foot(J.an2,P.f2||90,0,.55);
+  // nært ben
+  s+=limb(J.kn,J.hip,13,9.5,CL.shorts)+limb(J.an,J.kn,6,9,CL.skin)+foot(J.an,P.f1||90);
+  // overkropp
+  s+=limb(J.hip,J.sh,14,16,CL.shirt);
+  // nakke + hode
+  const nk=lerp(J.sh,J.hd,.55);
+  s+=limb(J.sh,nk,6,5,CL.skin)+`<circle cx="${f1(J.hd[0])}" cy="${f1(J.hd[1])}" r="7.5" fill="${CL.skin}"/>`;
+  // nær arm
+  s+=limb(J.sh,J.el,7.5,5.5,CL.shirt)+limb(J.el,J.wr,5.5,4,CL.skin)+`<circle cx="${f1(J.wr[0])}" cy="${f1(J.wr[1])}" r="3.4" fill="${CL.skin}"/>`;
+  // markerte muskler
+  const g=(HL[key]||[]),G=CL.glow;
+  const gl=(x)=>`<g fill="${G}" opacity=".55">${x}</g>`;
+  for(const h of g){
+    if(h==='th')s+=gl(limb(J.hip,J.kn,11,8,G).replace(/<g fill="[^"]*"[^>]*>/,'').replace(/<\/g>$/,''));
+    else if(h==='sn')s+=gl(limb(J.kn,J.an,8,5,G).replace(/<g fill="[^"]*"[^>]*>/,'').replace(/<\/g>$/,''));
+    else if(h==='ua')s+=gl(limb(J.sh,J.el,6,5,G).replace(/<g fill="[^"]*"[^>]*>/,'').replace(/<\/g>$/,''));
+    else if(h==='glute')s+=`<circle cx="${f1(J.hip[0])}" cy="${f1(J.hip[1])}" r="8" fill="${G}" opacity=".6"/>`;
+    else if(h==='delt')s+=`<circle cx="${f1(J.sh[0])}" cy="${f1(J.sh[1])}" r="7" fill="${G}" opacity=".6"/>`;
+    else if(h==='chest'){const c=lerp(J.sh,J.hip,.2);s+=`<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="8" fill="${G}" opacity=".6"/>`}
+    else if(h==='back'){const c=lerp(J.sh,J.hip,.35);s+=`<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="9" fill="${G}" opacity=".55"/>`}
+    else if(h==='core'){const c=lerp(J.sh,J.hip,.65);s+=`<circle cx="${f1(c[0])}" cy="${f1(c[1])}" r="8" fill="${G}" opacity=".55"/>`}
+  }
+  return s;
+}
+function rigSvg(key,t){
+  const ex=RIG[key],P=mix(ex.p[0],ex.p[ex.p.length-1],t);
+  const K='var(--ink)',M=CL.steel;
+  let s=`<rect x="0" y="138" width="200" height="12" fill="var(--line)" opacity=".5"/>`+`<line x1="0" y1="138" x2="200" y2="138" stroke="var(--line)" stroke-width="2"/>`;
+  if(ex.view==='front')return s+frontSvg(P,K);
+  if(ex.view==='face')return s+faceSvg(P);
+  if(ex.view==='top')return s+topSvg(P);
+  const J=solve(ex,P),J0=solve(ex,ex.p[0]),J1=solve(ex,ex.p[ex.p.length-1]);
+  // skygge
+  const xs=Object.values(J).map(a=>a[0]),mn=Math.min(...xs),mxx=Math.max(...xs);
+  s+=`<ellipse cx="${f1((mn+mxx)/2)}" cy="138" rx="${f1((mxx-mn)/2+8)}" ry="2.6" fill="#000" opacity=".12"/>`;
+  // utstyr bak figuren
+  for(const o of (ex.props||[])){
+    if(o.t==='rect')s+=`<rect x="${o.x}" y="${o.y}" width="${o.w}" height="${o.h}" rx="3" fill="${CL.pad}" stroke="${M}" stroke-width="1"/>`;
+    else if(o.t==='line')s+=`<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" stroke="${M}" stroke-width="3.5" stroke-linecap="round"/>`;
+    else if(o.t==='bar')s+=`<line x1="${o.x1}" y1="${o.y1}" x2="${o.x2}" y2="${o.y2}" stroke="${K}" stroke-width="3.5" stroke-linecap="round"/>`;
+    else if(o.t==='plateFix'){const a=J[o.j],c=[a[0]+o.dx,a[1]+o.dy],d=vec(o.ang,24);s+=`<line x1="${f1(c[0]-d[0]*.3)}" y1="${f1(c[1]-d[1]*.3)}" x2="${f1(c[0]+d[0])}" y2="${f1(c[1]+d[1])}" stroke="${M}" stroke-width="5" stroke-linecap="round"/>`}
+    else if(o.t==='perp'){const a=J.an,k=J[o.to],d=[k[0]-a[0],k[1]-a[1]],n=Math.hypot(d[0],d[1])||1,u=[-d[1]/n,d[0]/n],c=[a[0]-d[0]/n*7,a[1]-d[1]/n*7];s+=`<line x1="${f1(c[0]+u[0]*o.len)}" y1="${f1(c[1]+u[1]*o.len)}" x2="${f1(c[0]-u[0]*o.len)}" y2="${f1(c[1]-u[1]*o.len)}" stroke="${M}" stroke-width="5" stroke-linecap="round"/>`}
+  }
+  // spøkelsesposer + bevegelsessti
+  s+=ghost(J0)+ghost(J1);
+  const tj=TRK[key]===undefined?(ex.hold?'wr':'hip'):TRK[key];
+  if(tj&&!ex.static){
+    const pts=[];for(let i=0;i<=12;i++){const q=solve(ex,mix(ex.p[0],ex.p[ex.p.length-1],i/12))[tj];if(q)pts.push(q)}
+    if(pts.length>2){s+=`<polyline points="${pts.map(pt).join(' ')}" fill="none" stroke="${CL.glow}" stroke-width="1.6" stroke-dasharray="3 2.5" opacity=".8"/>`+arrowHead(pts[pts.length-2],pts[pts.length-1],CL.glow)}
+  }
+  // figuren
+  s+=bodySvg(ex,J,P,key,t);
+  // redskap foran figuren
+  const h=J[ex.holdAt||'wr'];
+  if(ex.hold==='db')s+=`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="5.8" fill="${CL.plate}"/><circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="2" fill="${M}"/>`;
+  if(ex.hold==='bar')s+=`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="10" fill="${CL.plate}"/><circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="7" fill="none" stroke="${M}" stroke-width="1"/><circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="2.5" fill="${M}"/>`;
+  for(const o of (ex.props||[])){
+    if(o.t==='barAt'){const j=J[o.j];s+=`<circle cx="${f1(j[0]+o.dx)}" cy="${f1(j[1]+o.dy)}" r="9" fill="${CL.plate}"/><circle cx="${f1(j[0]+o.dx)}" cy="${f1(j[1]+o.dy)}" r="2.5" fill="${M}"/>`}
+    else if(o.t==='padAt'){const k=J[o.j];s+=`<rect x="${f1(k[0]-9)}" y="${f1(k[1]-13)}" width="18" height="7" rx="3" fill="${M}"/>`}
+    else if(o.t==='cableTo'){const w=J.wr;s+=`<line x1="${f1(w[0])}" y1="${f1(w[1])}" x2="${o.x}" y2="${o.y}" stroke="${M}" stroke-width="1.6"/><circle cx="${o.x}" cy="${o.y}" r="4" fill="none" stroke="${M}" stroke-width="2"/>`}
+  }
+  // forklaringer
+  const cues=(CUES[key]||[]).map(([jn,txt])=>({j:J[jn],txt})).filter(c=>c.j);
+  const wide=mn<70||mxx>150;let L=0,R=0;
+  const lanes={l:[],r:[]};
+  cues.forEach((c,i)=>{c.w=c.txt.length*3.3+8;c.left=wide?(i%2===0):(c.j[0]<100);(c.left?lanes.l:lanes.r).push(c)});
+  for(const side of ['l','r']){
+    const arr=lanes[side].sort((p,q)=>p.j[1]-q.j[1]);let last=-99;
+    arr.forEach((c,i)=>{
+      let y=wide?(-22+i*12):Math.max(-22,Math.min(126,c.j[1]-5));
+      if(y<last+12)y=last+12;last=y;c.y=y;
+    });
+  }
+  for(const c of cues){
+    const x=c.left?3:197-c.w,ax=c.left?x+c.w:x,ay=c.y+5,j=c.j;
+    s+=`<line x1="${f1(ax)}" y1="${f1(ay)}" x2="${f1(j[0])}" y2="${f1(j[1])}" stroke="${CL.glow}" stroke-width=".9" stroke-dasharray="2 1.5" opacity=".9"/><circle cx="${f1(j[0])}" cy="${f1(j[1])}" r="1.8" fill="${CL.glow}"/>`+
+       `<rect x="${f1(x)}" y="${c.y}" width="${f1(c.w)}" height="10" rx="3" fill="var(--card)" stroke="${CL.glow}" stroke-width=".7"/><text x="${f1(x+4)}" y="${c.y+7.2}" font-size="6.3" fill="var(--ink)">${c.txt}</text>`;
+  }
+  return s;
+}
+function frontSvg(P,K){
+  const a=P.arm*Math.PI/180,sc=CL.skin;
+  let o=limb([92,134],[94,112],6,7,CL.skin)+limb([108,134],[106,112],6,7,CL.skin)+limb([94,112],[97,92],7,10,CL.shorts)+limb([106,112],[103,92],7,10,CL.shorts);
+  o+=limb([100,92],[100,50],17,19,CL.shorts,0)+limb([100,92],[100,50],14,18,CL.shirt);
+  o+=limb([100,50],[100,42],5,5,sc)+`<circle cx="100" cy="34" r="8" fill="${sc}"/>`;
+  for(const g of [-1,1]){
+    const sh=[100+g*9,52],dirx=g*Math.sin(a),diry=Math.cos(a);
+    const el=[sh[0]+dirx*22,sh[1]+diry*22];
+    // lett albuebøy (ca. 15-20°) innover mot kroppen
+    const b=17*Math.PI/180,ang=Math.atan2(dirx,diry)-g*b;
+    const h=[el[0]+Math.sin(ang)*20,el[1]+Math.cos(ang)*20];
+    o+=limb(sh,el,7,5.5,CL.shirt)+limb(el,h,5.5,4,sc)+`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="5.5" fill="${CL.plate}"/>`;
+  }
+  const gx=100+(9+Math.sin(a)*42);
+  o+=`<circle cx="${f1(gx)}" cy="${f1(52+Math.cos(a)*42)}" r="9" fill="${CL.glow}" opacity=".25"/>`;
+  // innfelling ovenfra: armene løftes 20-40° foran siden (V, ikke T)
+  const t=Math.min(1,Math.max(0,(P.arm-12)/73)),ix=165,iy=100;
+  o+=`<rect x="138" y="76" width="56" height="48" rx="6" fill="var(--card)" stroke="var(--line)"/>`
+    +`<text x="166" y="86" text-anchor="middle" font-size="6" fill="var(--mut)">Sett ovenfra</text>`
+    +`<circle cx="${ix}" cy="${iy+8}" r="4" fill="${sc}"/>`
+    +limb([ix-5,iy+10],[ix+5,iy+10],3,3,CL.shirt);
+  for(const g of [-1,1]){
+    const L=t*18,ang=30*Math.PI/180;
+    o+=`<line x1="${ix+g*5}" y1="${iy+10}" x2="${f1(ix+g*(5+Math.cos(ang)*L))}" y2="${f1(iy+10-Math.sin(ang)*L)}" stroke="${CL.glow}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }
+  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett forfra · opp til skulderhøyde (ikke høyere)</text>`;
+  return o;
+}
+function faceSvg(P){
+  const t=P.t,sc=CL.skin,C=CL.shirt;
+  let o=limb([92,134],[94,112],6,7,sc)+limb([108,134],[106,112],6,7,sc)+limb([94,112],[97,92],7,10,CL.shorts)+limb([106,112],[103,92],7,10,CL.shorts);
+  o+=limb([100,92],[100,50],14,18,C)+limb([100,50],[100,42],5,5,sc)+`<circle cx="100" cy="34" r="8" fill="${sc}"/>`;
+  for(const g of [-1,1]){
+    const sh=[100+g*9,52];
+    // start: armene frem mot kabelen (sett rett forfra: korte); slutt: albuer i skulderhøyde, ut til siden, underarm opp (ytterrotasjon)
+    const el=[100+g*(11+t*21),56-t*4];
+    const h=[100+g*(5+t*27),60-t*34];
+    o+=limb(sh,el,7,5.5,C)+limb(el,h,5.5,4,sc)+`<circle cx="${f1(h[0])}" cy="${f1(h[1])}" r="4.5" fill="${CL.plate}"/>`;
+  }
+  o+=`<rect x="0" y="0" width="0" height="0"/>`;
+  o+=`<line x1="${f1(100-5-t*27)}" y1="${f1(60-t*34)}" x2="${f1(100+5+t*27)}" y2="${f1(60-t*34)}" stroke="${CL.steel}" stroke-width="1.4" stroke-dasharray="2 2" opacity="${(t*0.8).toFixed(2)}"/>`;
+  o+=`<circle cx="${f1(100+(11+t*21))}" cy="${f1(56-t*4)}" r="9" fill="${CL.glow}" opacity=".3"/><circle cx="${f1(100-(11+t*21))}" cy="${f1(56-t*4)}" r="9" fill="${CL.glow}" opacity=".3"/>`;
+  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett forfra · albuer i skulderhøyde, hendene over albuene</text>`;
+  return o;
+}
+function topSvg(P){
+  const y=78-P.h*34,M=CL.steel;
+  let o=`<circle cx="22" cy="86" r="4" fill="${M}"/><line x1="22" y1="86" x2="100" y2="${f1(y)}" stroke="${M}" stroke-width="1.6"/>`;
+  o+=limb([84,96],[116,96],12,12,CL.shirt)+`<circle cx="100" cy="90" r="8" fill="${CL.skin}"/>`;
+  o+=limb([84,96],[100,y],6,5,CL.shirt)+limb([116,96],[100,y],6,5,CL.shirt)+`<circle cx="100" cy="${f1(y)}" r="4.5" fill="${CL.plate}"/>`;
+  o+=`<text x="100" y="-14" text-anchor="middle" font-size="7" fill="var(--mut)">Sett ovenfra · kabel fra siden · kroppen står stille</text>`;
+  return o;
+}
+
+/* Animasjon i dialogen, med realistisk tempo */
+const CF=['facepull','manualroing','kabelroing','facepull','nedtrekk','strikknedtrekk','pullups','hamcurl','biceps','triceps','trx','hipthrust','enbenship','tahev','sidehev','skulderpress','stepup','pallof'];
+function sched(key){return CF.includes(key)?[1.3,.6,2.4,.5]:[2.4,.6,1.3,.5]}
+function ease(x){return x*x*(3-2*x)}
+function posAt(key,time){
+  const T=sched(key),tot=T[0]+T[1]+T[2]+T[3];let x=time%tot;
+  if(x<T[0])return {t:ease(x/T[0]),seg:0};x-=T[0];
+  if(x<T[1])return {t:1,seg:1};x-=T[1];
+  if(x<T[2])return {t:1-ease(x/T[2]),seg:2};
+  return {t:0,seg:3};
+}
+let ANIM={raf:0,key:null,time:0,playing:true,last:0};
+function tick(ts){
+  const svg=document.getElementById('anim');if(!svg){ANIM.raf=0;return}
+  if(!ANIM.last)ANIM.last=ts;
+  const dt=(ts-ANIM.last)/1000;ANIM.last=ts;
+  const ex=RIG[ANIM.key];
+  if(ANIM.playing)ANIM.time+=dt;
+  const T=sched(ANIM.key),tot=T[0]+T[1]+T[2]+T[3];
+  const p=ex.static?{t:0,seg:1}:posAt(ANIM.key,ANIM.time);
+  svg.innerHTML=rigSvg(ANIM.key,p.t);
+  const cur=document.getElementById('tcur');
+  if(cur)cur.style.left=((ANIM.time%tot)/tot*100).toFixed(1)+'%';
+  const lab=document.getElementById('animlab');
+  if(lab){const l=ex.lab;lab.textContent=ex.static?'Hold stillingen. Pust rolig.':[l[0]+' → '+l[1],'Pause · '+l[1],l[1]+' → '+l[0],'Pause · '+l[0]][p.seg]}
+  ANIM.raf=requestAnimationFrame(tick);
+}
+function stopAnim(){cancelAnimationFrame(ANIM.raf);ANIM.raf=0}
+function animPlay(){ANIM.playing=!ANIM.playing;const b=document.getElementById('playbtn');if(b)b.textContent=ANIM.playing?'Pause':'Spill av'}
+function animTo(i){ANIM.playing=false;const T=sched(ANIM.key);ANIM.time=i?T[0]+.01:0;const b=document.getElementById('playbtn');if(b)b.textContent='Spill av'}
+function fmtS(x){return String(x).replace('.',',')}
+function openEx(key,keys){
+  const e=LIB[key];if(!e)return;
+  stopAnim();ANIM={raf:0,key,time:0,playing:!window.matchMedia('(prefers-reduced-motion: reduce)').matches,last:0};
+  const list=(a)=>a.map(x=>`<li>${x}</li>`).join('');
+  const ks=(keys&&keys.length>1)?`<div style="margin-bottom:8px">${keys.map(k=>`<span class="chip ${k===key?'sel':''}" onclick="openEx('${k}',${JSON.stringify(keys).replace(/"/g,'&quot;')})">${LIB[k].n}</span>`).join('')}</div>`:'';
+  const ex=RIG[key],lab=ex?ex.lab:['',''],T=sched(key),tot=T[0]+T[1]+T[2]+T[3];
+  const seg=(w,t,c)=>`<div style="width:${(w/tot*100).toFixed(1)}%;background:${c};font-size:10px;text-align:center;overflow:hidden;white-space:nowrap;padding:2px 0">${t}</div>`;
+  const tl=ex.static?'':`<div style="position:relative;margin:6px 0 2px"><div style="display:flex;border-radius:6px;overflow:hidden;color:#fff">
+      ${seg(T[0],'→ '+lab[1]+' '+fmtS(T[0])+' s','var(--acc)')}${seg(T[1],'pause','#8a949c')}${seg(T[2],'→ '+lab[0]+' '+fmtS(T[2])+' s','#c97a1e')}${seg(T[3],'','#8a949c')}</div>
+      <div id="tcur" style="position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);left:0"></div></div>`;
+  let m=document.getElementById('modal');
+  if(!m){m=document.createElement('div');m.id='modal';document.body.appendChild(m);m.addEventListener('click',ev=>{if(ev.target===m)closeEx()})}
+  m.innerHTML=`<div class="mbox"><div class="mhead"><b>${e.n}</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   ${ks}
+   <div class="pill">${e.g}</div> <span class="sub">${e.m} · ${e.u}</span>
+   <svg id="anim" viewBox="0 -25 200 175" style="background:var(--bg);border-radius:10px;margin:10px 0 4px"></svg>
+   ${tl}
+   <div class="sub" id="animlab" style="min-height:18px;margin:4px 0 6px"></div>
+   <div class="row" style="margin-bottom:6px"><button class="g" id="playbtn" onclick="animPlay()">${ANIM.playing?'Pause':'Spill av'}</button>
+     <button class="g" onclick="animTo(0)">${lab[0]}</button><button class="g" onclick="animTo(1)">${lab[1]}</button></div>
+   <div class="sub" style="margin-bottom:6px">Oransje = musklene som jobber · stiplet linje = bevegelsesbanen · lys figur = start og slutt.</div>
+   <h3>Oppsett</h3><ol>${list(e.opp)}</ol>
+   <h3>Utførelse</h3><ol>${list(e.ut)}</ol>
+   <h3>Pust</h3><p>${e.pust}</p>
+   <h3>Vanlige feil</h3><ul>${list(e.feil)}</ul>
+   <h3>Tips</h3><ul>${list(e.tips)}</ul>
+   <div class="row" style="align-items:stretch">
+     <div class="card" style="margin:0"><h2>Lettere</h2>${e.lett}</div>
+     <div class="card" style="margin:0"><h2>Tyngre</h2>${e.vanskelig}</div></div>
+   <div class="card" style="margin-top:8px"><h2>På hotell / reise</h2>${e.hotell}</div>
+   <div class="note">${e.sikker}</div></div>`;
+  m.style.display='flex';document.body.style.overflow='hidden';
+  ANIM.raf=requestAnimationFrame(tick);
+}
+function closeEx(){stopAnim();const m=document.getElementById('modal');if(m)m.style.display='none';document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEx()});
+
+const TRK={goblet:'hip',knebokstang:'hip',beinpress:'an',hamcurl:'an',tahev:'an',utfall:'hip',stepup:'hip',hipthrust:'hip',bulgarsk:'hip',
+ pullups:'sh',pushups:'sh',pushupshevet:'sh',trx:'sh',deadbug:'an2',enbenship:'an2',plank:null,baertur:null,facepull:'wr'};
+const HL={goblet:['th','glute'],knebokstang:['th','glute'],beinpress:['th','glute'],benk:['chest','ua'],manualflat:['chest','ua'],skraa:['chest','delt'],
+ manualroing:['back','ua'],kabelroing:['back'],rdl:['glute','th'],enbensrdl:['glute','th'],facepull:['delt','back'],plank:['core'],baertur:['core','delt'],
+ skulderpress:['delt','ua'],nedtrekk:['back'],strikknedtrekk:['back'],pullups:['back','ua'],bulgarsk:['th','glute'],hamcurl:['th'],tahev:['sn'],
+ utfall:['th','glute'],stepup:['th','glute'],hipthrust:['glute'],enbenship:['glute'],biceps:['ua'],triceps:['ua'],deadbug:['core'],
+ pushups:['chest','ua','core'],pushupshevet:['chest','delt','core'],trx:['back','ua']};
+const CUES={
+ goblet:[['kn','Knær følger tærne'],['to','Rett rygg, bryst opp'],['an','Hælene i gulvet']],
+ knebokstang:[['sh','Stang på trapezius'],['kn','Knær ut'],['to','Stiv stamme']],
+ beinpress:[['kn','Ikke lås knærne'],['hip','Rygg og sete mot setet']],
+ benk:[['wr','Stang over skuldrene'],['an','Føtter i gulvet'],['hip','Rumpe på benken']],
+ manualflat:[['wr','Manualer over skuldrene'],['hip','Rumpe på benken']],
+ skraa:[['wr','Manualer over øvre bryst'],['hip','Sitt godt tilbake']],
+ manualroing:[['el','Albue mot hoften'],['to','Flat rygg'],['wr','Strak arm nede']],
+ kabelroing:[['el','Albuer langs kroppen'],['to','Høy rygg, ikke lene'],['kn','Lett bøyde knær']],
+ rdl:[['hip','Hoftene bakover'],['to','Rett rygg'],['wr','Stang tett på lår']],
+ enbensrdl:[['hip','Hoftene mot gulvet'],['to','Rett rygg'],['an2','Fritt ben i flukt']],
+ facepull:[['el','Albuer høyt'],['wr','Hender mot ørene']],
+ plank:[['hip','Hofter i flukt'],['sh','Skuldre over albuer'],['to','Stram mage']],
+ baertur:[['sh','Skuldre bak og ned'],['to','Høy kropp']],
+ skulderpress:[['wr','Rett over skulder'],['to','Stram mage, ikke svai']],
+ nedtrekk:[['el','Albuer ned mot sidene'],['to','Lett bakoverlent'],['sh','Skuldre ned']],
+ strikknedtrekk:[['el','Albuer ned mot sidene'],['sh','Skuldre ned']],
+ pullups:[['sh','Skuldre ned først'],['hd','Hake over stangen']],
+ bulgarsk:[['kn','Kne over ankelen'],['to','Høy overkropp'],['an2','Bakfot på benk']],
+ hamcurl:[['hip','Hofter ned i benken'],['an','Hæl mot rumpe']],
+ tahev:[['an','Så høyt du kan'],['kn','Strake knær']],
+ utfall:[['kn','Kne over ankel'],['to','Høy overkropp'],['an2','Langt skritt bak']],
+ stepup:[['kn','Kne følger tå'],['to','Høy overkropp']],
+ hipthrust:[['hip','Klem setet'],['sh','Skulderblad på benk'],['to','Rett linje']],
+ enbenship:[['hip','Klem setet'],['sh','Skulderblad på benk']],
+ biceps:[['el','Albue stille'],['to','Ikke sving']],
+ triceps:[['el','Albue stille'],['wr','Press til strak arm']],
+ deadbug:[['to','Korsrygg i gulvet'],['an2','Senk sakte']],
+ pushups:[['hip','Rett linje'],['el','Albuer 45°']],
+ pushupshevet:[['hip','Rett linje'],['el','Albuer 45°']],
+ trx:[['hip','Kropp som planke'],['el','Albuer bak']]
+};
+
+
+
+/* =======================================================================
+   KVALITETSSIKRING 11.10.2026: teknikk og animasjon kontrollert mot åpne kilder
+   (rapporter i forskning/05–09: ACE Exercise Library, PMC/PubMed åpne artikler m.fl.).
+   Der kildene er uenige er det valgt den forsiktige varianten for en 50-åring.
+   ======================================================================= */
+CF.push('hammer');
+Object.assign(LIB.benk,{
+ opp:['Legg deg med øynene under stangen. Skulderbladene trekkes litt ned og bakover mot benken, uten å tvinge dem maksimalt sammen.','Føttene flatt i gulvet, under eller litt bak knærne. Svak bue i korsryggen er OK, setet blir på benken.','Grip stangen litt bredere enn skuldrene (ikke mer enn ca. 1,5 × avstanden mellom skulderleddene, omtrent 55–60 cm mellom hendene). Smalere hvis skuldrene er ømme. Håndleddene rett over underarmene.','Løft ut stangen til over skuldrene.'],
+ ut:['Pust inn og senk stangen kontrollert til nedre del av brystbenet (brystvortenivå). Underarmene er loddrette i bunnen.','Albuene ca. 45–70° fra kroppen: som en pil, ikke en T. Ikke rett ut til siden.','Press stangen opp og litt tilbake mot over skuldrene. Pust ut.'],
+ feil:['Albuene rett ut til siden (T, ca. 90°): den mest skulderbelastende posisjonen.','Rumpa løfter seg fra benken.','Stangen spretter fra brystet.','Håndleddene bøyes bakover.','Stangen senkes mot hals eller øvre bryst i stedet for nedre brystben.'],
+ tips:['Bruk alltid sikkerhetsstolper eller spotter.','1–3 repetisjoner igjen i tanken.','Senk i 2–3 sekunder.'],
+ sikker:'Bruk full grep med tommelen rundt stangen. Senk kontrollert og ikke sprett: rupturer av brystmuskelens sene skjer oftest under senking med tung vekt, og menn rundt 50 er i risikogruppen. Plutselig smell, hevelse eller blåmerke i armhule eller overarm: stopp og kontakt lege. Skarp smerte oppå skulderen i bunn: smalere grep og stopp 4–6 cm over brystet. Aldri tung stang uten sikkerhetsstolper.'});
+Object.assign(LIB.manualflat,{
+ ut:['Pust inn og senk manualene kontrollert til brysthøyde, albuene ca. 45–70° fra kroppen (pil, ikke T).','Underarmene er loddrette i bunnen. Stopp når overarmene er omtrent parallelle med gulvet.','Press opp og lett mot hverandre, pust ut.'],
+ feil:['Albuene rett ut til siden (T).','Manualene drar ut til siden og ned under benknivå i bunn.','Manualene sklir inn i hverandre.','Skulderbladene mister spenning.'],
+ sikker:'Sett manualene ned på lårene før du setter deg opp, ikke slipp dem. Tunge sett: spark opp med knærne, og la manualene synke til brystet og deretter til lårene ved utmattelse.'});
+Object.assign(LIB.skraa,{
+ ut:['Pust inn og senk manualene kontrollert til siden av øvre bryst.','Underarmene loddrette, albuene ca. 45–70° fra kroppen. Overarmene peker mot føttene og litt ned, ikke rett ned i benken.','Press opp, pust ut.'],
+ feil:['Benk for bratt (blir skulderpress).','Albuene rett ut til siden.','Rumpa løfter seg.']});
+Object.assign(LIB.skulderpress,{
+ opp:['Stå eller sitt, manualene i skulderhøyde, underarmene loddrette og håndleddene rett over albuene.','Albuene litt foran kroppen, ikke bak den.','Stram mage og sete (hvis stående), ribbena ned.'],
+ ut:['Press manualene opp i skapulaplanet: albuene ut og litt frem (ca. 30–40° foran siden), ikke rett til siden og ikke rett frem. Manualene går litt inn mot hverandre i toppen.','Hold hodet nøytralt, ikke stikk haken frem.','Senk kontrollert til skulderhøyde. Pust ut ved press.'],
+ feil:['Korsryggen svaier og ribbena åpner seg: stram mage, ribbena ned.','Albuene rett ut i 90° med ytterrotasjon («high five»-posisjon).','Manualene driver for langt frem eller bak.','Albuene låses hardt.'],
+ sikker:'Stopp ved stikkende skuldersmerte, særlig en smertefull bue omtrent midt i løftet (ca. 60–120°). Aldri press bak nakken. Svai mer enn 0–5° bakover betyr for tung vekt eller stive skuldre: bruk sittende ryggstøtte.'});
+Object.assign(LIB.sidehev,{
+ opp:['Stå høyt, lett bøyde knær, lette manualer langs siden.','Albuene lett bøyd (ca. 15–20°) og de holder seg slik hele veien.'],
+ ut:['Løft armene i en bue ca. 20–40° foran siden (som en V, ikke en T), til håndleddene er i skulderhøyde (ca. 80–90°, ikke høyere).','Tommelen peker frem eller litt opp, manualen er horisontal.','Senk sakte (2–3 sek).'],
+ tips:['Tenk å løfte med albuene, ikke hendene.','12–15 reps, lett vekt: du skal kunne senke på 2–3 sek uten å svinge overkroppen.'],
+ sikker:'Stopp tidligere hvis du kjenner en smertefull bue omtrent midt i løftet (60–120°). Ikke høyere enn skulderhøyde.'});
+Object.assign(LIB.pushups,{
+ opp:['Hender omtrent skulderbredde (eller litt bredere), under eller marginalt foran skuldrene.','Kroppen i en rett linje fra hode til hæl, mage og rumpe spent. Se ned og litt frem, nakken i forlengelse av ryggen.'],
+ ut:['Senk kroppen som ett stykke til overarmene er omtrent parallelle med gulvet. Dypere bare hvis skuldrene tåler det.','Albuene ca. 45–60° fra kroppen (pil, ikke T).','Press opp til strake armer. Pust ut.'],
+ sikker:'Stopp ved smerte i håndledd (bruk knyttnever eller håndtak). Stikk eller klikk foran i skulderen: bruk hevede hender (benk) eller gå mindre dypt.'});
+Object.assign(LIB.pushupshevet,{
+ opp:['Føttene på en benk eller stol (start lavt, 15–20 cm), hendene på gulvet omtrent skulderbredde.','Kroppen rett fra hode til hæl, se ned og litt frem.'],
+ ut:['Senk kontrollert til overarmene er omtrent parallelle med gulvet.','Albuene ca. 45–60° fra kroppen.','Press opp til strake armer. Hold mage og rumpe spent.'],
+ tips:['Jo høyere føttene er, desto mer last på skuldrene: velg høyere bare hvis skuldrene tåler det.'],
+ sikker:'Stopp ved stikk i skulder eller håndledd. Stolen eller kassen må stå stødig.'});
+Object.assign(LIB.triceps,{
+ ut:['Press håndtaket ned til nesten strake armer, albuene fast ved siden.','Klem triceps 1 sek. Ikke lås albuene hardt: stopp ca. 5° før.','Slipp kontrollert opp til underarmene er omtrent horisontale (ca. 90° i albuen).'],
+ tips:['Hold albuene stille som hengsler.','Overkroppen kan lene 5–10° frem, men skal ikke bevege seg under pressingen.'],
+ sikker:'Plutselig smell, skarp smerte eller svakhet bak albuen: stopp og få sjekket (tricepssenen). Ikke dropp raskt i bunnen med tung vekt.'});
+Object.assign(LIB.manualroing,{
+ ut:['Trekk albuen opp og bakover mot hoften, nær kroppen (ca. 30–45° fra siden).','Før manualen mot nedre ribbein/hofte uten å rotere overkroppen. Stopp når albuen er ved overkroppslinjen, ikke langt bak ryggen.','Senk sakte (2–3 sek) til strak arm.'],
+ feil:['Overkroppen roterer og tvister opp: hold skuldrene parallelle med gulvet.','Du drar med biceps: tenk albue mot hoften.','Albuen går langt bak ryggen og skulderen ruller frem.','Hodet løftes: nakken i flukt med ryggen.'],
+ sikker:'Stopp trekket når overkroppen vil rotere. Stopp ved stikkende smerte i skulder eller korsrygg.'});
+Object.assign(LIB.kabelroing,{
+ ut:['Trekk først med albuene, ikke ved å klemme skulderbladene. Albuene glir bakover nær ribbena (ca. 30–45° fra kroppen), ikke ut til siden.','Håndtaket stopper foran magen. Albuen ender ved overkroppslinjen eller maks litt bak den.','Pause 1 sek, slipp kontrollert frem til strakte armer.'],
+ opp:['Sett deg med føttene på platen, knærne litt bøyd.','Sitt høyt med bryst opp og nøytral rygg. Overkroppen er oppreist og stille hele settet.','Armene strakt, skuldrene kan gli litt frem uten at ryggen runder seg.'],
+ tips:['Tenk «albuer langs ribbena».','Mer mellomrygg og bakre skulder: bredere håndtak og albuer ut til skulderhøyde, lettere vekt, men ikke bak ryggen.'],
+ sikker:'Hold overkroppen oppreist og stille: ikke slå deg bakover for å få vekten opp. Stopp ved stikkende smerte i fremre skulder eller korsrygg.'});
+Object.assign(LIB.nedtrekk,{
+ ut:['Sett skuldrene ned (ikke opp mot ørene), og trekk så albuene ned mot sidene.','Trekk stangen ned foran hodet til øvre bryst. Stopp når albuene er ved ribbena: ikke la dem gå bak kroppen.','Pause 1 sek, slipp kontrollert opp til strake armer.'],
+ feil:['Du lener deg langt bakover og drar med kroppsvekt.','Albuene går bak kroppen og brystet skyves frem.','Stangen trekkes bak nakken.','Skuldrene trekkes opp mot ørene.'],
+ tips:['Tenk albuer ned mot hoftene (ikke bakover).','Ikke øk lenet under trekket: maks ca. 10–15°.'],
+ sikker:'Aldri bak nakken: ingen fordel og krever mer skulderbevegelighet. Stopp ved stikkende skulder- eller albuesmerte.'});
+Object.assign(LIB.strikknedtrekk,{
+ opp:['Fest strikken høyt, over hodehøyde, i en dørramme eller stolpe, slik at trekket går nedover.','Sitt og grip strikken med skulderbredde.'],
+ ut:['Sett skuldrene ned, og trekk albuene ned mot sidene til hendene er ved øvre bryst.','Stopp når albuene er ved ribbena, ikke bak kroppen.','Slipp kontrollert opp. La strikken aldri smelle tilbake.'],
+ sikker:'Sjekk at strikken er hel, og festet sikkert før du drar.'});
+Object.assign(LIB.pullups,{
+ opp:['Grip stangen omtrent skulderbredde (marginalt bredere er OK, unngå vid grep), håndflatene fra deg.','Heng med strake armer og skuldrene lett ned (ikke i ørene).','Kryss anklene, lett bøyde knær.'],
+ ut:['Start med å senke skuldrene, deretter albuene ned mot siden. La skulderbladene bevege seg fritt.','Hodet i flukt med overkroppen, før haken over stangen uten å stikke den frem.','Senk kontrollert til full hang. Pust ut når du drar.'],
+ feil:['Du svinger (kipping).','Albuene går bak kroppen i toppen.','Halv bevegelse: bruk hjelp heller enn å jukse.','Skuldrene i ørene.'],
+ sikker:'Stopp ved stikkende smerte i skulder eller albue. Slipp ikke ned ukontrollert i bunn: albuene tåler det dårlig. Ved skulderplager: unngå passivt hengende «dead hang».'});
+Object.assign(LIB.trx,{
+ opp:['Grip TRX-håndtakene, lean bakover med strake armer og kroppen som en rett planke fra ankel til skulder.','Jo flatere kropp, desto tyngre. Føttene i gulvet. Sag i korsryggen = stopp.'],
+ ut:['Trekk brystet mot håndtakene med albuene nær kroppen (ca. 30–45°); hendene ender ved brystet/nedre ribbein.','Albuene stopper ved overkroppslinjen, ikke langt bak ryggen. Klem skulderbladene lett sammen, pause 1 sek.','Slipp kontrollert til strake armer.'],
+ feil:['Hoftene synker.','Albuene går langt bak ryggen og skulderen ruller frem.','Skuldrene trekkes opp.','Du trekker med nakken.']});
+Object.assign(LIB.facepull,{
+ opp:['Still taukroken i øye- til skulderhøyde.','Grip tauet med tommelen mot deg, ta ett skritt bakover så kabelen er stram.','Stå stødig, lett bøyde knær, mage spent.'],
+ ut:['Trekk tauet mot ansiktet med albuene i skulderhøyde og ut til siden: ikke over skulderen.','Roter underarmene opp og ut slik at hendene ender over albuenivå, tommelen mot ørene.','Pause 1 sek og slipp kontrollert frem.'],
+ feil:['Albuene løftes over skulderen og skuldrene trekkes mot ørene.','Du lener deg bakover og bruker kroppsvekt.','Tung vekt gir innadrotasjon i skulderen: vekten skal være lett.'],
+ tips:['Lettvekts-øvelse for skuldrene, 12–15 reps.','Ikke over hodehøyde.'],
+ sikker:'Bruk lett vekt. Stopp ved stikkende skuldersmerte.'});
+Object.assign(LIB.biceps,{
+ opp:['Stå høyt, albuene inn mot kroppen, manualer langs siden. Skuldre ned, håndledd rette.'],
+ ut:['Bøy albuene og løft manualene mot skuldrene (ca. 140° i albuen). Albuene stille ved siden av kroppen.','Senk sakte (2–3 sek) til nesten strak arm, uten å smekke albuen i.'],
+ feil:['Du svinger med overkroppen.','Albuene driver frem, eller bak kroppen i bunn.','For rask senking.'],
+ sikker:'Stopp ved smerte i albuen eller innsiden av albuen. Ikke heng ned i helt strak arm med tung last, og ikke rykk opp fra bunn (distal bicepssene).'});
+LIB.hammer={n:'Hammer curl',g:'Armer',m:'Biceps, underarm (brachioradialis)',u:'2 manualer',
+ opp:['Stå høyt, manualer langs lårene med håndflatene mot kroppen og tommelen frem. Lukket grep.','Skuldre ned, albuene inn mot kroppen, håndledd rette.'],
+ ut:['Bøy albuene og løft manualene foran skuldrene uten å rotere håndleddet. Nøytralt grep hele veien.','Albuen er stille ved siden av kroppen.','Senk sakte (2–3 sek) til nesten strak arm.'],
+ pust:'Ut opp, inn ned.',
+ feil:['Du svinger med overkroppen.','Albuene driver frem og belaster fremre skulder.','Håndleddet bøyes.','For rask senking.'],
+ tips:['Nøytralt grep er ofte skånsommere for håndledd og albue.','Alternerende eller samtidig: begge fungerer.'],
+ lett:'Lettere manualer, eller kabel/strikk.',vanskelig:'Tempo 3 sek ned, eller pause 1 sek øverst.',hotell:'Manualer eller strikk.',
+ sikker:'Stopp ved skarp smerte i albuen. Mye grepbelastning kan trigge tennisalbue: bruk moderate manualer og 10–15 reps.'};
+LIB.overhead={n:'Triceps-ekstensjon over hodet (manual)',g:'Armer',m:'Triceps (spesielt langt hode)',u:'1 manual',
+ opp:['Sitt på en benk med ryggstøtte (eller stå), hold én manual med begge hender under øvre vektskive.','Løft manualen til over hodet med strake armer, ribbena ned, haken lett inn.'],
+ ut:['Senk manualen bak hodet ved å bøye kun albuene. Overarmene står stille tett ved hodet, albuene peker opp og frem.','Stopp ved ca. 90° i albuen (underarmene omtrent horisontale bak hodet), ikke dypere.','Press opp til nesten strake armer, ikke hard lås.'],
+ pust:'Inn ned, ut opp.',
+ feil:['Albuene flarer ut til sidene.','Overarmene vandrer frem og bak.','Korsryggen svaier: ribbena opp, for tung vekt.','For dypt og rykkete i bunn.'],
+ tips:['2–3 sek ned, 1 sek opp.','Ikke til failure: bruk en vekt der du kan stoppe kontrollert.','Får du ikke armene rett opp uten å svaie: la overarmene lene 10–20° frem, eller bruk kabel.'],
+ lett:'Lettere manual, eller kabel/strikk.',vanskelig:'Tempo 3 sek ned, eller pause 1 sek i bunn.',hotell:'Én manual og en stol eller benk.',
+ sikker:'Vær forsiktig med tung vekt bak hodet. Stopp ved smerte oppå eller foran skulderen, nummenhet i armen eller nakkesmerte. Plutselig smell eller svakhet bak albuen: stopp og få sjekket.'};
+Object.assign(LIB.rdl,{
+ opp:['Ta stangen fra stativ i lår- til midjehøyde. Føttene hoftebredde, stang/manualer foran lårene i strakte armer.','Knærne litt bøyd (ca. 10–15°) og de holder seg slik hele tiden.','Skuldrene bak, bryst opp, nøytral rygg, blikket mot gulvet.'],
+ ut:['Pust inn og send hoftene bakover som om du lukker en bildør med rumpa.','Senk stang/manualer tett langs lårene til omtrent knehøyde, eller til du kjenner tydelig strekk bak lårene og ryggen fortsatt er uendret. Midt på leggen bare hvis du er bevegelig nok uten at ryggen endrer seg.','Press hoftene frem for å reise deg, klem setet øverst. Pust ut.'],
+ feil:['Ryggen runder seg: stopp tidligere og trekk skuldrene bak.','Du bøyer knærne og gjør den til en knebøy: knærne er nesten stive.','Stangen driver bort fra kroppen.','Du ser opp i speilet: nakken strammes og ryggen følger blikket.','Du lener deg bakover i toppen.'],
+ sikker:'Stopp hvis ryggen begynner å runde seg. Øk vekten sakte over uker: rask lastøkning er en større skadefaktor enn små tekniske avvik. Rette ben (stiff-leg) er for øvede.'});
+Object.assign(LIB.enbensrdl,{
+ opp:['Stå på ett ben med lett bøyd kne, manualen i motsatt hånd av stående ben (valgfritt).','Hoftene i flukt, blikket 1–2 meter foran deg på gulvet. Ha gjerne en hånd i lett kontakt med en vegg eller stol.'],
+ ut:['Send hoftene bakover og la det frie benet strekke seg rett bakover i flukt med overkroppen.','Hold begge hofter vendt mot gulvet.','Senk så dypt du kan holde ryggen og hoftene stille: ikke så dypt som mulig.','Press hoftene frem og reis deg. Pust ut.'],
+ feil:['Hoften roterer åpent opp: hold begge hofter mot gulvet.','Ryggen runder seg.','Fritt ben kastes høyere enn overkroppen: korsryggen svaier.','Det stående benet låses helt eller bøyes for mye.']});
+Object.assign(LIB.hipthrust,{
+ ut:['Press hælene i gulvet og løft hoftene til overkropp og lår er i en rett linje (ikke høyere). Leggene er omtrent vertikale.','Ribbena ned mot bekkenet, rull bekkenet litt bakover og klem setet. Ikke svai korsryggen.','Pause 1 sek, senk kontrollert.'],
+ feil:['Hoftene løftes for høyt: da er det korsryggen som svaier, ikke setet som jobber.','Knærne faller innover.','Hamstring krampar: flytt føttene nærmere setet.'],
+ sikker:'Bruk pute under stangen. Hold benken stabil. Stopp ved smerte i korsrygg eller hoftebøyer.'});
+Object.assign(LIB.enbenship,{
+ opp:['Samme oppsett som hip thrust, men ett ben løftet (kne bøyd mot brystet eller strukket i linje med låret).'],
+ ut:['Press gjennom hælen og løft hoftene til en rett linje. Hoften skal ikke synke på det løftede benets side.','Ribbena ned, ikke svai korsryggen.','Pause 1 sek, senk kontrollert.'],
+ feil:['Hoften roterer og faller til siden.','Korsryggen svaier.','Hamstring krampar: flytt foten nærmere setet.'],
+ sikker:'Stopp ved krampe eller smerte i korsrygg.'});
+Object.assign(LIB.plank,{
+ ut:['Løft kroppen til en rett linje fra hodet til hælene.','Stram mage, klem rumpa og trykk underarmene lett mot gulvet.','Pust rolig mens du holder 10–30 sekunder. Gjenta 2–4 ganger.'],
+ feil:['Hoftene synker og korsryggen svikter.','Rumpa peker mot taket.','Skuldrene trekkes mot ørene.','Hodet henger ned eller løftes for høyt.'],
+ tips:['Flere korte, gode hold slår ett langt og slapt: 4 × 15 sek.','Stopp når formen går.'],
+ sikker:'Stopp ved smerte i korsrygg eller skuldre. Korsryggsplager: gjør planken på knær eller med hendene mot en benk.'});
+Object.assign(LIB.baertur,{
+ ut:['Gå jevne, kontrollerte skritt 20–30 meter.','Hold overkroppen høy, magen spent, ingen lening.','Snu rolig og gå tilbake.'],
+ sikker:'Velg en vekt du kan bære hele distansen uten å lene deg eller heve skuldrene. Start med to like vekter (ensidig bæring belaster korsryggen mer). Rydd veien, ikke slipp manualene på føttene.'});
+Object.assign(LIB.deadbug,{
+ opp:['Ligg på ryggen, knær bøyd 90° over hoftene, armene rett opp mot taket.','Hold korsryggen stille og lett mot gulvet: ikke klem hardt og ikke la den svaie.'],
+ ut:['Senk motsatt arm og ben mot gulvet, sakte, og strekk bare så langt du kan holde ryggen stille.','Gå tilbake og bytt side.','Pust ut når du strekker ut, inn når du kommer tilbake.'],
+ feil:['Korsryggen buer seg: stopp før det skjer.','Ribbena åpner seg og buer ut.','Du holder pusten.','For rask bevegelse.'],
+ tips:['6–10 rolige repetisjoner per side, 2–3 sett.','Siste repetisjon skal se like god ut som den første.']});
+Object.assign(LIB.pallof,{
+ opp:['Sett kabelen i brysthøyde og stå på tvers, slik at kabelen drar rett i siden av deg.','Hold håndtaket med begge hender foran brystet, ta et skritt bort så kabelen er stram.','Føttene skulderbredde, lett bøyde knær.'],
+ ut:['Press hendene rett frem fra brystet til strake armer, uten å la kroppen rotere mot kabelen. Hofte og skuldre vinkelrett frem.','Hold 2 sek.','Før hendene sakte tilbake til brystet. 5–10 repetisjoner per side, gjør begge sider.'],
+ lett:'Stå nærmere ankeret, eller kneel på ett kne.'});
+
+/* ---- animasjon: rettede poser ---- */
+RIG.benk.p=[{sn:35,th:270,to:-90,ua:0,fa:0},{sn:35,th:270,to:-90,ua:135,fa:0}];
+RIG.manualflat.p=[{sn:35,th:270,to:-90,ua:0,fa:0},{sn:35,th:270,to:-90,ua:130,fa:0}];
+RIG.skraa.p=[{sn:35,th:260,to:-60,ua:5,fa:5},{sn:35,th:260,to:-60,ua:155,fa:5}];
+RIG.skulderpress.p=[{sn:0,th:0,to:0,ua:160,fa:0},{sn:0,th:0,to:0,ua:3,fa:2}];
+RIG.pushups.p=[{sn:70,th:70,to:70,ua:180,fa:180,f1:180},{sn:87,th:87,to:87,ua:270,fa:125,f1:180}];
+RIG.pushupshevet.p=[{sn:81,th:81,to:81,ua:180,fa:180,f1:180},{sn:97,th:97,to:97,ua:250,fa:108,f1:180}];
+RIG.triceps.p=[{sn:0,th:0,to:8,ua:178,fa:88},{sn:0,th:0,to:8,ua:178,fa:178}];
+RIG.manualroing.p=[{sn:15,th:-30,to:70,ua:180,fa:180},{sn:15,th:-30,to:70,ua:255,fa:180}];
+RIG.kabelroing.p=[{sn:280,th:265,to:5,ua:95,fa:90},{sn:280,th:265,to:5,ua:195,fa:80}];
+RIG.nedtrekk.p=[{sn:-5,th:265,to:-10,ua:10,fa:10},{sn:-5,th:265,to:-10,ua:175,fa:40}];
+RIG.strikknedtrekk.p=RIG.nedtrekk.p;
+RIG.pullups.p=[{sn:75,th:0,to:0,ua:0,fa:0},{sn:75,th:0,to:-5,nk:5,ua:178,fa:12}];
+RIG.trx.p=[{sn:-50,th:-50,to:-50,nk:-50,ua:55,fa:55},{sn:-35,th:-35,to:-35,nk:-35,ua:160,fa:15}];
+RIG.facepull={view:'face',p:[{t:0},{t:1}],lab:['Armene frem','Albuer ut, hendene opp']};
+RIG.biceps.p=[{sn:0,th:0,to:0,ua:178,fa:180},{sn:0,th:0,to:0,ua:172,fa:38}];
+RIG.hammer={a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:178,fa:180},{sn:0,th:0,to:0,ua:172,fa:38}],lab:['Ned','Opp']};
+RIG.overhead={a:'an',at:[100,132],hold:'db',p:[{sn:0,th:0,to:0,ua:3,fa:2},{sn:0,th:0,to:0,ua:3,fa:-95}],lab:['Topp','Bak hodet (90°)']};
+RIG.rdl.p=[{sn:0,th:-8,to:0,ua:180,fa:180},{sn:0,th:-15,to:72,ua:215,fa:215}];
+RIG.enbensrdl.p=[{sn:0,th:-6,to:0,ua:185,fa:185,la:185,lb:185,f2:90},{sn:5,th:-8,to:75,ua:207,fa:207,la:262,lb:262,f2:180}];
+RIG.hipthrust.p=[{sn:-31,th:240,to:-55,ua:125,fa:125},{sn:-8,th:270,to:-84,ua:96,fa:96}];
+RIG.hipthrust.props=[{t:'rect',x:22,y:106,w:40,h:32}];
+RIG.enbenship.p=[{sn:-31,th:240,to:-55,ua:125,fa:125,la:55,lb:70,f2:90},{sn:-8,th:270,to:-84,ua:96,fa:96,la:70,lb:70,f2:90}];
+RIG.enbenship.props=[{t:'rect',x:22,y:106,w:40,h:32}];
+RIG.plank.at=[45,125];RIG.plank.p=[{sn:83,th:83,to:83,ua:180,fa:90,f1:180}];
+RIG.baertur.p=[{sn:0,th:0,to:0,ua:180,fa:180,la:150,lb:175,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:195,lb:190,f2:90}];
+RIG.deadbug.p=[{sn:270,th:180,to:-90,ua:0,fa:0,la:0,lb:90,f2:90},{sn:270,th:180,to:-90,ua:-90,fa:-90,la:88,lb:90,f2:90}];
+RIG.pallof.p=[{h:0},{h:0.6}];
+
+/* ---- forklaringer og markerte muskler ---- */
+Object.assign(CUES,{
+ benk:[['wr','Stang over skuldrene'],['el','Albue ca. 60° (pil, ikke T)'],['hip','Rumpe på benken']],
+ manualflat:[['wr','Manualer over skuldrene'],['el','Albue ca. 60°']],
+ skraa:[['wr','Manualer over øvre bryst'],['el','Albue mot føttene, ca. 60°']],
+ skulderpress:[['wr','Rett over skulder (skapulaplanet)'],['to','Ribbena ned, ikke svai']],
+ kabelroing:[['el','Albuer nær ribbena'],['to','Overkropp stille'],['kn','Lett bøyde knær']],
+ manualroing:[['el','Albue mot hoften, nær kroppen'],['to','Flat rygg'],['wr','Strak arm nede']],
+ nedtrekk:[['el','Albuer ned, ikke bak kroppen'],['to','Lett bakoverlent, ikke mer'],['wr','Stang foran hodet']],
+ strikknedtrekk:[['el','Albuer ned, ikke bak kroppen'],['sh','Skuldre ned']],
+ pullups:[['sh','Skuldre ned først'],['hd','Hake over stangen'],['el','Albuer ned mot siden']],
+ trx:[['hip','Kropp som planke'],['el','Albue ved kroppen, ikke langt bak']],
+ hammer:[['el','Albue stille'],['wr','Tommelen opp, håndledd rett']],
+ overhead:[['el','Albuer peker opp og frem'],['to','Ribbena ned, ikke svai'],['wr','Ca. 90° i albuen']],
+ rdl:[['hip','Hoftene bakover'],['kn','Lett bøyd kne, konstant'],['wr','Stang tett på lår']],
+ pushups:[['hip','Rett linje'],['el','Albuer 45–60°']],
+ pushupshevet:[['hip','Rett linje'],['el','Albuer 45–60°']]
+});
+Object.assign(HL,{hammer:['ua'],overhead:['ua']});
+Object.assign(TRK,{overhead:'wr'});
+
+
+/* ---- ben (forskning/07) ---- */
+Object.assign(LIB.goblet,{tips:['2 sekunder ned, 1 sekund opp.','Kneet kan gå litt forbi tåen når hælene er i gulvet: det er normalt. Bekkenet ruller ikke under.','Stopp når du har 1–3 repetisjoner igjen i tanken.']});
+Object.assign(LIB.knebokstang,{
+ ut:['Pust inn, spenn mage og rygg («stiv stamme»).','Send hoftene bakover og ned, knærne følger tærne.','Gå ned til lårene er omtrent parallelle, eller til rett før bekkenet ruller under og korsryggen runder seg. Stangen er hele tiden over midtfoten.','Press gulvet fra deg og reis deg. Pust ut på vei opp.'],
+ sikker:'Bruk alltid sikkerhetsstolper eller spotter på tunge sett. Ikke til failure med stang. Har du høyt blodtrykk: avklar med lege og unngå lange pusteholdt.'});
+Object.assign(LIB.beinpress,{
+ ut:['Pust inn og senk platen kontrollert til knærne er rundt 90° (maks ca. 100°), og ikke dypere enn der bekkenet løfter seg fra setet. Knærne skal ikke gå mot brystet.','Hold hælene i platen og press jevnt gjennom hele foten til beina nesten er strake. Ikke lås knærne.','Pust ut på vei opp, og senk igjen med kontroll.'],
+ feil:['Setet løfter seg og korsryggen runder seg: gå mindre dypt.','Knærne faller innover.','Knærne låses ut hardt i toppen.','Du skyver på knærne med hendene.']});
+Object.assign(LIB.bulgarsk,{
+ opp:['Mål skrittlengden fra bakfotens tåsnøre på benken til fremre hæl: ca. 70–80 cm (ca. 80 % av benlengde). Juster så fremre legg står omtrent loddrett i bunn og hælen er i gulvet.','Manualer langs siden, overkroppen høy.'],
+ feil:['For nær benken og kneet skyter frem forbi tåen.','Overkroppen faller langt frem.','Korsryggen overstrekkes for å holde seg høy.','Hælen i fremre fot løfter seg, eller kneet faller innover.'],
+ tips:['Start uten vekt, finn riktig avstand først.','Samme antall reps på begge sider.','Mer sete: 15–30° fremoverlent overkropp med vertikal legg.']});
+Object.assign(LIB.utfall,{
+ ut:['Ta ett langt skritt bakover (omtrent en benlengde) og senk til bakre kne er nær gulvet uten å treffe det. Bakre hæl opp, tåen i gulvet.','Fremre kne over ankelen, vekten mest på fremre ben, overkroppen høy.','Press gjennom fremre fot og trå tilbake til start. Pust ut opp.'],
+ tips:['Bakover-utfall gir vanligvis mindre belastning på kneskålen enn fremover-utfall, men er ikke risikofritt: ikke dypere enn du kontrollerer.']});
+Object.assign(LIB.stepup,{
+ u:'Kasse/benk (start lavt, ca. 20–25 cm), manualer',
+ opp:['Start med en lav kasse (ca. 20–25 cm) og øk høyden når du har kontroll. Sett hele foten på kassen.','Overkroppen høy, manualer langs siden.'],
+ feil:['Du dytter med bakre fot.','Kneet faller innover.','Bekkenet faller til siden.','For høy kasse.']});
+Object.assign(LIB.tahev,{
+ ut:['Press opp på tå så høyt du kan, knærne strake.','Pause 1 sek øverst.','Senk sakte (3 sek). Standard: ned til hælene er på gulvhøyde. Hæl under trinnet bare når akillessenen og hælen er helt smertefrie.'],
+ tips:['Progresjon over uker: to ben, deretter to ben med manualer, og først til slutt ett ben (høyest belastning på akillessenen).','Ta også et sett med bøyde knær (soleus).'],
+ sikker:'Stopp ved smerte eller ømhet i akillessenen eller hælen, eller stivhet dagen etter. Ikke sprett i bunnen. Aldersgruppen 40–59 år har økt risiko for akillesruptur: bygg opp gradvis.'});
+Object.assign(LIB.hamcurl,{
+ ut:['Bøy knærne og trekk hælene mot rumpa (ca. 100–110° i kneet).','Pause 1 sek øverst.','Senk sakte (3 sek) til nesten strake ben.'],
+ tips:['Senk sakte, det er der resultatet kommer.','Hoftene presses ned i benken. Fotposisjonen betyr lite: ved leggkrampe, slipp tåløftet.'],
+ sikker:'Stopp ved krampe eller stikkende smerte i baksiden av låret eller knehasen (hamstringsskade er vanlig hos løpere).'});
+
+RIG.knebokstang.p=[{sn:0,th:0,to:0,ua:200,fa:8},{sn:32,th:-80,to:35,ua:200,fa:8}];
+RIG.knebokstang.props=[{t:'barAt',j:'sh',dx:-5,dy:-4}];
+RIG.beinpress.p=[{sn:240,th:240,to:-50,ua:150,fa:100,f1:-30},{sn:285,th:200,to:-50,ua:150,fa:100,f1:-30}];
+RIG.beinpress.props=[{t:'line',x1:73,y1:104,x2:30,y2:70},{t:'plateFix',j:'an',dx:5,dy:-3,ang:-30}];
+RIG.bulgarsk.p=[{sn:5,th:-10,to:5,ua:180,fa:180,la:225,lb:250,f2:270},{sn:18,th:-85,to:5,ua:180,fa:180,la:207,lb:328,f2:270}];
+RIG.utfall.p=[{sn:0,th:0,to:0,ua:180,fa:180,la:180,lb:180,f2:90},{sn:10,th:-80,to:5,ua:180,fa:180,la:200,lb:265,f2:140}];
+RIG.stepup.at=[110,117];
+RIG.stepup.props=[{t:'rect',x:85,y:122,w:45,h:16}];
+RIG.stepup.p=[{sn:25,th:-67,to:10,ua:180,fa:180,la:160,lb:213,f2:90},{sn:0,th:0,to:0,ua:180,fa:180,la:110,lb:180,f2:90}];
+RIG.tahev={a:'an',at:[100,126],hold:'db',props:[{t:'rect',x:96,y:132,w:30,h:6}],p:[{sn:0,th:0,to:0,ua:180,fa:180,f1:78,ay:3},{sn:0,th:0,to:0,ua:180,fa:180,f1:140,ay:-9}],lab:['Hæl under kanten','På tå']};
+RIG.hamcurl.p=[{sn:90,th:90,to:90,ua:95,fa:150,f1:160},{sn:195,th:90,to:90,ua:95,fa:150,f1:240}];
+RIG.hamcurl.props=[{t:'rect',x:50,y:118,w:100,h:6},{t:'line',x1:58,y1:124,x2:58,y2:138},{t:'line',x1:142,y1:124,x2:142,y2:138}];
+Object.assign(CUES,{
+ knebokstang:[['sh','Stang på trapezius'],['kn','Knær følger tærne'],['to','Stiv stamme']],
+ beinpress:[['kn','Ca. 90° i kneet'],['hip','Rygg og sete mot setet']],
+ bulgarsk:[['kn','Kne ved ankelen, ikke forbi tå'],['to','Høy overkropp'],['an2','Bakfot på benk']],
+ tahev:[['an','Så høyt du kan'],['kn','Strake knær']],
+ utfall:[['kn','Kne over ankelen'],['to','Høy overkropp'],['an2','Bakre hæl opp, tå i gulvet']]
+});
+
+/* =======================================================================
+   MATBASE OG OPPSKRIFTER
+   Næringsverdier per 100 g (typiske norske verdier, avrundet).
+   [navn, kcal, protein, karbo, fett, kategori, enhet, gram per enhet]
+   ======================================================================= */
+const ING={ /* Kilde: Matvaretabellen.no (Mattilsynet), hentet 11.10.2026. Unntak er merket i Data-fanen. */
+ havre:['Havregryn',369,14.1,57.2,6.7,'Tørrvarer','dl',40],
+ muesli:['Müsli (fruktmüsli)',376,8.5,69.8,5.7,'Tørrvarer'],
+ melk:['Lettmelk (1 %)',41,3.5,4.5,1.0,'Meieri','dl',100],
+ skyr:['Skyr naturell',63,11,4,0.2,'Meieri'],
+ cottage:['Cottage cheese',97,13.0,1.5,4.3,'Meieri','dl',100],
+ egg:['Egg',148,12.9,0.3,10.5,'Meieri','egg',56],
+ ost:['Ost (Norvegia)',351,27,0,27,'Meieri','skive',10],
+ smor:['Smør',744,1.0,0.5,82,'Meieri','ts',5],
+ olje:['Olivenolje',892,0.2,0,99,'Tørrvarer','ts',4.5],
+ honning:['Honning',317,0.3,78.9,0,'Tørrvarer','ts',11],
+ peanottsmor:['Peanøttsmør',621,22.8,13.1,51.8,'Tørrvarer','ss',17],
+ valnott:['Valnøtter, hakket',680,14.1,2.8,66.5,'Tørrvarer','ss',9],
+ mandel:['Mandler',601,21.2,6.6,52.1,'Tørrvarer','neve',20],
+ brod:['Grovbrød',239,9.3,40.6,3.1,'Brød','skive',40],
+ knekke:['Knekkebrød (grovt)',308,9.0,55.4,1.5,'Brød','skive',12],
+ tortilla:['Fullkorn tortilla',260,8.5,44.8,4.8,'Brød','stk',60],
+ riskake:['Riskake',340,8.0,67.9,3.0,'Brød','stk',6],
+ banan:['Banan',88,1.1,19.7,0.2,'Frukt og grønt','stk',120],
+ eple:['Eple',50,0.0,11.0,0.1,'Frukt og grønt','stk',130],
+ baer:['Bær (blåbær)',51,1.0,7.5,0.9,'Frukt og grønt'],
+ skinke:['Skinke (kokt, pålegg)',95,16.7,0.7,2.8,'Pålegg','skive',12],
+ kalkunpal:['Kalkunfilet, pålegg',88,20.9,0,0.5,'Pålegg','skive',11],
+ kyllingpal:['Kyllingbryst, pålegg (omtrent som kalkunfilet)',88,20.9,0,0.5,'Pålegg','skive',11],
+ kylling:['Kyllingfilet (rå)',111,23.0,0,2.1,'Kjøtt'],
+ kyllinglaar:['Kyllinglår uten skinn (rå)',131,18.0,0,6.6,'Kjøtt'],
+ kjottdeig:['Karbonadedeig 4,5 % (rå)',123,20.7,0,4.5,'Kjøtt'],
+ biff:['Biff, ytrefilet (rå)',118,22.5,0,3.1,'Kjøtt'],
+ svinefilet:['Svinefilet / mørbrad (rå)',112,23.1,0.3,2.0,'Kjøtt'],
+ potet:['Poteter (kokte)',84,2.1,17.8,0.1,'Frukt og grønt','stk',80],
+ soetpotet:['Søtpotet',80,1.6,16.8,0.1,'Frukt og grønt'],
+ ris:['Ris, jasmin (tørr)',355,7.5,79.6,0.7,'Tørrvarer','dl',80],
+ pasta:['Fullkornspasta (tørr)',362,12.6,68.3,2.5,'Tørrvarer'],
+ brokkoli:['Brokkoli',24,2.9,2.0,0,'Frukt og grønt'],
+ spinat:['Spinat',17,2.8,0.1,0,'Frukt og grønt'],
+ gulrot:['Gulrot',25,0,5.3,0,'Frukt og grønt','stk',80],
+ lok:['Løk',30,1.0,4.4,0,'Frukt og grønt','stk',160],
+ paprika:['Paprika (rød)',26,0.8,4.2,0.2,'Frukt og grønt','stk',145],
+ agurk:['Agurk',9,0.8,1.3,0,'Frukt og grønt'],
+ salat:['Isbergsalat',12,1.0,1.8,0,'Frukt og grønt'],
+ mais:['Mais (hermetikk)',88,2.6,15.4,1.1,'Tørrvarer'],
+ sjokmelk:['Sjokolademelk',62,4.0,8.5,1.2,'Meieri','dl',100],
+ krydder:['Krydder, buljong, sitron (etter smak)',0,0,0,0,'Tørrvarer'],
+ myse:['Myseprotein (pulver, produsent)',385,80,6,5,'Annet','scoop',30],
+ proteinbar:['Proteinbar (ca., sjekk pakken)',370,30,35,12,'Annet','stk',55],
+ rundstykke:['Rundstykke, grovt',257,8.2,42.1,5.1,'Annet','stk',100],
+ loff:['Loff / hvitt brød',255,8.5,45.7,3.4,'Annet','skive',30],
+ polse:['Grillpølse',217,10.4,1.9,18.5,'Annet','stk',60],
+ leverpostei:['Leverpostei',237,9.9,4.3,20.0,'Annet','skive',20],
+ brunost:['Brunost',410,11.3,30.3,27.0,'Annet','skive',8],
+ syltetoy:['Syltetøy (blåbær)',181,0.4,43.0,0.4,'Annet','ts',10],
+ majones:['Majones',705,1,2,77,'Annet','ss',15],
+ bacon:['Bacon, stekt',520,30,0.2,44.3,'Annet','skive',10],
+ kjottkake:['Kjøttkake',177,11.9,6.8,11.3,'Annet','stk',70],
+ pannekake:['Pannekake',151,7.6,19.5,4.3,'Annet','stk',60],
+ pizza:['Pizza (kjøpt)',222,10.9,24.3,8.5,'Annet'],
+ chips:['Potetchips',502,6.1,50.5,29.3,'Annet'],
+ sjokolade:['Melkesjokolade',541,8.1,53.1,32.3,'Annet','rute',5],
+ kanelbolle:['Kanelbolle / skillingsbolle',339,8.1,52.8,10.0,'Annet','stk',100],
+ is:['Iskrem (vanilje)',178,3.8,20.0,9.2,'Annet','dl',55],
+ brus:['Brus (cola, sukker)',42,0,10.6,0,'Annet','dl',100],
+ juice:['Appelsinjuice',43,0.6,9.6,0.2,'Annet','dl',100],
+ ol:['Pils (4,7 %)',41,0.4,3.2,0,'Annet','dl',100],
+ vin:['Rødvin (12 %)',74,0.1,0.7,0,'Annet','dl',100],
+ peanotter:['Peanøtter',594,25.8,7.6,49.2,'Annet','neve',20],
+ cornflakes:['Frokostblanding (Spesial K)',352,8.0,74.4,1.4,'Annet','dl',20],
+ yoghurt:['Yoghurt med frukt (jordbær)',86,4.0,10.5,3.1,'Annet','dl',100],
+ pastakokt:['Pasta, kokt',133,4.2,23.6,2.1,'Annet','dl',60],
+ risskokt:['Ris, kokt (jasmin)',115,2.4,25.7,0.2,'Annet','dl',70],
+ kaffemelk:['Kaffemelk (3,5 %)',61,3.0,4.4,3.5,'Annet','ss',15]
+};
+const UNIT={neve:['neve','never'],ts:['ts','ts'],ss:['ss','ss'],dl:['dl','dl'],stk:['stk','stk'],skive:['skive','skiver'],egg:['egg','egg'],
+ 'liten neve':['liten neve','små never'],rute:['rute','ruter'],scoop:['scoop','scoop'],gel:['gel','geler']};
+function fracN(n){const w=Math.floor(n+1e-9),h=n-w;if(Math.abs(h)<.13)return String(w);if(Math.abs(h-.5)<.13)return (w?w:'')+'½';
+  if(Math.abs(h-.25)<.13)return (w?w:'')+'¼';if(Math.abs(h-.75)<.13)return (w?w:'')+'¾';return String(Math.round(n))}
+function measure(id,g){
+  const i=ING[id];g=Math.round(g);
+  if(id==='krydder')return 'etter smak';
+  if(!i[6])return g+' g';
+  const n=g/i[7],u=UNIT[i[6]],lab=n>1.2?u[1]:u[0];
+  if(i[6]==='egg'||i[6]==='skive'||i[6]==='stk'||i[6]==='scoop'||i[6]==='gel')return `${fracN(Math.round(n*2)/2)} ${lab} (${g} g)`;
+  if(i[6]==='dl')return `${g} g (ca. ${fracN(Math.round(n*4)/4)} dl)`;
+  return `${g} g (ca. ${fracN(Math.round(n*2)/2)} ${lab})`;
+}
+const q=(id,n)=>[id,n*ING[id][7]];
+function macro(items){const m={k:0,p:0,c:0,f:0};for(const [id,g] of items){const i=ING[id];m.k+=i[1]*g/100;m.p+=i[2]*g/100;m.c+=i[3]*g/100;m.f+=i[4]*g/100}return m}
+
+const RECIPES=[];
+const R=(id,slot,n,min,ing,p1,p2,steg,tips)=>RECIPES.push({id,slot,n,min,ing,p1,p2,steg,tips});
+const KR=['krydder',0];
+
+/* ---------- FROKOST ---------- */
+R('f_gront','frokost','Havregrøt med skyr, banan og bær',8,
+ [['havre',50],['melk',200],['skyr',150],q('banan',1),['baer',80]],
+ [['havre',20]],[q('eple',1)],
+ ['Kok havregryn og melk i en kasserolle i 3–4 minutter under omrøring (eller 2 min i mikro).','Ta av varmen og rør inn halvparten av skyren.','Hell i skål. Topp med resten av skyren, banan og bær.'],
+ 'Bruk frosne bær: da tiner de i grøten og ingenting må vaskes.');
+R('f_eggerore','frokost','Eggerøre med skinke, ost og brød',10,
+ [q('egg',3),['melk',15],q('smor',1),q('brod',2),q('skinke',3),q('ost',2),['agurk',80]],
+ [q('eple',1)],[q('brod',1)],
+ ['Visp egg med melk, salt og pepper.','Smelt smør i panne på middels varme. Hell i eggene og rør forsiktig i 2–3 minutter til de er kremete (ikke tørre).','Legg skinke og ost på brødskivene. Server eggerøren ved siden av, med agurk i staver.'],
+ 'Ta eggerøren av varmen mens den fortsatt ser litt våt ut. Den ferdigstekes av restvarmen.');
+R('f_skyrbolle','frokost','Skyr med müsli og banan',3,
+ [['skyr',250],['muesli',50],q('banan',1),q('mandel',1)],
+ [q('eple',1)],[q('riskake',2)],
+ ['Skyr i en bolle.','Topp med müsli, skivet banan og mandler.'],
+ 'Raskeste frokosten: 3 minutter. Fungerer også på hotell og reise.');
+R('f_brodegg','frokost','Brødskiver med egg, ost og skinke',10,
+ [q('brod',3),q('egg',2),q('ost',2),q('skinke',2),['agurk',80],['paprika',75]],
+ [q('eple',1)],[q('brod',1)],
+ ['Kok eggene 8 minutter, avkjøl i kaldt vann og skrell.','Smør brødskivene, legg på skinke, ost og skivet egg.','Agurk og paprika ved siden av.'],
+ 'Kok 4–6 egg søndag, så har du egg klare til hele uka.');
+
+/* ---------- MELLOMMÅLTID ---------- */
+R('m_skyr','mellom','Skyr med banan',2,
+ [['skyr',200],q('banan',1)],[q('mandel',0.5)],[q('knekke',1)],
+ ['Skyr i en boks, skiv banan oppi.'],'Tar 2 minutter og tåler å ligge i veska en times tid.');
+R('m_cottage','mellom','Cottage cheese, eple og knekkebrød',3,
+ [['cottage',150],q('eple',1),q('knekke',1)],[q('knekke',1)],[q('valnott',1)],
+ ['Cottage cheese i en skål. Eple i båter. Knekkebrød ved siden av.'],'');
+R('m_egg','mellom','Kokte egg, brød og gulrot',10,
+ [q('egg',2),q('brod',1),q('gulrot',1)],[q('knekke',1)],[q('mandel',0.5)],
+ ['Kok eggene 8 minutter, avkjøl, skrell.','Server med brødskive og gulrotstaver. Pepper/salt.'],'Kok flere egg i forveien. Holder 4–5 dager i kjøleskapet med skall.');
+R('m_kalkun','mellom','Kalkunpålegg på knekkebrød',4,
+ [q('kalkunpal',5),q('knekke',3),['agurk',80],['paprika',75]],[q('ost',2)],[q('knekke',1)],
+ ['Legg kalkunskiver på knekkebrødene, topp med agurk og paprika.'],'Lett, rask og fås overalt på reise.');
+
+/* ---------- FØR TRENING (lite fett, mye karbo) ---------- */
+R('p_bananbrod','pre','Banan og riskaker med peanøttsmør',3,
+ [q('banan',1),q('riskake',2),q('peanottsmor',1)],[q('riskake',1)],[q('riskake',1)],
+ ['Smør peanøttsmør på riskakene, spis banan ved siden av.'],'Spis 60–90 min før trening.');
+R('p_toast','pre','Brødskiver med kalkun og banan',4,
+ [q('brod',2),q('kalkunpal',2),q('banan',1)],[q('riskake',1)],[q('riskake',1)],
+ ['Legg kalkun på brødet, spis banan ved siden av.'],'');
+R('p_kakaomelk','pre','Sjokolademelk og banan',1,
+ [['sjokmelk',250],q('banan',1)],[q('riskake',1)],[q('riskake',1)],
+ ['Drikk og spis. Ferdig.'],'Fungerer som både før og etter trening.');
+
+/* ---------- ETTER LANG ØKT ---------- */
+R('e_kakaoegg','post','Sjokolademelk, egg og brød',8,
+ [['sjokmelk',250],q('egg',2),q('brod',1)],[q('brod',1)],[q('eple',1)],
+ ['Kok egg (8 min) eller stek spegeegg.','Server med brød og sjokolademelk.'],'Sjokolademelk har god dokumentert effekt som restitusjonsdrikk (karbohydrat + protein).');
+R('e_skyrmuesli','post','Skyr, müsli og bær',3,
+ [['skyr',250],['muesli',35],['baer',100]],[q('banan',1)],[q('eple',1)],
+ ['Skyr i skål, topp med müsli og bær.'],'');
+R('e_brodost','post','Brødskiver med skinke og ost + sjokolademelk',5,
+ [q('brod',2),q('skinke',3),q('ost',2),['sjokmelk',250]],[q('eple',1)],[q('brod',1)],
+ ['Smør brødet, legg på skinke og ost. Drikk sjokolademelk ved siden av.'],'');
+
+/* ---------- LUNSJ (alt kan pakkes og spises på jobb, ingen tilberedning) ---------- */
+R('l_wrap','lunsj','Wrap med kylling og ost',5,
+ [q('tortilla',1),q('kyllingpal',8),q('ost',2),['salat',40],['agurk',60],['paprika',75],['skyr',150]],
+ [q('eple',1)],[q('riskake',2)],
+ ['Legg kyllingpålegg, ost, salat, agurk og paprika på tortillaen.','Brett sammen og pakk inn i bakepapir.','Skyr i en boks som dessert.'],
+ 'Ferdig fra butikken: tar 5 minutter kvelden før eller om morgenen.');
+R('l_brodskiver','lunsj','Brødskiver med egg, skinke og ost',5,
+ [q('brod',2),q('egg',2),q('skinke',3),q('ost',2),['agurk',80],['paprika',75],['skyr',150]],
+ [q('brod',1)],[q('eple',1)],
+ ['Kok eggene kvelden før (8 min), eller kjøp ferdigkokte.','Smør brødskivene, legg på skinke, ost og skivet egg.','Agurk og paprika i staver. Skyr i en boks som dessert.'],
+ 'Kok 4–6 egg søndag, så er lunsjen lagt for uka.');
+R('l_kalkunbrod','lunsj','Brødskiver med kalkun, ost og cottage cheese',5,
+ [q('brod',3),q('kalkunpal',6),q('ost',2),['cottage',100],['agurk',80],['paprika',75]],
+ [q('eple',1)],[q('riskake',2)],
+ ['Legg kalkun, ost, agurk og paprika på brødskivene.','Cottage cheese i en boks ved siden av.'],
+ 'Fungerer også fint på kantina eller i bilen.');
+R('l_kyllingsalat','lunsj','Salat med kylling, egg og knekkebrød',8,
+ [['salat',100],q('kyllingpal',10),q('egg',2),['mais',40],['paprika',75],['agurk',80],q('olje',1),q('knekke',3)],
+ [q('knekke',1),q('eple',1)],[q('valnott',1)],
+ ['Kok eggene kvelden før.','Bland salat, paprika, agurk og mais i en boks. Legg på kyllingpålegg og egg i kvarter.','Dryss over olje, salt og pepper rett før du spiser. Knekkebrød ved siden av.'],
+ 'Ha oljen i en liten boks så salaten ikke blir slapp.');
+
+/* ---------- MIDDAG (vanlige varer, maks 25 min) ---------- */
+R('d_kylling','middag','Kyllinglår i ovn med poteter og brokkoli',35,
+ [['kyllinglaar',200],q('potet',3),['brokkoli',200],q('olje',1),KR],
+ [q('potet',1)],[q('potet',1)],
+ ['Ovn 200 °C. Skjær poteter i båter, legg på plate med olje, salt og pepper. Stek 10 min.','Legg kyllinglår på platen, krydre med salt og paprikapulver. Stek 25 min til gjennomstekt (74 °C).','Damp eller kok brokkoli 4–5 min. Server alt sammen.'],
+ 'Alt på én plate = lite oppvask. Lag dobbelt og ha rester til lunsj.');
+R('d_kjottdeig','middag','Kjøttdeig med ris og grønnsaker (én panne)',25,
+ [['kjottdeig',150],q('lok',1),q('gulrot',2),q('paprika',1),['ris',70],q('olje',1),KR],
+ [['ris',25]],[['ris',15]],
+ ['Sett ris på kok (ca. 12 min).','Hakk løk, gulrot og paprika. Brun kjøttdeigen i olje 5 min, tilsett grønnsakene og stek 5 min til.','Tilsett 1 dl vann og buljongterning, krydre med salt, pepper og paprikapulver. Småkok 5 min. Server på ris.'],
+ 'Uten tomat: paprika og gulrot gir sødme og farge.');
+R('d_svin','middag','Svinefilet med poteter og gulrot',30,
+ [['svinefilet',190],q('potet',4),q('gulrot',2),q('smor',1),KR],
+ [q('potet',1),q('smor',1)],[q('potet',1)],
+ ['Kok poteter og gulrot 15–20 min.','Salt og pepper svinefileten. Stek i panne 8–10 min på middels varme, snu jevnlig. La hvile 5 min, skjær i skiver.','Server med smør på potet og gulrot.'],
+ 'Svinefilet er mager og gjør seg fint kald dagen etter på brød.');
+R('d_kyllingpanne','middag','Kyllingpanne med ris og grønnsaker',20,
+ [['kylling',150],['ris',80],['brokkoli',100],q('gulrot',1),q('paprika',1),q('olje',1),KR],
+ [['ris',20]],[['ris',15]],
+ ['Sett ris på kok (ca. 12 min).','Skjær kylling og grønnsaker i biter. Stek kylling i olje 5 min, tilsett grønnsaker og stek 5 min.','Krydre med salt, pepper og paprikapulver. Server på ris.'],
+ 'Frosne grønnsaker er helt ok.');
+R('d_kyllingpasta','middag','Pasta med kylling og brokkoli',20,
+ [['pasta',80],['kylling',120],['brokkoli',150],q('olje',2),q('ost',3),KR],
+ [['pasta',20]],[['pasta',15]],
+ ['Kok pasta og brokkoli sammen siste 4 minutter. Spar litt kokevann.','Stek kylling i strimler i olje 6–7 min.','Bland alt, tilsett ost og et skvett kokevann. Salt og pepper.'],
+ 'Alt i én gryte + en panne.');
+R('d_omelett','middag','Omelett med skinke og ost + brød',10,
+ [q('egg',3),q('skinke',3),q('ost',2),q('smor',1),q('brod',2),['agurk',80],['paprika',75]],
+ [q('brod',1)],[q('eple',1)],
+ ['Visp eggene med salt og pepper.','Smelt smør i panne, hell i eggene og stek på middels varme 3–4 min. Legg på skinke og ost, brett sammen.','Server med brød, agurk og paprika.'],
+ 'Raskeste middagen: 10 minutter.');
+
+/* ---------- KVELDSMAT ---------- */
+R('k_skyr','kveld','Skyr med bær og honning',2,
+ [['skyr',250],['baer',80],q('honning',1)],[q('mandel',0.5)],[['muesli',15]],
+ ['Skyr, bær og honning i en skål.'],'Skyr er rik på kasein (langsomt protein) og mettende på kvelden.');
+R('k_cottage','kveld','Cottage cheese med knekkebrød',3,
+ [['cottage',200],q('knekke',2),['agurk',60]],[q('knekke',1)],[q('mandel',0.5)],
+ ['Cottage cheese i en skål, knekkebrød og agurk ved siden av.'],'');
+R('k_egg','kveld','Egg og brød med kalkun',10,
+ [q('egg',2),q('brod',1),q('kalkunpal',2)],[q('knekke',1)],[q('mandel',0.5)],
+ ['Kok eller stek eggene. Server på brødskive med kalkun.'],'');
+
+/* ---------- DAGSOPPSETT ---------- */
+const SLOTOPT={frokost:['frokost'],mellom:['mellom'],pre:['pre','mellom'],post:['post','mellom'],lunsj:['lunsj'],middag:['middag'],kveld:['kveld']};
+const SLOTNAME={frokost:'Frokost',mellom:'Mellommåltid',pre:'Før trening',post:'Etter trening',lunsj:'Lunsj',middag:'Middag',kveld:'Kveldsmat'};
+const TRAINTIME={morgen:'Morgen (ca. 06:30)',lunsj:'Lunsj (ca. 12:00)',kveld:'Kveld (ca. 17:30)'};
+const TEMPL={
+ kveld:[['07:00','frokost'],['10:00','mellom'],['12:30','lunsj'],['16:00','pre'],['17:30','T'],['19:15','middag'],['21:30','kveld']],
+ morgen:[['06:00','pre'],['06:30','T'],['07:45','frokost'],['10:30','mellom'],['12:45','lunsj'],['16:00','mellom'],['19:00','middag'],['21:30','kveld']],
+ lunsj:[['07:00','frokost'],['10:00','mellom'],['11:30','pre'],['12:15','T'],['13:30','lunsj'],['16:30','mellom'],['19:00','middag'],['21:30','kveld']],
+ hvile:[['07:30','frokost'],['10:30','mellom'],['12:30','lunsj'],['15:30','mellom'],['18:30','middag'],['21:00','kveld']],
+ lang:[['06:30','frokost'],['09:00','T'],['11:15','post'],['13:30','lunsj'],['16:30','mellom'],['19:00','middag'],['21:30','kveld']]
+};
+function trainWindow(p){
+  if(p.k==='lang')return 'lang';
+  if(['styrke','løp','kval','rolig'].includes(p.k)&&!p.opt)return S.profile.trainTime||'kveld';
+  return 'hvile';
+}
+function dayLevel(k,p){const def=weekNo(k)<=DEFICIT_TO;return p.k==='lang'?(def?1:2):(def?0:1)}
+function recMacro(r,lvl){return macro(r.ing.concat(lvl>=1?r.p1:[],lvl>=2?r.p2:[]))}
+function recItems(r,lvl){return {base:r.ing,p1:lvl>=1?r.p1:[],p2:lvl>=2?r.p2:[]}}
+function optsFor(slot){return RECIPES.filter(r=>SLOTOPT[slot].includes(r.slot))}
+function dayNo(k){return Math.floor((parse(k)-parse('2026-01-01'))/864e5)}
+function slotsFor(k){
+  const p=effPlan(k),win=trainWindow(p),tpl=TEMPL[win];
+  const d=S.days[k]||{},pick=d.pick||{},used=new Set();
+  const out=[];
+  tpl.forEach(([time,slot],i)=>{
+    if(slot==='T'){out.push({i,time,slot:'T'});return}
+    const opts=optsFor(slot);
+    let r=RECIPES.find(x=>x.id===pick[i]);
+    if(!r){
+      let n=(dayNo(k)*2+i*3)%opts.length;
+      for(let c=0;c<opts.length;c++){const cand=opts[(n+c)%opts.length];if(!used.has(cand.id)){r=cand;break}}
+    }
+    used.add(r.id);
+    out.push({i,time,slot,r});
+  });
+  return out;
+}
+function dayMacros(k){
+  const p=effPlan(k),lvl=dayLevel(k,p),d=S.days[k]||{},ate=d.ate||{};
+  const tot={k:0,p:0,c:0,f:0},eaten={k:0,p:0,c:0,f:0};
+  for(const s of slotsFor(k)){if(!s.r)continue;const m=recMacro(s.r,lvl);for(const x in tot){tot[x]+=m[x];if(ate[s.i])eaten[x]+=m[x]}}
+  return {tot,eaten,lvl};
+}
+function levelName(l){return ['Basisdag','Mer-dag','Stor dag'][l]}
+function ingList(r,lvl){
+  const t=recItems(r,lvl),L=(a)=>a.filter(x=>x[0]!=='krydder').map(([id,g])=>`<li>${ING[id][0]}: <b>${measure(id,g)}</b></li>`).join('');
+  let h=`<ul>${L(t.base)}</ul>`;
+  const extra=t.p1.concat(t.p2);
+  if(extra.length)h+=`<div class="sub" style="margin-top:6px">Tillegg i dag (${levelName(lvl).toLowerCase()}):</div><ul>${L(extra)}</ul>`;
+  const kr=r.ing.find(x=>x[0]==='krydder');if(kr)h+=`<div class="sub">+ krydder, salt, pepper og buljong etter smak</div>`;
+  return h;
+}
+function recipeSheet(rid,k){
+  const r=RECIPES.find(x=>x.id===rid),p=effPlan(k),lvl=dayLevel(k,p),m=recMacro(r,lvl);
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>${r.n}</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   <div class="pill">${SLOTNAME[r.slot]||r.slot}</div> <span class="sub">ca. ${r.min} min</span>
+   <div class="row" style="margin:10px 0">
+     <div><div class="big">${Math.round(m.k)}</div><div class="sub">kcal</div></div>
+     <div><div class="big">${Math.round(m.p)}</div><div class="sub">g protein</div></div>
+     <div><div class="big">${Math.round(m.c)}</div><div class="sub">g karbo</div></div>
+     <div><div class="big">${Math.round(m.f)}</div><div class="sub">g fett</div></div></div>
+   <h3>Ingredienser (1 porsjon)</h3>${ingList(r,lvl)}
+   <h3>Slik gjør du</h3><ol>${r.steg.map(x=>`<li>${x}</li>`).join('')}</ol>
+   ${r.tips?`<div class="note">${r.tips}</div>`:''}</div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+function pickRecipe(i,rid){const d=day(cur);d.pick=d.pick||{};d.pick[i]=rid;d.openSwap=null;save();render()}
+function toggleSwap(i){const d=day(cur);d.openSwap=(d.openSwap===i)?null:i;save();render()}
+function ateToggle(i,v){const d=day(cur);d.ate=d.ate||{};d.ate[i]=v;save();render()}
+function setTrainTime(v){S.profile.trainTime=v;save();render()}
+
+function mealTimeline(k,edit){
+  const p=effPlan(k),slots=slotsFor(k),lvl=dayLevel(k,p),d=S.days[k]||{},ate=d.ate||{};
+  let h='';
+  for(const s of slots){
+    if(s.slot==='T'){
+      h+=`<div class="tl train"><div class="tm">${s.time}</div><div class="tb"><b>TRENING: ${p.t}</b><div class="sub">${p.min} min · ${p.d||''}</div>
+        ${p.k==='lang'&&p.min>=75?`<div class="sub">Under økten: vann, og 1 gel (ca. 25 g karbo) hver 45. minutt etter første time.</div>`:''}
+        <div style="margin-top:4px"><span class="chip" onclick="go('trening')">Åpne økt</span>${p.s?`<span class="chip" onclick="go('trening')">Se øvelser</span>`:''}</div></div></div>`;
+      continue;
+    }
+    const m=recMacro(s.r,lvl);
+    h+=`<div class="tl"><div class="tm">${s.time}</div><div class="tb">
+      <label class="chk" style="padding:0;border:0"><input type="checkbox" ${ate[s.i]?'checked':''} onchange="ateToggle(${s.i},this.checked)">
+      <span><b>${SLOTNAME[s.slot]}</b>: ${s.r.n}</span></label>
+      <div class="sub">${Math.round(m.k)} kcal · ${Math.round(m.p)} g protein · ${Math.round(m.c)} g karbo</div>
+      ${edit?`<div style="margin-top:4px"><span class="chip" onclick="recipeSheet('${s.r.id}','${k}')">Oppskrift og mengder</span><span class="chip" onclick="toggleSwap(${s.i})">Bytt ⇄</span></div>`:''}
+      ${edit&&d.openSwap===s.i?`<div class="swap">${optsFor(s.slot).map(o=>{const mm=recMacro(o,lvl);return `<div class="dayrow" onclick="pickRecipe(${s.i},'${o.id}')"><span>${o.id===s.r.id?'✓ ':''}${o.n}</span><span class="sub">${Math.round(mm.k)} kcal · ${Math.round(mm.p)} g P</span></div>`}).join('')}</div>`:''}
+      </div></div>`;
+  }
+  return h;
+}
+function shoppingList(k){
+  const ds=weekDays(k),tot={};
+  for(const dk of ds){
+    const p=effPlan(dk),lvl=dayLevel(dk,p);
+    for(const s of slotsFor(dk)){if(!s.r)continue;const t=recItems(s.r,lvl);
+      for(const [id,g] of t.base.concat(t.p1,t.p2)){if(id==='krydder')continue;tot[id]=(tot[id]||0)+g}}
+  }
+  const cats={};
+  for(const [id,g] of Object.entries(tot)){const c=ING[id][5];(cats[c]=cats[c]||[]).push([id,g])}
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>Handleliste uke ${weekNo(k)}</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   <div class="sub">Basert på dagens valgte måltider for ${fmt(ds[0])}–${fmt(ds[6])}. Mengder er netto for hele uka; ta ca. 10 % buffer.</div>
+   ${Object.keys(cats).sort().map(c=>`<h3>${c}</h3><ul>${cats[c].sort((a,b)=>ING[a[0]][0].localeCompare(ING[b[0]][0])).map(([id,g])=>`<li>${ING[id][0]}: <b>${g>=1000?(g/1000).toFixed(1)+' kg':Math.round(g)+' g'}</b>${ING[id][6]?` <span class="sub">(≈ ${fracN(Math.round(g/ING[id][7]*2)/2)} ${UNIT[ING[id][6]][g/ING[id][7]>1.2?1:0]})</span>`:''}</li>`).join('')}</ul>`).join('')}
+   <div class="note">Krydder, salt, pepper og buljong kommer i tillegg.</div></div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+
+/* =======================================================================
+   EGENTEST (kvalitetssikring) – kjøres fra Data-fanen
+   ======================================================================= */
+function selfTest(){
+  const res=[],ok=(c,t)=>res.push([!!c,t]);
+  const ban=/fisk|laks|tunfisk|tomat|squash|zucchini|ketchup|sopp|champignon|sjampinjong|kantarell|hummus|tofu|cashew|soya|linser|parmesan/i;
+  // 1. oppskrifter
+  let bad=[];for(const r of RECIPES){
+    for(const [id] of r.ing.concat(r.p1,r.p2))if(!ING[id])bad.push(r.id+':'+id);
+    if(ban.test((r.n+' '+r.steg.join(' ')+' '+r.tips).replace(/tomatfri|uten tomat|uten ketchup|i stedet for ketchup/gi,'')))bad.push(r.id+':forbudt ord');
+    for(const [id] of r.ing.concat(r.p1,r.p2))if(ban.test(ING[id]?ING[id][0]:''))bad.push(r.id+':forbudt ingrediens');
+  }
+  ok(!bad.length,'Oppskrifter: ingredienser finnes, ingen fisk/tomat/squash/sopp og ingen uvanlige varer '+(bad.length?JSON.stringify(bad):'('+RECIPES.length+' oppskrifter)'));
+  // 1b. enkelhet: maks 8 ingredienser og tid
+  const complex=RECIPES.filter(r=>r.ing.filter(x=>x[0]!=='krydder').length>8||r.min>(r.slot==='middag'?35:15)).map(r=>r.id);
+  ok(!complex.length,'Alle oppskrifter er enkle: maks 8 ingredienser, lunsj/frokost under 15 min '+complex.join(','));
+  // 2. alle slots har minst 3 alternativer
+  const few=Object.keys(SLOTOPT).filter(s=>optsFor(s).length<3);
+  ok(!few.length,'Hvert måltid har minst 3 alternativer '+few.join(','));
+  // 3. dagsummer per nivå
+  const bounds={0:[2150,2650],1:[2550,3050],2:[2850,3400]};
+  let off=[];
+  for(let w=1;w<=28;w++){for(let dd=0;dd<7;dd++){
+    const k=addDays(S.profile.start,(w-1)*7+dd),p=effPlan(k),m=dayMacros(k);
+    if(!m.tot.p)continue;
+    const b=bounds[m.lvl];
+    if(m.tot.k<b[0]||m.tot.k>b[1])off.push(k+' '+Math.round(m.tot.k)+' kcal (nivå '+m.lvl+')');
+    if(m.tot.p<150)off.push(k+' protein '+Math.round(m.tot.p));
+  }}
+  ok(!off.length,'Alle 28 uker: kcal innen nivåets ramme og protein ≥ 150 g '+(off.length?off.slice(0,4).join('; '):''));
+  // 4. plan vs. uke vs. i dag vs. plan-fane
+  let mis=[];
+  for(let w=1;w<=29;w++)for(let dd=0;dd<7;dd++){
+    const k=addDays(S.profile.start,(w-1)*7+dd),a=effPlan(k).t,b=weekDays(k).map(x=>effPlan(x).t)[dow(k)];
+    if(a!==b)mis.push(k);
+    if(weekNo(k)!==w)mis.push('weekNo '+k);
+  }
+  ok(!mis.length,'Samme økt vises i I dag, Uke og Plan for alle datoer '+(mis.length?mis.slice(0,3).join(','):''));
+  // 5. Styrke og løp per uke
+  const cnt=[];for(let w=9;w<=27;w++){const ds=weekDays(addDays(S.profile.start,(w-1)*7));
+    const s=ds.filter(k=>planFor(k).k==='styrke').length,l=ds.filter(k=>['kval','lang'].includes(planFor(k).k)).length;
+    if(s!==3||l!==2)cnt.push(w)}
+  ok(!cnt.length,'Uke 9–27 har 3 styrkeøkter og 2 løpeøkter '+cnt.join(','));
+  // 5b. logging
+  const tk='2026-10-10';S.days[tk]={log:[{k:100,p:10,c:5,f:2}],ate:{}};
+  const iv=intake(tk);delete S.days[tk];
+  const e=macro([['egg',159]]),b=macro([['brod',70]]);
+  const e2=macro([['egg',168]]),b2=macro([['brod',80]]);
+  ok(Math.abs(iv.p-10)<.01&&Math.abs(iv.k-100)<.01&&Math.abs(e2.p-21.7)<.1&&Math.round(b2.k)===191,'Matloggeren regner riktig (3 egg = 21,7 g protein, 2 skiver brød = 191 kcal)');
+  // 5c. matbasen: energi må stemme med makroene (4/4/9 kcal per g, alkohol unntatt)
+  const odd=Object.entries(ING).filter(([id,v])=>!['krydder','ol','vin','kaffemelk','brus','juice'].includes(id)&&v[1]>20).filter(([id,v])=>{const est=4*v[2]+4*v[3]+9*v[4];return Math.abs(v[1]-est)>Math.max(30,.22*v[1])}).map(([id,v])=>v[0]+' ('+v[1]+' vs '+Math.round(4*v[2]+4*v[3]+9*v[4])+')');
+  ok(!odd.length,'Matbasen: kcal stemmer med protein/karbo/fett for alle matvarer '+odd.join('; '));
+  // 6. bibliotek
+  const miss=Object.keys(LIB).filter(x=>!RIG[x]);let sess=[];
+  for(const [sk,list] of Object.entries(EX))for(const e of list)for(const x of e.keys)if(!LIB[x])sess.push(sk+':'+x);
+  ok(!miss.length&&!sess.length,'Alle øvelser i øktene har teknikk og animasjon '+miss.concat(sess).join(','));
+  return res;
+}
+function runTest(){
+  const r=selfTest();
+  const mm=document.getElementById('modal')||(()=>{const x=document.createElement('div');x.id='modal';document.body.appendChild(x);x.addEventListener('click',ev=>{if(ev.target===x)closeEx()});return x})();
+  stopAnim();
+  mm.innerHTML=`<div class="mbox"><div class="mhead"><b>Egentest</b><button class="g" onclick="closeEx()">Lukk ✕</button></div>
+   ${r.map(([o,t])=>`<div class="chk"><span>${o?'✅':'❌'}</span><span>${t}</span></div>`).join('')}</div>`;
+  mm.style.display='flex';document.body.style.overflow='hidden';
+}
+
+
+/* =======================================================================
+   MATLOGGER: skriv inn / velg hva du faktisk har spist
+   ======================================================================= */
+let LG={q:'',sel:null};
+function lgSlotNow(){const h=new Date().getHours();return h<10?'frokost':h<14?'lunsj':h<17?'mellom':h<21?'middag':'kveld'}
+function lgMatches(){
+  const q=LG.q.trim().toLowerCase();if(!q)return [];
+  const out=[];
+  for(const [id,v] of Object.entries(ING)){if(id==='krydder')continue;if(v[0].toLowerCase().includes(q))out.push({t:'i',id,n:v[0],sub:Math.round(v[1])+' kcal · '+v[2]+' g protein per 100 g'})}
+  for(const r of RECIPES)if(r.n.toLowerCase().includes(q))out.push({t:'r',id:r.id,n:r.n,sub:'Oppskrift (hele måltidet)'});
+  const rank=x=>(x.t==='i'?0:10)+(x.n.toLowerCase().startsWith(q)?0:1);
+  out.sort((a,b)=>rank(a)-rank(b));
+  return out.filter(x=>x.t==='i').slice(0,7).concat(out.filter(x=>x.t==='r').slice(0,3));
+}
+function lgInit(){
+  const el=$('#logger');if(!el)return;
+  el.innerHTML=`<input id="lgq" placeholder="Søk: brød, egg, banan, kylling, sjokolade…" value="${LG.q.replace(/"/g,'&quot;')}" oninput="LG.q=this.value;LG.sel=null;lgResults()" autocomplete="off">
+    <div id="lgres"></div><div id="lgsel"></div>
+    <details style="margin-top:8px"><summary class="sub" style="cursor:pointer">Fant du den ikke? Legg inn egen matvare</summary>
+      <div class="row" style="margin-top:8px"><input id="cu_n" placeholder="Navn" style="flex:3"></div>
+      <div class="row" style="margin-top:6px"><div><label>kcal / 100 g</label><input id="cu_k" type="number" inputmode="decimal"></div>
+        <div><label>Protein</label><input id="cu_p" type="number" inputmode="decimal"></div>
+        <div><label>Karbo</label><input id="cu_c" type="number" inputmode="decimal"></div>
+        <div><label>Fett</label><input id="cu_f" type="number" inputmode="decimal"></div></div>
+      <div class="row" style="margin-top:6px"><div><label>Gram per stk/skive (valgfritt)</label><input id="cu_g" type="number" inputmode="decimal"></div>
+        <button class="g" onclick="lgCustom()" style="align-self:end">Lagre matvare</button></div></details>`;
+  lgResults();
+}
+function lgResults(){
+  const el=$('#lgres');if(!el)return;
+  const m=lgMatches();
+  el.innerHTML=m.map(x=>`<div class="dayrow" onclick="lgPick('${x.t}','${x.id}')"><span><b>${x.n}</b><br><span class="sub">${x.sub}</span></span><span class="pill">${x.t==='r'?'oppskrift':'velg'}</span></div>`).join('')||(LG.q.trim()?'<div class="sub" style="padding:8px 0">Ingen treff. Legg inn som egen matvare under.</div>':'');
+  if(!LG.sel)$('#lgsel').innerHTML='';
+}
+function lgPick(t,id){
+  LG.sel={t,id};
+  const el=$('#lgsel');
+  const slotOpts=Object.entries(SLOTNAME).filter(([k])=>k!=='pre'&&k!=='post').map(([k,l])=>`<option value="${k}" ${lgSlotNow()===k?'selected':''}>${l}</option>`).join('');
+  if(t==='i'){
+    const i=ING[id],u=i[6]?UNIT[i[6]]:null;
+    el.innerHTML=`<div class="card" style="margin:10px 0 0"><h2>${i[0]}</h2>
+      <div class="row"><div><label>Mengde</label><input id="lg_amt" type="number" inputmode="decimal" value="${u?1:100}" oninput="lgPreview()"></div>
+        <div><label>Enhet</label><select id="lg_unit" onchange="lgUnitChange()">${u?`<option value="${i[7]}" selected>${i[6]} (${i[7]} g)</option>`:''}<option value="1" ${u?'':'selected'}>gram</option></select></div>
+        <div><label>Måltid</label><select id="lg_slot">${slotOpts}</select></div></div>
+      <div id="lgprev" class="sub" style="margin:8px 0"></div>
+      <button class="b" onclick="lgAdd()">Legg til som spist</button></div>`;
+  } else {
+    el.innerHTML=`<div class="card" style="margin:10px 0 0"><h2>${RECIPES.find(r=>r.id===id).n}</h2>
+      <div class="row"><div><label>Porsjoner</label><select id="lg_amt" onchange="lgPreview()">${[0.5,1,1.5,2].map(x=>`<option ${x===1?'selected':''}>${x}</option>`).join('')}</select></div>
+        <div><label>Måltid</label><select id="lg_slot">${slotOpts}</select></div></div>
+      <div id="lgprev" class="sub" style="margin:8px 0"></div>
+      <button class="b" onclick="lgAdd()">Legg til som spist</button></div>`;
+  }
+  lgPreview();
+}
+function lgUnitChange(){const u=$('#lg_unit');$('#lg_amt').value=(+u.value===1)?100:1;lgPreview()}
+function lgCalc(){
+  const sel=LG.sel;if(!sel)return null;
+  const amt=parseFloat(String($('#lg_amt').value).replace(',','.'))||0;
+  if(sel.t==='i'){
+    const g=amt*(+$('#lg_unit').value||1),m=macro([[sel.id,g]]);
+    const i=ING[sel.id],uv=+$('#lg_unit').value;
+    const label=(uv===1)?`${Math.round(g)} g`:`${fracN(amt)} ${UNIT[i[6]][amt>1?1:0]} (${Math.round(g)} g)`;
+    return {n:i[0],label,g,...m};
+  }
+  const r=RECIPES.find(x=>x.id===sel.id),lvl=dayLevel(cur,effPlan(cur)),m=recMacro(r,lvl);
+  const f=amt;return {n:r.n,label:`${amt} porsjon${amt===1?'':'er'}`,g:0,k:m.k*f,p:m.p*f,c:m.c*f,f:m.f*f};
+}
+function lgPreview(){
+  const c=lgCalc(),el=$('#lgprev');if(!el||!c)return;
+  el.innerHTML=`<b>${c.label}</b>: ${Math.round(c.k)} kcal · <b>${c.p.toFixed(1)} g protein</b> · ${c.c.toFixed(1)} g karbo · ${c.f.toFixed(1)} g fett`;
+}
+function lgAdd(){
+  const c=lgCalc();if(!c||!(c.k>0||c.p>0))return;
+  const d=day(cur);(d.log=d.log||[]).push({n:c.n,label:c.label,slot:$('#lg_slot').value,k:c.k,p:c.p,c:c.c,f:c.f});
+  save();LG.sel=null;LG.q='';render();
+}
+function lgDel(i){day(cur).log.splice(i,1);save();render()}
+function lgCustom(){
+  const n=$('#cu_n').value.trim(),k=+$('#cu_k').value,p=+$('#cu_p').value||0,c=+$('#cu_c').value||0,f=+$('#cu_f').value||0,g=+$('#cu_g').value||0;
+  if(!n||!k)return;
+  const id='c_'+Date.now();
+  const rec={id,n,k,p,c,f,u:g?'stk':null,ug:g||null};
+  S.customIng.push(rec);ING[id]=[n,k,p,c,f,'Egne',rec.u,rec.ug];
+  save();LG.q=n;lgInit();
+}
+function logCard(k){
+  const d=S.days[k]||{},log=d.log||[],i=intake(k),pt=proteinTarget();
+  const bySlot={};log.forEach((l,ix)=>{(bySlot[l.slot]=bySlot[l.slot]||[]).push([l,ix])});
+  return `<div class="card"><h2>Hva har jeg faktisk spist?</h2>
+    <div class="sub" style="margin-bottom:8px">Søk opp matvaren, velg mengde (gram, skiver, stk, dl) og legg til. Alt regnes inn i dagssummen under, sammen med måltidene du har krysset av.</div>
+    <div id="logger"></div>
+    ${log.length?`<h2 style="margin-top:14px">Logget i dag</h2>${Object.entries(bySlot).map(([sl,arr])=>`<div class="sub" style="margin-top:6px"><b>${SLOTNAME[sl]||sl}</b></div>`+arr.map(([l,ix])=>`<div class="chk"><span style="flex:1">${l.n} <span class="sub">${l.label}</span><br><span class="sub">${Math.round(l.k)} kcal · P ${l.p.toFixed(1)} · K ${l.c.toFixed(1)} · F ${l.f.toFixed(1)}</span></span><button class="x" onclick="lgDel(${ix})">×</button></div>`).join('')).join('')}`:''}
+    </div>`;
+}
+
+/* =======================================================================
+   2. TILSTAND
+   ======================================================================= */
+const KEY='treningsdagbok.v1';
+let S=load();
+function load(){
+  try{const r=JSON.parse(localStorage.getItem(KEY));if(r&&r.days){r.weeks=r.weeks||{};r.customFoods=r.customFoods||[];r.customIng=r.customIng||[];r.customIng.forEach(c=>{ING[c.id]=[c.n,c.k,c.p,c.c,c.f,'Egne',c.u||null,c.ug||null]});r.profile=Object.assign({height:175,startWeight:90,goalLow:80,goalHigh:83,start:START,race:RACE},r.profile);return r}}catch(e){}
+  return {profile:{height:175,startWeight:90,goalLow:80,goalHigh:83,start:START,race:RACE},days:{},weeks:{},customFoods:[],customIng:[]};
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('Kunne ikke lagre i nettleseren – bruk Eksporter under Data.')}}
+const two=n=>String(n).padStart(2,'0');
+const D=(d=new Date())=>d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate());
+const parse=k=>new Date(k+'T00:00:00Z');
+const dow=k=>parse(k).getUTCDay();
+const addDays=(k,n)=>{const d=parse(k);d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
+const day=k=>S.days[k]||(S.days[k]={});
+const $=s=>document.querySelector(s);
+const NO=['søn','man','tir','ons','tor','fre','lør'];
+const fmt=k=>k.slice(8)+'.'+k.slice(5,7);
+let tab='idag',cur=D();
+
+/* =======================================================================
+   3. HJELPERE
+   ======================================================================= */
+function weekNo(k){return Math.floor((parse(k)-parse(S.profile.start))/6048e5)+1}
+function daysTo(k){return Math.round((parse(k)-parse(D()))/864e5)}
+function weights(){return Object.entries(S.days).filter(([k,v])=>v.weight).map(([k,v])=>[k,+v.weight]).sort()}
+function trend(){const w=weights();return w.map(([k])=>{const s=w.filter(([k2])=>k2<=k&&(parse(k)-parse(k2))/864e5<7);return [k,s.reduce((a,b)=>a+b[1],0)/s.length]})}
+function refWeight(){const t=trend();return t.length?t[t.length-1][1]:+S.profile.startWeight}
+function intake(k){
+  const d=S.days[k]||{},m={k:0,p:0,c:0,f:0},e=dayMacros(k).eaten;
+  for(const x in m)m[x]+=e[x];
+  for(const l of (d.log||[])){m.k+=l.k;m.p+=l.p;m.c+=l.c;m.f+=l.f}
+  for(const l of (d.meals||[]))m.p+=(+l.p||0);
+  return m;
+}
+function protein(k){return Math.round(intake(k).p)}
+function proteinTarget(){return Math.round(refWeight()*1.8/5)*5}
+function allFoods(){return FOODS.concat(S.customFoods||[])}
+function weekDays(k){const s=addDays(k,-dow(k));return [...Array(7)].map((_,i)=>addDays(s,i))}
+function restRun(k){let n=0,d=k;for(;n<7;){d=addDays(d,-1);if(d<S.profile.start)return 0;if((S.days[d]||{}).done)break;n++}return n}
+function set(f,v,sub){const d=day(cur);if(sub){d[sub]=d[sub]||{};d[sub][f]=v}else d[f]=v;save()}
+function travelSess(k,p){return (weekDays(k).indexOf(k)%2===0)?'R1':'R2'}
+function effPlan(k){ // tar hensyn til reisedag
+  const p=planFor(k),d=S.days[k]||{};
+  if(d.travel&&(p.k==='styrke'||p.k==='bonus')) return Object.assign({},p,{s:travelSess(k,p),t:SESS[travelSess(k,p)].t,d:'Reisedag: '+SESS[travelSess(k,p)].sub,min:30});
+  if(d.travel&&(p.k==='løp'||p.k==='rolig'||p.k==='kval'||p.k==='lang')) return Object.assign({},p,{t:p.t+' (reise)',d:'Reisedag: 20–30 min jogg/gange på tid, etter følelse. Teller som gjennomført.',min:25});
+  return p;
+}
+
+/* =======================================================================
+   4. VISNINGER
+   ======================================================================= */
+const TABS=[['idag','I dag'],['uke','Uke'],['trening','Trening'],['mat','Kosthold'],['ovelser','Øvelser'],['fremgang','Fremgang'],['plan','Plan'],['data','Data']];
+function navR(){$('#nav').innerHTML=TABS.map(([k,l])=>`<button class="${tab==k?'on':''}" onclick="go('${k}')">${l}</button>`).join('')}
+function go(t){tab=t;render();window.scrollTo(0,0)}
+function render(){
+  navR();
+  const w=weekNo(D()),r=daysTo(S.profile.race),ph=phaseOf(w);
+  $('#topline').textContent=`Uke ${Math.min(Math.max(w,0),WEEKS)} av ${WEEKS} · ${ph.name} · ${r>0?r+' dager til halvmaraton':r===0?'LØPSDAG':'løpet er gjennomført'}`;
+  $('#view').innerHTML=({idag:vIdag,uke:vUke,trening:vTrening,mat:vMat,ovelser:vOvelser,fremgang:vFremgang,plan:vPlan,data:vData})[tab]();
+  if(tab=='fremgang')drawChart();
+  if(tab=='mat')lgInit();
+}
+function dateBar(){return `<div class="row" style="margin-bottom:10px"><button class="g" style="flex:0" onclick="shift(-1)">‹</button>
+  <input type="date" value="${cur}" onchange="cur=this.value;render()"><button class="g" style="flex:0" onclick="shift(1)">›</button></div>`}
+function shift(n){cur=addDays(cur,n);render()}
+function chips(keys){return keys.map(k=>`<span class="chip" onclick="openEx('${k}',${JSON.stringify(keys).replace(/"/g,'&quot;')})">▶ ${LIB[k].n}</span>`).join('')}
+function exList(key){return (EX[key]||[]).map(e=>`<div class="ex"><div class="nm">${e.n} <span class="pill">${e.s}</span></div><div>${chips(e.keys)}</div></div>`).join('')}
+
+function shortTitle(p){
+  if(p.s&&(p.s==='R1'||p.s==='R2'))return 'Reise';
+  if(p.s&&p.k==='styrke')return 'Styrke '+p.s;
+  return ({lang:'Langtur',kval:'Kvalitet',løp:'Gå/løp',rolig:'Rolig',gange:'Gange',hvile:'Hvile',bonus:'Bonus'})[p.k]||p.t||'Fri';
+}
+function weekStrip(k){
+  return `<div class="strip">${weekDays(k).map(x=>{const p=effPlan(x),dn=(S.days[x]||{}).done;
+    return `<div class="sd ${x===k?'sel':''} ${x===D()?'today':''}" onclick="cur='${x}';render()"><div class="sub">${NO[dow(x)]} ${x.slice(8)}</div><div class="sdot ${dn?'done':''}"></div><div class="sl">${shortTitle(p)}${p.opt?'*':''}</div></div>`}).join('')}</div>`;
+}
+function vIdag(){
+  const d=day(cur),p=effPlan(cur),ph=p.ph||phaseOf(weekNo(cur));
+  const pt=proteinTarget(),pr=protein(cur),rules=d.rules||{};
+  const ruleN=RULES.filter((_,i)=>rules[i]).length,gap=restRun(cur);
+  const en=energy(cur,p),dm=dayMacros(cur);
+  const bfWeeks=[1,13,26].includes(weekNo(cur));
+  return dateBar()+weekStrip(cur)+`
+  <div class="card"><h2>${NO[dow(cur)]} ${fmt(cur)} · uke ${p.w} · ${ph.name}</h2>
+    <div class="big">${p.t||'Fri'}</div>
+    <div class="sub">${p.min?p.min+' min · ':''}${p.opt?'valgfri · ':''}${levelName(dm.lvl)} (${Math.round(dm.tot.k)} kcal, ${Math.round(dm.tot.p)} g protein)</div>
+    <div style="margin:8px 0">${p.d||''}</div>
+    <label class="chk"><input type="checkbox" ${d.done?'checked':''} onchange="set('done',this.checked);render()"><span>Økten er gjennomført</span></label>
+    <label class="chk"><input type="checkbox" ${d.minimum?'checked':''} onchange="set('minimum',this.checked);if(this.checked)set('done',true);render()"><span>Tok bare minimumsøkta (15 min) <span class="pill a">teller som seier</span></span></label>
+    <label class="chk"><input type="checkbox" ${d.travel?'checked':''} onchange="set('travel',this.checked);render()"><span>Reisedag (hotell/lite tid)</span></label>
+    ${gap>=2&&!d.done?`<div class="sub" style="color:var(--bad);margin-top:6px">Regelen: aldri to dager på rad uten bevegelse. Ta minimumsøkta nå.</div>`:''}
+  </div>
+  <div class="card"><h2>Dagens opplegg: hva, når og hvor mye</h2>
+    <div class="row" style="margin-bottom:6px"><div class="sub">Trener: ${TRAINTIME[S.profile.trainTime||'kveld']}</div>
+      <select style="flex:0 0 auto;width:auto;min-width:200px" onchange="setTrainTime(this.value)">${Object.entries(TRAINTIME).map(([k,l])=>`<option value="${k}" ${(S.profile.trainTime||'kveld')===k?'selected':''}>${l}</option>`).join('')}</select></div>
+    ${mealTimeline(cur,false)}
+    <div class="row" style="margin-top:8px"><button class="b" onclick="go('mat')">Oppskrifter, mengder og bytt måltid</button></div></div>
+  ${p.s?`<div class="card"><h2>Øvelser i dag</h2>${exList(p.s)}<div class="sub" style="margin-top:6px">${STRENGTH_RULE}</div></div>`:''}
+  ${(d.minimum||(gap>=2&&!d.done))?`<div class="card"><h2>${SESS.MIN.t}</h2>${exList('MIN')}</div>`:''}
+  <div class="card"><h2>Rask innlogging (under 1 min)</h2>
+    <div class="row">
+      <div><label>Vekt (kg)</label><input type="number" step="0.1" inputmode="decimal" value="${d.weight||''}" onchange="set('weight',this.value)"></div>
+      <div><label>Form (1–5)</label><select onchange="set('readiness',this.value)">${['',1,2,3,4,5].map(x=>`<option ${d.readiness==x?'selected':''}>${x}</option>`).join('')}</select></div>
+      <div><label>Søvn (t)</label><input type="number" step="0.5" inputmode="decimal" value="${d.sleep||''}" onchange="set('sleep',this.value)"></div>
+      <div><label>Økt-RPE (1–10)</label><input type="number" min="1" max="10" value="${d.rpe||''}" onchange="set('rpe',this.value)"></div>
+    </div></div>
+  ${intakeCard(cur)}
+  <div class="card"><h2>Regler og tilskudd</h2><div class="sub">Regler: ${ruleN}/${RULES.length} ✓ · Tilskudd: ${SUPPS.filter((_,i)=>(d.supp||{})[i]).length}/${SUPPS.length}</div><button class="g" style="margin-top:8px" onclick="go('mat')">Logg hva jeg har spist</button></div>
+  ${bfWeeks?`<div class="note">Uke ${weekNo(cur)}: tid for kroppsfettmåling (BIA/DEXA). Logg under Fremgang.</div>`:''}
+  ${weekNo(cur)===18?`<div class="note">Uke 18: 5 km-test i løpet av uka. Logg tid under Trening → Løp/kondisjon.</div>`:''}`;
+}
+
+function vUke(){
+  const ds=weekDays(cur),w=weekNo(cur),ph=phaseOf(w);
+  const plan=ds.map(k=>({k,p:effPlan(k)}));
+  const planned=plan.filter(x=>['styrke','løp','rolig','kval','lang'].includes(x.p.k)&&!x.p.opt).length;
+  const done=ds.filter(k=>(S.days[k]||{}).done).length;
+  const wk=S.weeks[w]||{};
+  return dateBar()+`<div class="card"><h2>Uke ${w} · ${ph.name} · ${done} gjennomført (plan ${planned})</h2>`+
+  plan.map(({k,p})=>{const x=S.days[k]||{};
+    return `<div class="dayrow ${k==D()?'today':''}" onclick="cur='${k}';go('idag')">
+      <span><span class="dot ${x.done?'done':''}"></span>${NO[dow(k)]} ${fmt(k)}</span>
+      <span style="text-align:right">${p.t||'Fri'}${x.minimum?' · min':''}${p.opt?' · valgfri':''}</span></div>`}).join('')+`</div>
+  <div class="card"><h2>Ukegjennomgang (5 min)</h2>
+    <div class="sub">Snittvekt denne uka: <b>${avgWeight(ds)}</b> · Midjemål: <b>${lastWaist(ds)}</b></div>
+    <label style="margin-top:8px">Hva gikk bra? Hva justerer jeg neste uke?</label>
+    <textarea onchange="S.weeks[${w}]=Object.assign(S.weeks[${w}]||{},{note:this.value});save()">${wk.note||''}</textarea>
+    <div class="sub" style="margin-top:6px">Sjekk: Snitt flatt >2–3 uker i underskuddsfasen → trekk 100–150 kcal. Faller >0,8 %/uke → legg til mat.</div></div>
+  <div class="card"><h2>Minimumsøkt</h2>${exList('MIN')}<div class="sub" style="margin-top:6px">ELLER 20 min rask gange. Teller som gjennomført.</div></div>`;
+}
+function avgWeight(ds){const v=ds.map(k=>+(S.days[k]||{}).weight).filter(Boolean);return v.length?(v.reduce((a,b)=>a+b)/v.length).toFixed(1)+' kg':'–'}
+function lastWaist(ds){const v=ds.map(k=>(S.days[k]||{}).waist).filter(Boolean);return v.length?v[v.length-1]+' cm':'–'}
+
+function vTrening(){
+  const d=day(cur),p=effPlan(cur),sets=d.sets||[];
+  const last={};
+  Object.entries(S.days).filter(([k,v])=>v.sets&&k<cur).sort().forEach(([k,v])=>v.sets.forEach(s=>{last[s.ex]=`${s.w} kg × ${s.r}`}));
+  const exs=p.s?EX[p.s]:[];
+  return dateBar()+`
+  <div class="card"><h2>${p.t||'Økt'} ${p.min?'· '+p.min+' min':''}</h2>
+    <div class="sub">${p.d||''}</div>
+    <div class="row" style="margin-top:8px">
+      <div><label>Varighet (min)</label><input type="number" value="${d.minutes||''}" onchange="set('minutes',this.value)"></div>
+      <div><label>RPE (1–10)</label><input type="number" min="1" max="10" value="${d.rpe||''}" onchange="set('rpe',this.value)"></div>
+    </div></div>
+  ${exs.length?`<div class="card"><h2>Øvelser · ${STRENGTH_RULE.split('.')[0]}</h2>${exs.map((e,i)=>`
+    <div class="ex"><div class="nm">${e.n} <span class="pill">${e.s}</span></div>
+      <div>${chips(e.keys)}</div>
+      <div class="sub">Sist: ${last[e.n]||'–'}</div>
+      <div class="row" style="margin-top:4px"><input id="w${i}" type="number" step="0.5" inputmode="decimal" placeholder="kg"><input id="r${i}" type="number" inputmode="numeric" placeholder="reps">
+      <button class="b" style="flex:0" onclick="addSet(${i})">+ sett</button></div></div>`).join('')}</div>`:''}
+  <div class="card"><h2>Loggede sett</h2>
+    <table><tr><th>Øvelse</th><th>Kg</th><th>Reps</th><th></th></tr>
+    ${sets.map((s,i)=>`<tr><td>${s.ex}</td><td>${s.w}</td><td>${s.r}</td><td><button class="x" onclick="delSet(${i})">×</button></td></tr>`).join('')||'<tr><td colspan="4" class="sub">Ingen sett ennå</td></tr>'}</table>
+    <div class="row" style="margin-top:10px"><div style="flex:2"><label>Annen øvelse</label><input id="ex" placeholder="Navn"></div>
+      <div><label>Kg</label><input id="w" type="number" step="0.5" inputmode="decimal"></div><div><label>Reps</label><input id="r" type="number" inputmode="numeric"></div>
+      <button class="b" style="flex:0" onclick="addSet()">+</button></div></div>
+  <div class="card"><h2>Løp / kondisjon</h2>
+    <div class="row">
+      <div><label>Distanse (km)</label><input type="number" step="0.1" value="${(d.run||{}).km||''}" onchange="set('km',this.value,'run')"></div>
+      <div><label>Tid (min)</label><input type="number" value="${(d.run||{}).min||''}" onchange="set('min',this.value,'run')"></div>
+      <div><label>Snittpuls</label><input type="number" value="${(d.run||{}).hr||''}" onchange="set('hr',this.value,'run')"></div>
+    </div></div>
+  <div class="card"><h2>Notat</h2><textarea onchange="set('note',this.value)">${d.note||''}</textarea></div>`;
+}
+function addSet(i){
+  const d=day(cur),exs=effPlan(cur).s?EX[effPlan(cur).s]:[];
+  let ex,w,r;
+  if(i===undefined){ex=$('#ex').value.trim();w=$('#w').value;r=$('#r').value}
+  else{ex=exs[i].n;w=$('#w'+i).value;r=$('#r'+i).value}
+  if(!ex||!r)return;
+  (d.sets=d.sets||[]).push({ex,w:w||0,r});save();render();
+}
+function delSet(i){day(cur).sets.splice(i,1);save();render()}
+
+function intakeCard(k){
+  const i=intake(k),pt=proteinTarget(),en=energy(k,effPlan(k)),left=Math.max(0,pt-i.p);
+  return `<div class="card"><h2>Faktisk spist hittil i dag</h2>
+    <div class="row"><div><div class="big">${Math.round(i.p)}</div><div class="sub">g protein (mål ${pt})</div></div>
+      <div><div class="big">${Math.round(i.c)}</div><div class="sub">g karbo</div></div>
+      <div><div class="big">${Math.round(i.f)}</div><div class="sub">g fett</div></div>
+      <div><div class="big">${Math.round(i.k)}</div><div class="sub">kcal (mål ${en.lo}–${en.hi})</div></div></div>
+    <div class="bar" style="margin-top:8px"><i style="width:${Math.min(100,i.p/pt*100)}%"></i></div>
+    <div class="sub" style="margin-top:6px">${left>0?`Mangler ca. ${Math.round(left)} g protein og ${Math.max(0,Math.round(en.lo-i.k))} kcal for å nå dagens minimum.`:'Proteinmålet er nådd. 🎉'}</div></div>`;
+}
+function vMat(){
+  const d=day(cur),meals=d.meals||[],rules=d.rules||{},supp=d.supp||{},p=effPlan(cur);
+  const pt=proteinTarget(),pr=protein(cur),en=energy(cur,p),dm=dayMacros(cur);
+  const inRange=dm.tot.k>=en.lo-150&&dm.tot.k<=en.hi+150;
+  return dateBar()+weekStrip(cur)+`
+  <div class="card"><h2>${NO[dow(cur)]} ${fmt(cur)} · ${p.t} · ${levelName(dm.lvl)}</h2>
+    <div class="row">
+      <div><div class="big">${Math.round(dm.tot.k)}</div><div class="sub">kcal planlagt (mål ${en.lo}–${en.hi}) ${inRange?'✓':''}</div></div>
+      <div><div class="big">${Math.round(dm.tot.p)}</div><div class="sub">g protein (mål ≥ ${pt})</div></div>
+      <div><div class="big">${Math.round(dm.tot.c)}</div><div class="sub">g karbo</div></div>
+      <div><div class="big">${Math.round(dm.tot.f)}</div><div class="sub">g fett</div></div>
+    </div>
+    <div class="sub" style="margin-top:6px">${en.def?'Underskuddsfase (til uke '+DEFICIT_TO+')':'Vedlikehold'}. Mengdene i oppskriftene er tilpasset dagens nivå.</div></div>
+  ${intakeCard(cur)}
+  <div class="card"><h2>Hva spiser jeg når? (trykk «Bytt» for alternativer)</h2>
+    <div class="row" style="margin-bottom:6px"><div class="sub">Trener</div>
+      <select style="flex:0 0 auto;width:auto;min-width:200px" onchange="setTrainTime(this.value)">${Object.entries(TRAINTIME).map(([k,l])=>`<option value="${k}" ${(S.profile.trainTime||'kveld')===k?'selected':''}>${l}</option>`).join('')}</select></div>
+    ${mealTimeline(cur,true)}</div>
+  ${logCard(cur)}
+  <div class="card"><h2>Handleliste og oppskrifter</h2>
+    <button class="b" onclick="shoppingList(cur)">Handleliste for uke ${weekNo(cur)}</button></div>
+  <div class="card"><h2>Dagens regler</h2>
+    ${RULES.map((t,i)=>`<label class="chk"><input type="checkbox" ${rules[i]?'checked':''} onchange="setIn('rules',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t}</span></label>`).join('')}</div>
+  <div class="card"><h2>Tilskudd</h2>
+    ${SUPPS.map(([t,s],i)=>`<label class="chk"><input type="checkbox" ${supp[i]?'checked':''} onchange="setIn('supp',${i},this.checked)"><span style="color:var(--ink);font-size:16px">${t} <span class="sub">${s}</span></span></label>`).join('')}</div>
+  <div class="card"><h2>Når du er på reise</h2>${TRAVEL_RULES.map(t=>`<div class="sm" style="margin:4px 0">• ${t}</div>`).join('')}</div>`;
+}
+function setIn(g,i,v){const d=day(cur);d[g]=d[g]||{};d[g][i]=v;save();render()}
+function addFood(){const i=$('#food').value;if(i==='')return;const f=allFoods()[i];logMeal(f[0],f[1])}
+function logMeal(n,p){const d=day(cur);(d.meals=d.meals||[]).push({n,p});save();render()}
+function addCustom(){const n=$('#cn').value.trim(),p=+$('#cp').value;if(!n||!p)return;
+  if(!S.customFoods.find(f=>f[0]==n))S.customFoods.push([n,p]);logMeal(n,p)}
+function delMeal(i){day(cur).meals.splice(i,1);save();render()}
+
+let exFilter='',exGroup='';
+function vOvelser(){
+  const groups=[...new Set(Object.values(LIB).map(e=>e.g))];
+  const list=Object.entries(LIB).filter(([k,e])=>(!exGroup||e.g===exGroup)&&(!exFilter||e.n.toLowerCase().includes(exFilter.toLowerCase())));
+  return `<div class="card"><h2>Øvelsesbibliotek (${Object.keys(LIB).length})</h2>
+    <input id="exq" placeholder="Søk øvelse…" value="${exFilter}" oninput="exFilter=this.value;vOvelserList()">
+    <div style="margin-top:8px"><span class="chip ${!exGroup?'sel':''}" onclick="exGroup='';render()">Alle</span>${groups.map(g=>`<span class="chip ${exGroup===g?'sel':''}" onclick="exGroup='${g}';render()">${g}</span>`).join('')}</div></div>
+    <div class="card" id="exlist">${exRows(list)}</div>`;
+}
+function exRows(list){return list.map(([k,e])=>`<div class="dayrow" onclick="openEx('${k}')"><span><b>${e.n}</b><br><span class="sub">${e.m}</span></span><span class="pill">${e.g}</span></div>`).join('')||'<div class="sub">Ingen treff</div>'}
+function vOvelserList(){const l=Object.entries(LIB).filter(([k,e])=>(!exGroup||e.g===exGroup)&&(!exFilter||e.n.toLowerCase().includes(exFilter.toLowerCase())));$('#exlist').innerHTML=exRows(l)}
+function vFremgang(){
+  const t=trend(),last=t.length?t[t.length-1][1]:null;
+  const all=Object.entries(S.days),done=all.filter(([k,v])=>v.done).length;
+  const wkDone=weekDays(D()).filter(k=>(S.days[k]||{}).done).length;
+  const km=all.reduce((a,[k,v])=>a+(+(v.run||{}).km||0),0);
+  const waist=all.filter(([k,v])=>v.waist).sort().map(([k,v])=>fmt(k)+': '+v.waist);
+  const bf=all.filter(([k,v])=>v.bf).sort().map(([k,v])=>fmt(k)+': '+v.bf+' %');
+  const d=day(cur);
+  return `<div class="card"><h2>Vekt (7-dagers snitt)</h2>
+    <div class="big">${last?last.toFixed(1)+' kg':'–'}</div>
+    <div class="sub">Start ${S.profile.startWeight} kg · mål ${S.profile.goalLow}–${S.profile.goalHigh} kg – vekt er sekundært, følg midje, styrke og bilder</div>
+    <svg id="chart" viewBox="0 0 400 160"></svg></div>
+  <div class="card"><h2>Konsistens</h2>
+    <div class="row"><div><div class="big">${wkDone}</div><div class="sub">økter denne uka</div></div>
+    <div><div class="big">${done}</div><div class="sub">totalt</div></div>
+    <div><div class="big">${km.toFixed(0)}</div><div class="sub">km løpt</div></div></div></div>
+  <div class="card"><h2>Midjemål og kroppsfett (${fmt(cur)})</h2>
+    <div class="row"><div><label>Midje (cm, ved navle)</label><input type="number" step="0.5" value="${d.waist||''}" onchange="set('waist',this.value)"></div>
+    <div><label>Kroppsfett (%)</label><input type="number" step="0.1" value="${d.bf||''}" onchange="set('bf',this.value)"></div></div>
+    <div class="sub" style="margin-top:6px">Midje: ${waist.join(' · ')||'ingen ennå – mål ukentlig'}<br>Kroppsfett: ${bf.join(' · ')||'mål ved start, uke 13 og uke 26'}<br>Helsemål: midje under halve høyden (≈ 87 cm).</div></div>`;
+}
+function drawChart(){
+  const t=trend(),el=$('#chart');
+  if(t.length<2){el.innerHTML='<text x="10" y="80" fill="currentColor" font-size="12">Logg vekt noen dager for å se kurven.</text>';return}
+  const ys=t.map(x=>x[1]).concat([+S.profile.goalHigh,+S.profile.goalLow]),mn=Math.min(...ys)-1,mx=Math.max(...ys)+1;
+  const t0=parse(t[0][0]),sp=Math.max(864e5,parse(t[t.length-1][0])-t0);
+  const X=k=>20+(parse(k)-t0)/sp*370,Y=v=>150-(v-mn)/(mx-mn)*140;
+  el.innerHTML=`<rect x="20" y="${Y(S.profile.goalHigh)}" width="370" height="${Y(S.profile.goalLow)-Y(S.profile.goalHigh)}" fill="var(--acc)" opacity=".15"/>
+   <polyline fill="none" stroke="var(--acc)" stroke-width="2.5" points="${t.map(([k,v])=>X(k)+','+Y(v)).join(' ')}"/>
+   <text x="22" y="${Y(S.profile.goalHigh)-3}" font-size="9" fill="var(--mut)">målsone</text>`;
+}
+
+function vPlan(){
+  const w0=weekNo(D());
+  return `<div class="card"><h2>Faser</h2>${PHASES.map(p=>`<div style="margin:6px 0"><b>${p.name}</b> <span class="pill">uke ${p.from}–${p.to} · ${p.days} dager</span><div class="sm sub">${p.text}</div></div>`).join('')}
+  <div class="sub" style="margin-top:6px">Kosthold: underskudd uke 1–${DEFICIT_TO} (ca. 0,4–0,5 kg/uke), vedlikehold uke ${DEFICIT_TO+1}–28. Trykk på en uke for å se hver dag.</div></div>
+  ${[...Array(WEEKS)].map((_,i)=>{const w=i+1,s=addDays(S.profile.start,i*7),ph=phaseOf(w);
+    const ds=[...Array(7)].map((_,j)=>addDays(s,j));
+    return `<details class="card wk ${w===w0?'hl':''}" ${w===w0?'open':''}><summary><b>Uke ${w}</b> · ${fmt(ds[0])}–${fmt(ds[6])} · ${ph.name}${w===w0?' · <span class="pill a">nå</span>':''}</summary>
+      ${ds.map(k=>{const p=planFor(k);return `<div class="dayrow ${k===D()?'today':''}" onclick="cur='${k}';go('idag')"><span>${NO[dow(k)]} ${fmt(k)}</span><span style="text-align:right"><b>${p.t||'Fri'}</b>${p.opt?' <span class="sub">(valgfri)</span>':''}<br><span class="sub">${(p.d||'').split(' · ')[0].slice(0,90)}</span></span></div>`}).join('')}
+    </details>`}).join('')}`;
+}
+function vData(){
+  const p=S.profile;
+  return `<div class="card"><h2>Innstillinger</h2>
+    <div class="row">
+      <div><label>Startvekt</label><input type="number" value="${p.startWeight}" onchange="S.profile.startWeight=+this.value;save()"></div>
+      <div><label>Mål fra (kg)</label><input type="number" value="${p.goalLow}" onchange="S.profile.goalLow=+this.value;save()"></div>
+      <div><label>Mål til (kg)</label><input type="number" value="${p.goalHigh}" onchange="S.profile.goalHigh=+this.value;save()"></div>
+    </div><div class="sub" style="margin-top:8px">Løpsdato og startdato er låst til planen (Madrid, søndag 25.4.2027). Er løpet en annen dag, si fra så justeres planen.</div></div>
+  <div class="card"><h2>Sikkerhetskopi</h2>
+    <div class="sub">Data ligger kun i denne nettleseren på denne enheten. Eksporter jevnlig (f.eks. hver søndag).</div>
+    <div class="row" style="margin-top:8px"><button class="b" onclick="exp()">Eksporter JSON</button><button class="g" onclick="$('#imp').click()">Importer</button></div>
+    <input id="imp" type="file" accept=".json" class="hide" onchange="imp(this.files[0])"></div>
+  <div class="card"><h2>Kilder til næringsverdier</h2><div class="sub">Næringsverdier og porsjonsvekter er hentet fra <b>Matvaretabellen.no</b> (Mattilsynet, 2 121 matvarer) og kontrollert 11.10.2026. Unntak: skyr naturell (Tine-pakning, finnes ikke som naturell i tabellen), myseprotein og proteinbar (produsent, sjekk pakken), kyllingpålegg (satt lik kalkunfilet), og vekt per stk for poteter og løk er veiledende. Egne matvarer legger du inn selv.</div></div>
+  <div class="card"><h2>Kvalitetssjekk</h2><div class="sub">Kontrollerer plan, måltider, kcal/protein per dag og at alle øvelser har teknikk.</div><button class="g" style="margin-top:8px" onclick="runTest()">Kjør egentest</button></div>
+  <div class="card"><h2>Nullstill</h2><button class="g" onclick="if(confirm('Slette ALL data?')){localStorage.removeItem(KEY);S=load();render()}">Slett alle data</button></div>
+  <div class="card"><h2>Om</h2><div class="sub">Programmet bygger på forskningsnotatene i mappen «forskning». Dette er ikke medisinsk rådgivning – ved smerte, brystsmerter eller uvanlig tungpust: stopp og kontakt lege.</div></div>`;
+}
+function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='treningsdagbok-'+D()+'.json';a.click()}
+function imp(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.days)throw 0;S=o;save();S=load();render()}catch(e){alert('Ugyldig fil')}};r.readAsText(f)}
+
+render();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+</script>
+</body>
+</html>
